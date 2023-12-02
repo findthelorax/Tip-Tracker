@@ -1,0 +1,86 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;  /* Horizontal centering */
+  min-height: 100vh;  /* Ensure the container takes at least the full height of the viewport */
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.team-card {
+  padding-top: 20px;
+}
+
+.calculated-sales-table {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+}
+
+.calculated-sales-header,
+.calculated-sales-row,
+.calculated-sales-summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.calculated-sales-header {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+.calculated-sales-header div {
+  margin-right: 20px; /* Adjust the margin as needed */
+  flex: 1;
+}
+.calculated-sales-row div {
+  margin-right: 20px; /* Adjust the margin as needed */
+  flex: 1;
+}
+.totals-header div {
+  margin-right: 20px; /* Adjust the margin as needed */
+  flex: 1;
+}
+
+.calculated-sales-summary {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+.calculated-sales-summary div {
+  flex: 1; /* Equal width for each column */
+}
+.daily-totals-table,
+.weekly-totals-table {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+}
+
+.totals-header,
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.totals-header {
+  font-weight: bold;
+}
+
+.totals-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.totals-row div {
+  margin-right: 20px; /* Adjust the margin as needed */
+  flex: 1;
+}
