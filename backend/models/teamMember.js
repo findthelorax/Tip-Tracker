@@ -8,11 +8,13 @@ const teamMemberSchema = new mongoose.Schema({
     position: String,
 	dailyTotals: [{ 	
 	teamMember: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'TeamMember',
+		type: String,
 		required: true,
 	},
-	position: String,
+	position: {
+		type: String,
+		required: true,
+	},
 	date: String,
 	foodSales: Number,
 	barSales: Number,
@@ -28,10 +30,11 @@ const teamMemberSchema = new mongoose.Schema({
 });
 
 teamMemberSchema.methods.addDailyTotal = function (dailyTotalData) {
-	this.dailyTotals.push({
-		...dailyTotalData,
-		position: this.position,
-	});
+    this.dailyTotals.push({
+        ...dailyTotalData,
+        teamMember: this.name,
+        position: this.position,
+    });
 };
 
 // Add pre save middleware to capitalize name

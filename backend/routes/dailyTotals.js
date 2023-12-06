@@ -4,17 +4,32 @@ const router = express.Router();
 const TeamMember = require('../models/teamMember');
 const DailyTotals = require('../models/dailyTotals');
 
+router.post('/', async (req, res) => {
+    try {
+        const dailyTotalsData = req.body.dailyTotals;
+        const newDailyTotal = new DailyTotals(dailyTotalsData);
+        await newDailyTotal.save();
+        res.status(201).json(newDailyTotal);
+    } catch (error) {
+        console.error('Error adding daily totals:', error);
+        res.status(500).json({
+            error: `Error adding daily totals: ${
+                error.message || 'Internal Server Error'
+            }`,
+        });
+    }
+});
+
 router.post('/:id', async (req, res) => {
 	try {
 		const memberId = req.params.id;
 		const dailyTotalsData = req.body;
 		
 		// Find the team member by ID
-		// const teamMember = await TeamMember.findById(memberId);
+		const teamMember = await TeamMember.findById(memberId);
 
-		const teamMember = await TeamMember.find();
-		console.log(teamMember);
-		console.log(memberId);
+		// const teamMember = await TeamMember.find();
+		console.log(`MEMBER ID: ${memberId}`);
 		const newDailyTotals = new DailyTotals({
 			teamMember: teamMember.name,
 			position: teamMember.position,

@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 const dailyTotalsSchema = new mongoose.Schema({
-	teamMember: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'TeamMember',
-		required: true,
-	},
+	teamMember: String,
 	position: String,
 	date: String,
 	foodSales: Number,

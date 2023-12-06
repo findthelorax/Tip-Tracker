@@ -140,7 +140,7 @@ function App() {
 			const response = await axios.get(
 				`${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/all`
 			);
-			console.log(response.data); // This will log the response data to the console
+			console.log(`fetchDailyTotalsAll: ${response.data}`); // This will log the response data to the console
 			const updatedData = response.data.map((dailyTotal) => ({
 				...dailyTotal,
 				teamMember: dailyTotal.teamMember,
@@ -205,6 +205,8 @@ function App() {
 					member.name === dailyTotals.teamMember
 			);
 
+			console.log(`SELECTED TEAM MEMBER: ${selectedTeamMember.name} - ${selectedTeamMember.position}`);
+
 			// Prepare dailyTotals data with teamMember field
 			const dailyTotalsData = {
 				teamMember: selectedTeamMember.name,
@@ -221,7 +223,7 @@ function App() {
 			await axios.post(
 				`${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
 				{
-					dailyTotals: [dailyTotalsData], // Wrap in an array
+					dailyTotals: dailyTotalsData, // Wrap in an array
 				}
 			);
 
@@ -469,7 +471,7 @@ function App() {
 									);
 
 									fetchDailyTotalsAll();
-									console.log(response.data); 
+									console.log(`deleteDailyTotal: ${response.data}`); 
 								} catch (error) {
 									console.error(
 										'Error deleting daily total:',
@@ -489,9 +491,7 @@ function App() {
 									{isFirstItem && (
 										<div className="teamMember-separator">
 											<hr />
-											<p>{`${dailyTotal.teamMember} - :${
-												dailyTotal.position
-											}: ${
+											<p>{`${dailyTotal.teamMember} - ${
 												correspondingTeamMember
 													? correspondingTeamMember.position ||
 													  'No Position'
