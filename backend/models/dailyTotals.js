@@ -6,6 +6,7 @@ const dailyTotalsSchema = new mongoose.Schema({
 		ref: 'TeamMember',
 		required: true,
 	},
+	position: String,
 	date: String,
 	foodSales: Number,
 	barSales: Number,
