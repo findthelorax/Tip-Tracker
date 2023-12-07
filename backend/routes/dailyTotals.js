@@ -29,7 +29,6 @@ router.post('/:id', async (req, res) => {
 		const teamMember = await TeamMember.findById(memberId);
 
 		// const teamMember = await TeamMember.find();
-		console.log(`MEMBER ID: ${memberId}`);
 		const newDailyTotals = new DailyTotals({
 			teamMember: teamMember.name,
 			position: teamMember.position,
