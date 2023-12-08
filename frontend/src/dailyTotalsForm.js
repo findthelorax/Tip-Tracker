@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function DailyTotalsForm({
-	dailyTotals,
-	submitDailyTotals,
-}) {
+function DailyTotalsForm(props) {
+	const { dailyTotals, submitDailyTotals } = props;
 	const [team, setTeam] = useState([]);
 
 	useEffect(() => {
@@ -19,6 +17,23 @@ function DailyTotalsForm({
 			})
 			.catch((error) => console.error('Error:', error));
 	}, []);
+
+	const handleDailyTotalsChange = (field, value) => {
+		if (field === 'date') {
+			// Format the date to match the server's format
+			const formattedDate = new Date(value).toISOString().slice(0, 10);
+
+			props.setDailyTotals((prevDailyTotals) => ({
+				...prevDailyTotals,
+				date: formattedDate,
+			}));
+		} else {
+			props.setDailyTotals((prevDailyTotals) => ({
+				...prevDailyTotals,
+				[field]: value,
+			}));
+		}
+	};
 
 	return (
 		<div>
@@ -108,6 +123,7 @@ function DailyTotalsForm({
 					}
 				/>
 			</div>
+			{/* <button onClick={props.submitDailyTotals}>Submit Daily Totals</button> */}
 			<button onClick={submitDailyTotals}>Submit Daily Totals</button>
 		</div>
 	);
