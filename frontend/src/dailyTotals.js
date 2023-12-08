@@ -103,8 +103,8 @@ function DailyTotals() {
 			// };
 
 			// console.log(
-				`dailyTotalsData: ${dailyTotalsData}, dailyTotals: ${dailyTotals}`
-			);
+			// `dailyTotalsData: ${dailyTotalsData}, dailyTotals: ${dailyTotals}`
+			// );
 			// Send the data to the server
 			await axios.post(
 				`${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
