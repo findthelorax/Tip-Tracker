@@ -91,6 +91,26 @@ function DailyTotals() {
 				`SELECTED TEAM MEMBER: ${selectedTeamMember.name} - ${selectedTeamMember.position}`
 			);
 
+        // Prepare daily total object
+        const newDailyTotal = {
+            date: dailyTotals.date,
+            foodSales: dailyTotals.foodSales,
+            barSales: dailyTotals.barSales,
+            nonCashTips: dailyTotals.nonCashTips,
+            cashTips: dailyTotals.cashTips,
+        };
+
+  // Update the team member's dailyTotals array
+        selectedTeamMember.dailyTotals.push(newDailyTotal);
+
+  // Update the team state with the modified team member
+        setTeam((prevTeam) =>
+            prevTeam.map((member) =>
+                member.name === selectedTeamMember.name ? selectedTeamMember : member
+            )
+        );
+
+
 			// Prepare dailyTotals data with teamMember field
 			// const dailyTotalsData = {
 			// 	teamMember: selectedTeamMember.name,
