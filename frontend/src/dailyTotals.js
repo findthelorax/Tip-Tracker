@@ -92,17 +92,17 @@ function DailyTotals() {
 			);
 
 			// Prepare dailyTotals data with teamMember field
-			const dailyTotalsData = {
-				teamMember: selectedTeamMember.name,
-				position: selectedTeamMember.position,
-				date: dailyTotals.date,
-				foodSales: dailyTotals.foodSales,
-				barSales: dailyTotals.barSales,
-				nonCashTips: dailyTotals.nonCashTips,
-				cashTips: dailyTotals.cashTips,
-			};
+			// const dailyTotalsData = {
+			// 	teamMember: selectedTeamMember.name,
+			//  position: selectedTeamMember.position,
+			// 	date: dailyTotals.date,
+			// 	foodSales: dailyTotals.foodSales,
+			// 	barSales: dailyTotals.barSales,
+			// 	nonCashTips: dailyTotals.nonCashTips,
+			// 	cashTips: dailyTotals.cashTips,
+			// };
 
-			console.log(
+			// console.log(
 				`dailyTotalsData: ${dailyTotalsData}, dailyTotals: ${dailyTotals}`
 			);
 			// Send the data to the server
