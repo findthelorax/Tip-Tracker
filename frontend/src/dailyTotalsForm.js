@@ -27,12 +27,27 @@ function DailyTotalsForm(props) {
 				...prevDailyTotals,
 				date: formattedDate,
 			}));
+		} else if (field === 'teamMember') {
+			// Find the selected team member
+			const selectedMember = team.find((member) => member.name === value);
+
+			// Set team member and position
+			props.setDailyTotals((prevDailyTotals) => ({
+				...prevDailyTotals,
+				teamMember: value,
+				position: selectedMember ? selectedMember.position : '',
+			}));
 		} else {
 			props.setDailyTotals((prevDailyTotals) => ({
 				...prevDailyTotals,
 				[field]: value,
 			}));
 		}
+	};
+	
+	const logData = () => {
+		console.log('Input Box Data:', dailyTotals);
+		console.log('Submit Data:', submitDailyTotals);
 	};
 
 	return (
@@ -124,6 +139,7 @@ function DailyTotalsForm(props) {
 				/>
 			</div>
 			{/* <button onClick={props.submitDailyTotals}>Submit Daily Totals</button> */}
+			<button onClick={logData}>Log Data</button>
 			<button onClick={submitDailyTotals}>Submit Daily Totals</button>
 		</div>
 	);

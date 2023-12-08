@@ -44,98 +44,98 @@ function DailyTotals() {
 		}
 	};
 
-	const submitDailyTotals = () => {
-		setTeamMembers((prevTeamMembers) => {
-			const teamMemberIndex = prevTeamMembers.findIndex(
-				(member) => member.name === dailyTotals.teamMember
-			);
-			if (teamMemberIndex !== -1) {
-				const updatedTeamMembers = [...prevTeamMembers];
-				updatedTeamMembers[teamMemberIndex].dailyTotals.push(
-					dailyTotals
-				);
-				return updatedTeamMembers;
-			}
-			return prevTeamMembers;
-		});
-	};
-
-	// const submitDailyTotals = async () => {
-	// 	try {
-	// 		// Validate if teamMember is selected
-	// 		if (!dailyTotals.teamMember) {
-	// 			alert('Please select a team member');
-	// 			return;
-	// 		}
-
-	// 		const isDuplicateDailyTotal = dailyTotalsAll.find(
-	// 			(total) =>
-	// 				total.teamMember === dailyTotals.teamMember &&
-	// 				total.position === dailyTotals.position &&
-	// 				total.date === dailyTotals.date
-	// 		);
-
-	// 		if (isDuplicateDailyTotal) {
-	// 			alert(
-	// 				`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMember} - ${isDuplicateDailyTotal.position} already exist.`
-	// 			);
-	// 			return;
-	// 		}
-
-	// 		// Find the selected team member by name and position to get their ID
-	// 		const selectedTeamMember = team.find(
+	// const submitDailyTotals = () => {
+	// 	setTeamMembers((prevTeamMembers) => {
+	// 		const teamMemberIndex = prevTeamMembers.findIndex(
 	// 			(member) => member.name === dailyTotals.teamMember
 	// 		);
-
-	// 		console.log(
-	// 			`SELECTED TEAM MEMBER: ${selectedTeamMember.name} - ${selectedTeamMember.position}`
-	// 		);
-
-	// 		// Prepare dailyTotals data with teamMember field
-	// 		const dailyTotalsData = {
-	// 			teamMember: selectedTeamMember.name,
-	// 			position: selectedTeamMember.position,
-	// 			date: dailyTotals.date,
-	// 			foodSales: dailyTotals.foodSales,
-	// 			barSales: dailyTotals.barSales,
-	// 			nonCashTips: dailyTotals.nonCashTips,
-	// 			cashTips: dailyTotals.cashTips,
-	// 		};
-
-	// 		console.log(
-	// 			`dailyTotalsData: ${dailyTotalsData}, dailyTotals: ${dailyTotals}`
-	// 		);
-	// 		// Send the data to the server
-	// 		await axios.post(
-	// 			`${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
-	// 			{
-	// 				dailyTotals: dailyTotalsData, // Wrap in an array
-	// 			}
-	// 		);
-
-	// 		// Clear the form fields
-	// 		setDailyTotals({
-	// 			teamMember: '',
-	// 			date: formatDate(new Date()),
-	// 			foodSales: '',
-	// 			barSales: '',
-	// 			nonCashTips: '',
-	// 			cashTips: '',
-	// 		});
-
-	// 		// Refresh the daily totals list
-	// 		fetchDailyTotalsAll();
-	// 	} catch (error) {
-	// 		if (error.response && error.response.status === 400) {
-	// 			alert(
-	// 				`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
+	// 		if (teamMemberIndex !== -1) {
+	// 			const updatedTeamMembers = [...prevTeamMembers];
+	// 			updatedTeamMembers[teamMemberIndex].dailyTotals.push(
+	// 				dailyTotals
 	// 			);
-	// 		} else {
-	// 			alert('An error occurred while submitting daily totals.');
+	// 			return updatedTeamMembers;
 	// 		}
-	// 		console.error(error);
-	// 	}
+	// 		return prevTeamMembers;
+	// 	});
 	// };
+
+	const submitDailyTotals = async (dailyTotal) => {
+		try {
+			// Validate if teamMember is selected
+			if (!dailyTotals.teamMember) {
+				alert('Please select a team member');
+				return;
+			}
+
+			const isDuplicateDailyTotal = dailyTotalsAll.find(
+				(total) =>
+					total.teamMember === dailyTotals.teamMember &&
+					total.position === dailyTotals.position &&
+					total.date === dailyTotals.date
+			);
+
+			if (isDuplicateDailyTotal) {
+				alert(
+					`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMember} - ${isDuplicateDailyTotal.position} already exist.`
+				);
+				return;
+			}
+
+			// Find the selected team member by name and position to get their ID
+			const selectedTeamMember = team.find(
+				(member) => member.name === dailyTotals.teamMember
+			);
+
+			console.log(
+				`SELECTED TEAM MEMBER: ${selectedTeamMember.name} - ${selectedTeamMember.position}`
+			);
+
+			// Prepare dailyTotals data with teamMember field
+			const dailyTotalsData = {
+				teamMember: selectedTeamMember.name,
+				position: selectedTeamMember.position,
+				date: dailyTotals.date,
+				foodSales: dailyTotals.foodSales,
+				barSales: dailyTotals.barSales,
+				nonCashTips: dailyTotals.nonCashTips,
+				cashTips: dailyTotals.cashTips,
+			};
+
+			console.log(
+				`dailyTotalsData: ${dailyTotalsData}, dailyTotals: ${dailyTotals}`
+			);
+			// Send the data to the server
+			await axios.post(
+				`${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
+				
+					dailyTotals
+				
+			);
+
+			// Clear the form fields
+			setDailyTotals({
+				teamMember: '',
+				date: formatDate(new Date()),
+				foodSales: '',
+				barSales: '',
+				nonCashTips: '',
+				cashTips: '',
+			});
+
+			// Refresh the daily totals list
+			fetchDailyTotalsAll();
+		} catch (error) {
+			if (error.response && error.response.status === 400) {
+				alert(
+					`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
+				);
+			} else {
+				alert('An error occurred while submitting daily totals.');
+			}
+			console.error(error);
+		}
+	};
 
 	return (
 		<div>
