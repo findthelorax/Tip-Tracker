@@ -21,9 +21,6 @@ function DailyTotals({ team, setTeam, setError }) {
             const response = await axios.get(
                 `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/all`
             );
-            console.log(
-                `fetchDailyTotalsAll: ${JSON.stringify(response.data, null, 2)}`
-            ); // This will log the response data to the console in a readable format
             const updatedData = response.data.map((dailyTotal) => ({
                 ...dailyTotal,
                 teamMember: dailyTotal.teamMember,
@@ -31,11 +28,27 @@ function DailyTotals({ team, setTeam, setError }) {
             }));
             console.log(response.data);
             setDailyTotalsAll(updatedData);
+            console.log(dailyTotalsAll, dailyTotals, dailyTotal)
+
+            updatedData.forEach(dailyTotal => {
+                console.log(`Team Member: ${dailyTotal.teamMember}`);
+            });   
+            // Add your code here
+            // updatedData.forEach(teamMember => {
+            //     console.log(`Name: ${teamMember.name}, Position: ${teamMember.position}`);
+            //     teamMember.dailyTotals.forEach(dailyTotal => {
+            //         console.log(dailyTotal);
+            //     });
+            // });
         } catch (error) {
             setError(`Error fetching daily totals: ${error.message}`);
             alert(`Error fetching daily totals: ${error.message}`);
         }
     };
+
+    useEffect(() => {
+        fetchDailyTotalsAll();
+    }, []);
 
     const submitDailyTotals = async (dailyTotal) => {
         try {
@@ -70,8 +83,8 @@ function DailyTotals({ team, setTeam, setError }) {
 
             // Prepare daily total object
             const newDailyTotal = {
-                teamMember: selectedTeamMember.name,
-                position: selectedTeamMember.position,
+                // teamMember: selectedTeamMember.name,
+                // position: selectedTeamMember.position,
                 date: dailyTotals.date,
                 foodSales: dailyTotals.foodSales,
                 barSales: dailyTotals.barSales,
@@ -79,20 +92,24 @@ function DailyTotals({ team, setTeam, setError }) {
                 cashTips: dailyTotals.cashTips,
             };
 
-            const updatedDailyTotals = [...selectedTeamMember.dailyTotals, newDailyTotal];
-            selectedTeamMember = { ...selectedTeamMember, dailyTotals: updatedDailyTotals };
+            const updatedTeamMember = { ...selectedTeamMember, dailyTotals: newDailyTotal };
             
-            // // Update the team state with the modified team member
-            // setTeam((prevTeam) =>
-            //     prevTeam.map((member) =>
-            //         member.name === selectedTeamMember.name
-            //             ? selectedTeamMember
-            //             : member
-            //     )
+            // Update the team state with the modified team member
+            setTeam((prevTeam) =>
+            prevTeam.map((member) =>
+                member.name === updatedTeamMember.name
+                    ? updatedTeamMember
+                    : member
+            )
+        );
+
+            // await axios.post(
+            //     `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
+            //     dailyTotals
             // );
 
             await axios.post(
-                `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
+                `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${updatedTeamMember._id}`,
                 dailyTotals
             );
 

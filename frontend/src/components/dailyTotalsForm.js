@@ -30,7 +30,7 @@ function DailyTotalsForm(props) {
 			// Set team member and position
 			props.setDailyTotals((prevDailyTotals) => ({
 				...prevDailyTotals,
-				teamMember: value,
+				teamMember: selectedMember.teamMember,
 				position: selectedMember ? selectedMember.position : '',
 			}));
 		} else {

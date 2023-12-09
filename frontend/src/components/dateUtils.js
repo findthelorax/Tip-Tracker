@@ -1,18 +1,31 @@
 import { utcToZonedTime } from "date-fns-tz";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 
 export function formatDate(date, dateFormat = "eee, MMM d") {
-    return format(new Date(date), dateFormat);
+    const currentYear = new Date().getFullYear();
+    const dateStringWithYear = `${date}, ${currentYear}`;
+
+    // Check if the input date is a valid date
+    if (!isValid(new Date(dateStringWithYear))) {
+        console.error("Invalid date string:", date);
+        return "Invalid Date";
+    }
+
+    return format(new Date(dateStringWithYear), dateFormat);
 }
 
-export const formatDateWithTimeZone = (dateString, timeZone) => {
-    // Parse the input date string into a Date object
-    const date = new Date(dateString);
+export const formatDateWithTimeZone = (dateString, timeZone, dateFormat = "eee, MMM d") => {
+    const currentYear = new Date().getFullYear();
+    const dateStringWithYear = `${dateString}, ${currentYear}`;
+
+    // Check if the input date string is a valid date
+    const parsedDate = new Date(dateStringWithYear);
 
     // Convert the date to the specified time zone
-    const zonedDate = utcToZonedTime(date, timeZone);
-    // Format the zoned date as desired (e.g., "Sun, Dec 3")
-    const formattedDate = format(zonedDate, "eee, MMM d");
-	
+    const zonedDate = utcToZonedTime(parsedDate, timeZone);
+
+    // Format the zoned date as desired
+    const formattedDate = format(zonedDate, dateFormat);
+    
     return formattedDate;
 };
