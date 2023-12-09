@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 
 function DailyTotalsForm(props) {
@@ -12,7 +12,7 @@ function DailyTotalsForm(props) {
 				setTeam(response.data);
 			})
 			.catch((error) => console.error('Error:', error));
-	}, [team]);
+	}, [team, setTeam]);
 
 	const handleDailyTotalsChange = (field, value) => {
 		if (field === 'date') {
@@ -30,7 +30,7 @@ function DailyTotalsForm(props) {
 			// Set team member and position
 			props.setDailyTotals((prevDailyTotals) => ({
 				...prevDailyTotals,
-				teamMember: selectedMember.teamMember,
+				teamMember: selectedMember ? selectedMember.name : '',
 				position: selectedMember ? selectedMember.position : '',
 			}));
 		} else {

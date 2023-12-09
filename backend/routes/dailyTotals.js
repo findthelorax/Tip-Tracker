@@ -28,7 +28,6 @@ router.post('/:id', async (req, res) => {
 		// Find the team member by ID
 		const teamMember = await TeamMember.findById(memberId);
 
-		// const teamMember = await TeamMember.find();
 		const newDailyTotals = new DailyTotals({
 			teamMember: teamMember.name,
 			position: teamMember.position,
@@ -56,38 +55,31 @@ router.get('/all', async (req, res) => {
 
 		// Flatten the array and return
 		const flattenedDailyTotals = allDailyTotals.flatMap((member) =>
-			member.dailyTotals.map((total) => ({
-				...total,
-				teamMember: total.teamMember,
-				position: total.position,
-				date: total.date,
-				foodSales: total.foodSales
-					? total.foodSales.toLocaleString('en-US', {
-							style: 'currency',
-							currency: 'USD',
-					  })
-					: 'N/A',
-				barSales: total.barSales
-					? total.barSales.toLocaleString('en-US', {
-							style: 'currency',
-							currency: 'USD',
-					  })
-					: 'N/A',
-				nonCashTips: total.nonCashTips
-					? total.nonCashTips.toLocaleString('en-US', {
-							style: 'currency',
-							currency: 'USD',
-					  })
-					: 'N/A',
-				cashTips: total.cashTips
-					? total.cashTips.toLocaleString('en-US', {
-							style: 'currency',
-							currency: 'USD',
-					  })
-					: 'N/A',
-			}))
+			// member.dailyTotals.map((total) => ({
+			// 	...total,
+			// 	teamMember: total.teamMember,
+			// 	position: total.position,
+			// 	date: total.date,
+			// 	foodSales: total.foodSales,
+			// 	barSales: total.barSales,
+			// 	nonCashTips: total.nonCashTips,
+			// 	cashTips: total.cashTips,
+			// }))
+			member.dailyTotals.map((total) => {
+				const totalObject = total.toObject();
+				return {
+					...totalObject,
+					teamMember: totalObject.teamMember,
+					position: totalObject.position,
+					date: totalObject.date,
+					foodSales: totalObject.foodSales,
+					barSales: totalObject.barSales,
+					nonCashTips: totalObject.nonCashTips,
+					cashTips: totalObject.cashTips,
+				};
+			})
 		);
-
+			console.log('Flattened Daily Totals:', flattenedDailyTotals);
 		res.json(flattenedDailyTotals);
 	} catch (error) {
 		console.error('Error fetching daily totals:', error);

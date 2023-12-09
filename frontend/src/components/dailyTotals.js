@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { formatDate, formatDateWithTimeZone } from "./dateUtils";
+import { FormattedDate } from "./dateUtils";
 import DailyTotalsForm from "./dailyTotalsForm";
-const timeZone = 'America/New_York';
+import { set } from "lodash";
+const timeZone = "America/New_York";
 
 function DailyTotals({ team, setTeam, setError }) {
     const [dailyTotals, setDailyTotals] = useState({
         teamMember: "",
         position: "",
-        date: formatDate(new Date()),
+        date: new Date(),
         foodSales: "",
         barSales: "",
         nonCashTips: "",
@@ -28,18 +29,6 @@ function DailyTotals({ team, setTeam, setError }) {
             }));
             console.log(response.data);
             setDailyTotalsAll(updatedData);
-            console.log(dailyTotalsAll, dailyTotals, dailyTotal)
-
-            updatedData.forEach(dailyTotal => {
-                console.log(`Team Member: ${dailyTotal.teamMember}`);
-            });   
-            // Add your code here
-            // updatedData.forEach(teamMember => {
-            //     console.log(`Name: ${teamMember.name}, Position: ${teamMember.position}`);
-            //     teamMember.dailyTotals.forEach(dailyTotal => {
-            //         console.log(dailyTotal);
-            //     });
-            // });
         } catch (error) {
             setError(`Error fetching daily totals: ${error.message}`);
             alert(`Error fetching daily totals: ${error.message}`);
@@ -92,16 +81,19 @@ function DailyTotals({ team, setTeam, setError }) {
                 cashTips: dailyTotals.cashTips,
             };
 
-            const updatedTeamMember = { ...selectedTeamMember, dailyTotals: newDailyTotal };
-            
+            const updatedTeamMember = {
+                ...selectedTeamMember,
+                dailyTotals: newDailyTotal,
+            };
+
             // Update the team state with the modified team member
             setTeam((prevTeam) =>
-            prevTeam.map((member) =>
-                member.name === updatedTeamMember.name
-                    ? updatedTeamMember
-                    : member
-            )
-        );
+                prevTeam.map((member) =>
+                    member.name === updatedTeamMember.name
+                        ? updatedTeamMember
+                        : member
+                )
+            );
 
             // await axios.post(
             //     `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
@@ -116,7 +108,7 @@ function DailyTotals({ team, setTeam, setError }) {
             // Clear the form fields
             setDailyTotals({
                 teamMember: "",
-                date: formatDate(new Date()),
+                date: new Date(),
                 foodSales: "",
                 barSales: "",
                 nonCashTips: "",
@@ -199,7 +191,9 @@ function DailyTotals({ team, setTeam, setError }) {
                         );
 
                         const deleteDailyTotal = async () => {
-                            const formattedDate = formatDateWithTimeZone(dailyTotal.date, timeZone);
+                            const formattedDate = FormattedDate(
+                                dailyTotal.date
+                            );
                             const confirmation = window.confirm(
                                 `ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${dailyTotal.teamMember.toUpperCase()}		ON:		${formattedDate.toUpperCase()}?`
                             );
@@ -214,6 +208,10 @@ function DailyTotals({ team, setTeam, setError }) {
                                     alert("Failed to delete daily total");
                                     return;
                                 }
+                                if (!dailyTotal || !dailyTotal._id) {
+                                    console.error(`dailyTotal._id is undefined: , ${dailyTotal}, ${dailyTotal}`);
+                                    return;
+                                }
                                 const response = await axios.delete(
                                     `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${correspondingTeamMember._id}/dailyTotals/${dailyTotal._id}`
                                 );
@@ -223,8 +221,12 @@ function DailyTotals({ team, setTeam, setError }) {
                                     `deleteDailyTotal: ${response.data}`
                                 );
                             } catch (error) {
-                                setError(`Error deleting daily total: ${error.message}`);
-                                alert(`Failed to delete daily totals: ${error.message}`);
+                                setError(
+                                    `Error deleting daily total: ${error.message}`
+                                );
+                                alert(
+                                    `Failed to delete daily totals: ${error.message}`
+                                );
                             }
                         };
 
@@ -251,21 +253,49 @@ function DailyTotals({ team, setTeam, setError }) {
                                 <div className="flex-table-row">
                                     <div className="date-column">
                                         {dailyTotal.date
-                                            ? formatDateWithTimeZone(dailyTotal.date, timeZone)
+                                            ? FormattedDate(dailyTotal.date)
                                             : "Invalid Date"}
                                     </div>
 
                                     <div className="foodSales-column">
-                                        {dailyTotal.foodSales}
+                                        {dailyTotal.foodSales
+                                            ? Number(
+                                                  dailyTotal.foodSales
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
                                     </div>
                                     <div className="barSales-column">
-                                        {dailyTotal.barSales}
+                                        {dailyTotal.barSales
+                                            ? Number(
+                                                  dailyTotal.barSales
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
                                     </div>
                                     <div className="nonCashTips-column">
-                                        {dailyTotal.nonCashTips}
+                                        {dailyTotal.nonCashTips
+                                            ? Number(
+                                                  dailyTotal.nonCashTips
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
                                     </div>
                                     <div className="cashTips-column">
-                                        {dailyTotal.cashTips}
+                                        {dailyTotal.cashTips
+                                            ? Number(
+                                                  dailyTotal.cashTips
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
                                     </div>
                                     <div className="delete-button-column">
                                         <button onClick={deleteDailyTotal}>
