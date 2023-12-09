@@ -23,6 +23,7 @@ function TeamMemberForm({
 				value={position}
 				onChange={(e) => setPosition(e.target.value)}
 			>
+				<option value="" disabled>Select a position</option>
 				<option value="bartender">Bartender</option>
 				<option value="runner">Runner</option>
 				<option value="server">Server</option>

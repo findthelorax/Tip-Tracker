@@ -5,7 +5,7 @@ import TeamMemberForm from './teamMemberForm';
 function TeamOperations() {
 	const [team, setTeam] = useState([]);
 	const [name, setName] = useState('');
-	const [position, setPosition] = useState('');
+	const [position, setPosition] = useState('bartender');
 	const clearInputs = () => {
 		setName('');
 		setPosition('server');
@@ -24,6 +24,7 @@ function TeamOperations() {
 					{ name, position }
 				);
 				setTeam([...team, response.data]);
+				console.log(response.data);
 				clearInputs();
 			} catch (error) {
 				console.error('Error adding team member:', error);

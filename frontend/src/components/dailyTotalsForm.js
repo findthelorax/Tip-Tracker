@@ -2,21 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function DailyTotalsForm(props) {
-	const { dailyTotals, submitDailyTotals } = props;
-	const [team, setTeam] = useState([]);
+	const { dailyTotals, submitDailyTotals, team, setTeam } = props;
 
 	useEffect(() => {
 		axios
 			.get(`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`)
 			.then((response) => {
-				console.log('Team:', response.data);
-				if (response.data.length > 0) {
-					console.log('First member:', response.data[0]);
-				}
+				if (response.data.length > 0)
 				setTeam(response.data);
 			})
 			.catch((error) => console.error('Error:', error));
-	}, []);
+	}, [team]);
 
 	const handleDailyTotalsChange = (field, value) => {
 		if (field === 'date') {
