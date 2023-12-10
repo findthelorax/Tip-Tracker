@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const TeamMember = require("../models/teamMember");
-const DailyTotals = require("../models/dailyTotals");
+// const DailyTotals = require("../models/dailyTotals");
 
 router.get("/", async (req, res) => {
     try {
@@ -28,23 +28,6 @@ router.post("/", async (req, res) => {
     res.json(teamMember);
 });
 
-// router.delete("/:id", async (req, res) => {
-//     const memberId = req.params.id;
-//     try {
-//         // Find and remove the team member by ID
-//         await TeamMember.findOneAndDelete({ _id: memberId });
-//         res.json({
-//             success: true,
-//             message: "Team member deleted successfully",
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             error: error.message || "Internal Server Error",
-//         });
-//     }
-// });
-
 router.delete("/:id", async (req, res) => {
     const memberId = req.params.id;
     const teamMember = await TeamMember.findById(memberId); // Check if the team member exists
@@ -66,7 +49,6 @@ router.get("/:id/dailyTotals", async (req, res) => {
     try {
         const { id } = req.params;
         const teamMember = await TeamMember.findById(id).populate(
-            "teamMember",
             "name"
         );
         if (!teamMember) {
@@ -79,7 +61,7 @@ router.get("/:id/dailyTotals", async (req, res) => {
     }
 });
 
-// Example server route for handling daily totals submission for a specific team member
+// Server route for handling daily totals submission for a specific team member
 router.post(`/:id/dailyTotals`, async (req, res) => {
     try {
         const memberId = req.params.id;
@@ -155,44 +137,24 @@ router.delete("/:id/dailyTotals/:dailyTotalId", async (req, res) => {
     const memberId = req.params.id;
     const dailyTotalId = req.params.dailyTotalId;
 
+    // Find the team member by ID
     try {
-        // Find the team member by ID
-        const teamMember = await TeamMember.findById(memberId);
-
-        if (!teamMember) {
-            return res.status(404).json({
-                success: false,
-                message: "Team member not found",
-            });
-        }
-
-        // Find the index of the daily total to be deleted
-        const indexToDelete = teamMember.dailyTotals.findIndex(
-            (total) => total._id.toString() === dailyTotalId
+        const result = await TeamMember.updateOne(
+            { _id: memberId },
+            { $pull: { dailyTotals: { _id: dailyTotalId } } }
         );
-
-        // Check if the daily total exists
-        if (indexToDelete === -1) {
+    
+        if (result.nModified === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Daily total not found",
             });
         }
-
-        const dailyTotal = teamMember.dailyTotals.id(req.params.dailyTotalId);
-        if (!dailyTotal)
-            return res
-                .status(404)
-                .send("The daily total with the given ID was not found.");
-
-		teamMember.dailyTotals.pull(dailyTotalId);
-		await teamMember.save();
-
-		res.status(200).json({
-			success: true,
-			message: "Daily total deleted successfully",
-			dailyTotal,
-		});
+    
+        res.status(200).json({
+            success: true,
+            message: "Daily total deleted successfully",
+        });
     } catch (error) {
         console.error("Error deleting daily total:", error);
         res.status(500).json({

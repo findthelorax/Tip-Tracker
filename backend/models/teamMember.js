@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const DailyTotals = require('./dailyTotals'); // import the DailyTotal model
 const WeeklyTotals = require('./weeklyTotals'); // import the DailyTotal model
 
 
@@ -7,14 +6,8 @@ const teamMemberSchema = new mongoose.Schema({
     name: String,
     position: String,
 	dailyTotals: [{ 	
-	teamMember: {
-		type: String,
-		required: true,
-	},
-	position: {
-		type: String,
-		required: true,
-	},
+	teamMember: String,
+	position: String,
 	date: String,
 	foodSales: Number,
 	barSales: Number,

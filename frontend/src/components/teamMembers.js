@@ -1,9 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import TeamMemberForm from './teamMemberForm';
+import { TeamContext } from './teamContext';
 
-function TeamOperations() {
-	const [team, setTeam] = useState([]);
+export const fetchTeamMembers = async (setTeam) => {
+	try {
+		const response = await axios.get(
+			`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
+		);
+		setTeam(response.data);
+	} catch (error) {
+		console.error('Error fetching team members:', error);
+		alert('Failed to fetch team members');
+	}
+};
+
+function TeamOperations({ refresh, setRefresh }) {
+	const { team, setTeam } = useContext(TeamContext);
 	const [name, setName] = useState('');
 	const [position, setPosition] = useState('bartender');
 	const clearInputs = () => {
@@ -12,9 +25,8 @@ function TeamOperations() {
 	};
 
 	useEffect(() => {
-		fetchTeamMembers();
-		displayTeam();
-	}, []);
+		fetchTeamMembers(setTeam);
+	}, [refresh]);
 
 	const addTeamMember = async () => {
 		if (name && position) {
@@ -26,36 +38,13 @@ function TeamOperations() {
 				setTeam([...team, response.data]);
 				console.log(response.data);
 				clearInputs();
+				await fetchTeamMembers();
 			} catch (error) {
 				console.error('Error adding team member:', error);
 				alert('Failed to add team member');
 			}
 		} else {
 			alert('Please enter both name and position');
-		}
-	};
-
-	const displayTeam = async () => {
-		try {
-			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
-			);
-			setTeam(response.data);
-		} catch (error) {
-			console.error('Error fetching team members:', error);
-			alert(`Failed to fetch team members: ${error.message}`);
-		}
-	};
-
-	const fetchTeamMembers = async () => {
-		try {
-			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
-			);
-			setTeam(response.data);
-		} catch (error) {
-			console.error('Error fetching team members:', error);
-			alert('Failed to fetch team members');
 		}
 	};
 
@@ -91,24 +80,32 @@ function TeamOperations() {
 				setPosition={setPosition}
 				addTeamMember={addTeamMember}
 			/>
-			{team.map((member) => (
-				<div key={member._id} className="member-card">
-					<strong>
-						{member.name.charAt(0).toUpperCase() +
-							member.name.slice(1)}
-					</strong>{' '}
-					- {member.position}
-					<button
-						onClick={() =>
-							deleteTeamMember(
-								member._id,
-								member.name,
-								member.position
-							)
-						}
-					>
-						Delete
-					</button>
+			{['bartender', 'host', 'server', 'runner'].map((position) => (
+				<div key={position}>
+					<h2>{position.charAt(0).toUpperCase() + position.slice(1)}s</h2>
+					{[...team]
+						.filter((member) => member.position === position)
+						.sort((a, b) => a.name.localeCompare(b.name))
+						.map((member) => (
+							<div key={member._id} className="member-card">
+								<strong>
+									{member.name.charAt(0).toUpperCase() +
+										member.name.slice(1)}
+								</strong>{' '}
+								- {member.position}
+								<button
+									onClick={() =>
+										deleteTeamMember(
+											member._id,
+											member.name,
+											member.position
+										)
+									}
+								>
+									Delete
+								</button>
+							</div>
+						))}
 				</div>
 			))}
 		</div>

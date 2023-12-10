@@ -1,7 +1,7 @@
 // weeklyTotalsRoutes.js
 const express = require('express');
 const router = express.Router();
-const TeamMember = require('../models/teamMember');
+// const TeamMember = require('../models/teamMember');
 const WeeklyTotals = require('../models/weeklyTotals');
 
 // Get all weekly totals

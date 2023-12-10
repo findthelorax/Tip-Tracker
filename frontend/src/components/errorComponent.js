@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ErrorContext } from './ErrorContext';
 
-const ErrorComponent = ({ error }) => {
+function ErrorComponent() {
+    const { error } = useContext(ErrorContext);
+
     if (!error) {
         return null;
     }
 
     return (
         <div className="error">
-            <h2>Error</h2>
-            <p>{error.toString()}</p>
+            {error}
         </div>
     );
-};
+}
 
 export default ErrorComponent;

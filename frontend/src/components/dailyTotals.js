@@ -1,45 +1,113 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import axios from "axios";
 import { FormattedDate } from "./dateUtils";
 import DailyTotalsForm from "./dailyTotalsForm";
-import { set } from "lodash";
-const timeZone = "America/New_York";
+// import submitDailyTotals from "./sumbitDailyTotals";
+import { TeamContext } from "./teamContext";
 
-function DailyTotals({ team, setTeam, setError }) {
+// const timeZone = "America/New_York";
+
+function DailyTotals({ setError, refresh, setRefresh }) {
+    const { team, setTeam } = useContext(TeamContext);
     const [dailyTotals, setDailyTotals] = useState({
         teamMember: "",
         position: "",
-        date: new Date(),
+        date: new Date().toISOString().split("T")[0],
         foodSales: "",
         barSales: "",
         nonCashTips: "",
         cashTips: "",
+        barTipOuts: "",
+        runnerTipOuts: "",
+        hostTipOuts: "",
+        totalTipOuts: "",
+        tipsReceived: "",
+        totalPayrollTips: "",
     });
     const [dailyTotalsAll, setDailyTotalsAll] = useState([]);
 
-    const fetchDailyTotalsAll = async () => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/all`
-            );
-            const updatedData = response.data.map((dailyTotal) => ({
-                ...dailyTotal,
-                teamMember: dailyTotal.teamMember,
-                position: dailyTotal.position,
-            }));
-            console.log(response.data);
-            setDailyTotalsAll(updatedData);
-        } catch (error) {
-            setError(`Error fetching daily totals: ${error.message}`);
-            alert(`Error fetching daily totals: ${error.message}`);
-        }
-    };
+    // const fetchDailyTotalsAll = useCallback(async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/all`
+    //         );
+    //         const updatedData = response.data.map((dailyTotal) => ({
+    //             ...dailyTotal,
+    //             teamMember: dailyTotal.teamMember,
+    //             position: dailyTotal.position,
+    //         }));
+    //         console.log("RESPONSE:", response.data);
+    //         console.log("UPDATED:", updatedData);
+    //         setDailyTotalsAll(updatedData);
+    //     } catch (error) {
+    //         setError(`Error fetching daily totals: ${error.message}`);
+    //         alert(`Error fetching daily totals: ${error.message}`);
+    //     }
+    // }, [setDailyTotalsAll, setError]);
 
-    useEffect(() => {
-        fetchDailyTotalsAll();
-    }, []);
 
-    const submitDailyTotals = async (dailyTotal) => {
+    // function DailyTotals({ setError, refresh, setRefresh }) {
+    //     // ... (existing code)
+
+    //     const calculateAllDailyTotals = () => {
+    //         // Map and sort dailyTotals for all team members
+    //         const allDailyTotals = dailyTotalsAll
+    //             .sort((a, b) => {
+    //                 const correspondingTeamMemberA = team.find(
+    //                     (member) => member.name === a.teamMember
+    //                 );
+    //                 const correspondingTeamMemberB = team.find(
+    //                     (member) => member.name === b.teamMember
+    //                 );
+
+    //                 if (
+    //                     !correspondingTeamMemberA ||
+    //                     !correspondingTeamMemberB
+    //                 ) {
+    //                     return 0;
+    //                 }
+
+    //                 const nameComparison =
+    //                     correspondingTeamMemberA.name.localeCompare(
+    //                         correspondingTeamMemberB.name
+    //                     );
+    //                 if (nameComparison !== 0) {
+    //                     return nameComparison;
+    //                 }
+
+    //                 return correspondingTeamMemberA.position.localeCompare(
+    //                     correspondingTeamMemberB.position
+    //                 );
+    //             })
+    //             .map((dailyTotal, index, array) => {
+    //                 // ... (existing code for rendering each daily total)
+    //             });
+
+    //         return allDailyTotals;
+    //     };
+
+    //     return (
+    //         <div>
+    //             {/* ... (existing code) */}
+
+    //             <h2>Daily Totals</h2>
+    //             <div className="sales-table">
+    //                 <div className="header-row">
+    //                     {/* ... (existing header row) */}
+    //                 </div>
+
+    //                 {/* Call the calculateAllDailyTotals function */}
+    //                 {calculateAllDailyTotals()}
+    //             </div>
+    //         </div>
+    //     );
+    // }
+
+    // useEffect(() => {
+    //     fetchDailyTotalsAll();
+    // }, [fetchDailyTotalsAll, refresh]);
+
+    const submitDailyTotals = async () => {
         try {
             // Validate if teamMember is selected
             if (!dailyTotals.teamMember) {
@@ -61,6 +129,17 @@ function DailyTotals({ team, setTeam, setError }) {
                 return;
             }
 
+            // const isDuplicateDateTotal = dailyTotalsAll.find(
+            //     (total) => new Date(total.date).toDateString() === new Date(dailyTotals.date).toDateString()
+            // );
+            
+            // if (isDuplicateDateTotal) {
+            //     alert(
+            //         `${isDuplicateDateTotal.date} Date already exist.`
+            //     );
+            //     return;
+            // }
+
             // Find the selected team member by name and position to get their ID
             const selectedTeamMember = team.find(
                 (member) => member.name === dailyTotals.teamMember
@@ -70,20 +149,31 @@ function DailyTotals({ team, setTeam, setError }) {
                 `SELECTED TEAM MEMBER: ${selectedTeamMember.name} - ${selectedTeamMember.position}`
             );
 
+            if (!selectedTeamMember) {
+                alert("Team member not found");
+                return;
+            }
+
             // Prepare daily total object
-            const newDailyTotal = {
-                // teamMember: selectedTeamMember.name,
-                // position: selectedTeamMember.position,
+            const newDailyTotals = {
+                teamMember: selectedTeamMember.name,
+                position: selectedTeamMember.position,
                 date: dailyTotals.date,
                 foodSales: dailyTotals.foodSales,
                 barSales: dailyTotals.barSales,
                 nonCashTips: dailyTotals.nonCashTips,
                 cashTips: dailyTotals.cashTips,
+                barTipOuts: dailyTotals.barTipOuts,
+                runnerTipOuts: dailyTotals.runnerTipOuts,
+                hostTipOuts: dailyTotals.hostTipOuts,
+                totalTipOuts: dailyTotals.totalTipOuts,
+                tipsReceived: dailyTotals.tipsReceived,
+                totalPayrollTips: dailyTotals.totalPayrollTips,
             };
 
             const updatedTeamMember = {
                 ...selectedTeamMember,
-                dailyTotals: newDailyTotal,
+                dailyTotals: newDailyTotals,
             };
 
             // Update the team state with the modified team member
@@ -95,15 +185,15 @@ function DailyTotals({ team, setTeam, setError }) {
                 )
             );
 
+            await axios.post(
+                `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${selectedTeamMember._id}/dailyTotals`,
+                newDailyTotals
+            );
+
             // await axios.post(
-            //     `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${selectedTeamMember._id}`,
+            //     `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${updatedTeamMember._id}`,
             //     dailyTotals
             // );
-
-            await axios.post(
-                `${process.env.REACT_APP_SERVER_URL}/api/dailyTotals/${updatedTeamMember._id}`,
-                dailyTotals
-            );
 
             // Clear the form fields
             setDailyTotals({
@@ -116,7 +206,7 @@ function DailyTotals({ team, setTeam, setError }) {
             });
 
             // Refresh the daily totals list
-            fetchDailyTotalsAll();
+            // fetchDailyTotalsAll();
         } catch (error) {
             if (error.response && error.response.status === 400) {
                 alert(
@@ -137,8 +227,31 @@ function DailyTotals({ team, setTeam, setError }) {
                 submitDailyTotals={submitDailyTotals}
                 team={team}
                 setTeam={setTeam}
+                refresh={refresh}
             />
 
+            {/* Change to TABLE
+
+<h2>Daily Totals</h2>
+<table className="sales-table">
+    <thead>
+        <tr className="header-row">
+            <th><div className="date-column">Date</div></th>
+            <th><div className="foodSales-column">Food Sales</div></th>
+            <th><div className="barSales-column">Bar Sales</div></th>
+            <th><div className="nonCashTips-column">Non-Cash Tips</div></th>
+            <th><div className="cashTips-column">Cash Tips</div></th>
+            <th><div className="barTipOuts-column">Bar Tip Outs</div></th>
+            <th><div className="runnerTipOuts-column">Runner Tip Outs</div></th>
+            <th><div className="hostTipOuts-column">Host Tip Outs</div></th>
+            <th><div className="totalTipOuts-column">Total Tip Outs</div></th>
+            <th><div className="tipsReceived-column">Tips Received</div></th>
+            <th><div className="totalPayrollTips-column">Total Payroll Tips</div></th>
+            <th><div className="action-column">Action</div></th>
+        </tr>
+    </thead>
+</table>
+*/}
             <h2>Daily Totals</h2>
             <div className="sales-table">
                 <div className="header-row">
@@ -147,16 +260,18 @@ function DailyTotals({ team, setTeam, setError }) {
                     <div className="barSales-column">Bar Sales</div>
                     <div className="nonCashTips-column">Non-Cash Tips</div>
                     <div className="cashTips-column">Cash Tips</div>
+                    <div className="barTipOuts-column">Bar Tip Outs</div>
+                    <div className="runnerTipOuts-column">Runner Tip Outs</div>
+                    <div className="hostTipOuts-column">Host Tip Outs</div>
+                    <div className="totalTipOuts-column">Total Tip Outs</div>
+                    <div className="tipsReceived-column">Tips Received</div>
+                    <div className="totalPayrollTips-column">
+                        Total Payroll Tips
+                    </div>
                     <div className="action-column">Action</div>
                 </div>
 
                 {dailyTotalsAll
-                    // .sort(
-                    // 	(a, b) =>
-                    // 		a.teamMember.localeCompare(b.teamMember) ||
-                    // 		new Date(a.date) - new Date(b.date)
-                    // )
-
                     .sort((a, b) => {
                         const correspondingTeamMemberA = team.find(
                             (member) => member.name === a.teamMember
@@ -209,14 +324,16 @@ function DailyTotals({ team, setTeam, setError }) {
                                     return;
                                 }
                                 if (!dailyTotal || !dailyTotal._id) {
-                                    console.error(`dailyTotal._id is undefined: , ${dailyTotal}, ${dailyTotal}`);
+                                    console.error(
+                                        `dailyTotal._id is undefined: , ${dailyTotal}, ${dailyTotal}`
+                                    );
                                     return;
                                 }
                                 const response = await axios.delete(
                                     `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${correspondingTeamMember._id}/dailyTotals/${dailyTotal._id}`
                                 );
 
-                                fetchDailyTotalsAll();
+                                // fetchDailyTotalsAll();
                                 console.log(
                                     `deleteDailyTotal: ${response.data}`
                                 );
@@ -291,6 +408,66 @@ function DailyTotals({ team, setTeam, setError }) {
                                         {dailyTotal.cashTips
                                             ? Number(
                                                   dailyTotal.cashTips
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="barTipOuts-column">
+                                        {dailyTotal.barTipOuts
+                                            ? Number(
+                                                  dailyTotal.barTipOuts
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="runnerTipOuts-column">
+                                        {dailyTotal.runnerTipOuts
+                                            ? Number(
+                                                  dailyTotal.runnerTipOuts
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="hostTipOuts-column">
+                                        {dailyTotal.hostTipOuts
+                                            ? Number(
+                                                  dailyTotal.hostTipOuts
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="totalTipOuts-column">
+                                        {dailyTotal.totalTipOuts
+                                            ? Number(
+                                                  dailyTotal.totalTipOuts
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="tipsReceived-column">
+                                        {dailyTotal.tipsReceived
+                                            ? Number(
+                                                  dailyTotal.tipsReceived
+                                              ).toLocaleString("en-US", {
+                                                  style: "currency",
+                                                  currency: "USD",
+                                              })
+                                            : "N/A"}
+                                    </div>
+                                    <div className="totalPayrollTips-column">
+                                        {dailyTotal.totalPayrollTips
+                                            ? Number(
+                                                  dailyTotal.totalPayrollTips
                                               ).toLocaleString("en-US", {
                                                   style: "currency",
                                                   currency: "USD",

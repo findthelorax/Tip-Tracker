@@ -1,15 +1,8 @@
 const mongoose = require('mongoose');
 
 const weeklyTotalsSchema = new mongoose.Schema({
-	_id: mongoose.Schema.Types.ObjectId,
-    teamMember: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'TeamMember',
-        required: true,
-    },
-    position: String,
-	startDate: Date,
-	endDate: Date,
+	teamMember: String,
+	position: String,
 	date: String,
 	foodSales: Number,
 	barSales: Number,

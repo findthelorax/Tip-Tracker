@@ -1,18 +1,21 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import submitDailyTotals from "./sumbitDailyTotals";
 
 function DailyTotalsForm(props) {
-	const { dailyTotals, submitDailyTotals, team, setTeam } = props;
+	const { team, setTeam, dailyTotals, submitDailyTotals, refresh } = props;
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(() => {
 		axios
 			.get(`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`)
 			.then((response) => {
 				if (response.data.length > 0)
 				setTeam(response.data);
+				// updateTeam(response.data);
 			})
 			.catch((error) => console.error('Error:', error));
-	}, [team, setTeam]);
+	}, [refresh, setTeam]);
 
 	const handleDailyTotalsChange = (field, value) => {
 		if (field === 'date') {
@@ -58,7 +61,7 @@ function DailyTotalsForm(props) {
 						handleDailyTotalsChange('teamMember', e.target.value)
 					}
 				>
-					<option value="">Select Team Member</option>
+					<option value="" disabled>Select Team Member</option>
 					{team.map((member) => (
 						<option key={member._id} value={member.name}>
 							{`${member.name} - ${member.position}`}
@@ -71,7 +74,7 @@ function DailyTotalsForm(props) {
 				<input
 					type="date"
 					id="date"
-					value={new Date().toISOString().split('T')[0]}
+					value={dailyTotals.date}
 					onChange={(e) =>
 						handleDailyTotalsChange('date', e.target.value)
 					}
@@ -134,9 +137,8 @@ function DailyTotalsForm(props) {
 					}
 				/>
 			</div>
-			{/* <button onClick={props.submitDailyTotals}>Submit Daily Totals</button> */}
 			<button onClick={logData}>Log Data</button>
-			<button onClick={submitDailyTotals}>Submit Daily Totals</button>
+			<button onClick={() => submitDailyTotals(dailyTotals)}>Submit Daily Totals</button>
 		</div>
 	);
 }
