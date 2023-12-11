@@ -1,16 +1,17 @@
 import axios from 'axios';
 
+
 const submitDailyTotals = async (dailyTotals, dailyTotalsAll, team, setTeam, setDailyTotals, fetchDailyTotalsAll) => {
     try {
         // Validate if teamMember is selected
-        if (!dailyTotals.teamMember) {
+        if (!dailyTotals.teamMemberName) {
             alert("Please select a team member");
             return;
         }
 
         const isDuplicateDailyTotal = dailyTotalsAll.find(
             (total) =>
-                total.teamMember === dailyTotals.teamMember &&
+                total.teamMemberName === dailyTotals.teamMemberName &&
                 total.position === dailyTotals.position &&
                 total.date === dailyTotals.date
         );

@@ -1,109 +1,116 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import TeamMemberForm from './teamMemberForm';
-import { TeamContext } from './teamContext';
+import { TeamContext } from './contexts/TeamContext';
+import { getTeamMembers, addTeamMember, deleteTeamMember } from './api';
 
-export const fetchTeamMembers = async (setTeam) => {
-	try {
-		const response = await axios.get(
-			`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
-		);
-		setTeam(response.data);
-	} catch (error) {
-		console.error('Error fetching team members:', error);
-		alert('Failed to fetch team members');
-	}
-};
+const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
-function TeamOperations({ refresh, setRefresh }) {
+const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
+function TeamOperations() {
 	const { team, setTeam } = useContext(TeamContext);
-	const [name, setName] = useState('');
+	const [teamMemberName, setTeamMemberName] = useState('');
 	const [position, setPosition] = useState('bartender');
+
 	const clearInputs = () => {
-		setName('');
+		setTeamMemberName('');
 		setPosition('server');
 	};
 
 	useEffect(() => {
-		fetchTeamMembers(setTeam);
-	}, [refresh]);
-
-	const addTeamMember = async () => {
-		if (name && position) {
+		const fetchTeamMembers = async () => {
 			try {
-				const response = await axios.post(
-					`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`,
-					{ name, position }
-				);
-				setTeam([...team, response.data]);
-				console.log(response.data);
-				clearInputs();
-				await fetchTeamMembers();
+				const teamMembers = await getTeamMembers();
+				setTeam(teamMembers);
 			} catch (error) {
-				console.error('Error adding team member:', error);
-				alert('Failed to add team member');
+				console.error('Error fetching team members:', error);
 			}
-		} else {
-			alert('Please enter both name and position');
-		}
-	};
+		};
+	
+		fetchTeamMembers();
+	}, [ setTeam]);
 
-	const deleteTeamMember = async (id, name, position) => {
-		const confirmation = window.confirm(
-			`ARE YOU SURE YOU WANT TO DELETE:\n\n${name.toUpperCase()}	-	${position}?`
-		);
-		if (!confirmation) {
-			return;
-		}
+    const teamByPosition = useMemo(() => {
+        const teamByPosition = POSITIONS.reduce((acc, position) => {
+            acc[position] = [];
+            return acc;
+        }, {});
 
-		try {
-			// Send a DELETE request to the server to delete the team member by ID
-			await axios.delete(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${id}`
-			);
-			// Remove the deleted team member from the local state
-			setTeam((prevTeam) =>
-				prevTeam.filter((member) => member._id !== id)
-			);
-		} catch (error) {
-			console.error('Error deleting team member:', error);
-			alert('Failed to delete team member');
-		}
-	};
+        team.forEach(member => {
+            teamByPosition[member.position].push(member);
+        });
+
+        return Object.fromEntries(
+            Object.entries(teamByPosition).map(([position, members]) => [
+                position,
+                [...members].sort((a, b) => a.teamMemberName.localeCompare(b.teamMemberName)),
+            ])
+        );
+    }, [team]);
+
+	const addTeamMemberToTeam = useCallback(async () => {
+        if (teamMemberName && position) {
+            try {
+                const newMember = await addTeamMember(teamMemberName, position);
+                setTeam((prevTeam) => [...prevTeam, newMember]);
+                clearInputs();
+            } catch (error) {
+                console.error('Error adding team member:', error);
+                alert('Failed to add team member');
+            }
+        } else {
+            alert('Please enter both name and position');
+        }
+    }, [teamMemberName, position, setTeam]);
+
+    const deleteTeamMemberFromTeam = useCallback(async (id, teamMemberName, position) => {
+        const confirmation = window.confirm(
+            `ARE YOU SURE YOU WANT TO DELETE:\n\n${teamMemberName.toUpperCase()} - ${position}?`
+        );
+        if (!confirmation) {
+            return;
+        }
+    
+        try {
+            await deleteTeamMember(id);
+            setTeam((prevTeam) =>
+                prevTeam.filter((member) => member._id !== id)
+            );
+        } catch (error) {
+            console.error('Error deleting team member:', error);
+            alert('Failed to delete team member');
+        }
+    }, [setTeam]);
 
 	return (
 		<div className="team-card">
 			<TeamMemberForm
-				name={name}
+				teamMemberName={teamMemberName}
+				setTeamMemberName={setTeamMemberName}
 				position={position}
-				setName={setName}
 				setPosition={setPosition}
-				addTeamMember={addTeamMember}
+				addTeamMember={addTeamMemberToTeam}
 			/>
-			{['bartender', 'host', 'server', 'runner'].map((position) => (
-				<div key={position}>
-					<h2>{position.charAt(0).toUpperCase() + position.slice(1)}s</h2>
-					{[...team]
-						.filter((member) => member.position === position)
-						.sort((a, b) => a.name.localeCompare(b.name))
-						.map((member) => (
-							<div key={member._id} className="member-card">
-								<strong>
-									{member.name.charAt(0).toUpperCase() +
-										member.name.slice(1)}
-								</strong>{' '}
-								- {member.position}
-								<button
-									onClick={() =>
-										deleteTeamMember(
-											member._id,
-											member.name,
-											member.position
-										)
-									}
-								>
-									Delete
-								</button>
+            {POSITIONS.map((position) => (
+                <div key={position}>
+                    <h2>{capitalizeFirstLetter(position)}s</h2>
+                    {teamByPosition[position].map((member) => (
+                        <div key={member._id} className="member-card">
+                            <strong>
+                                {capitalizeFirstLetter(member.teamMemberName)}
+                            </strong>{' '}
+                            - {member.position}
+                            <button
+                                onClick={() =>
+                                    deleteTeamMemberFromTeam(
+                                        member._id,
+                                        member.teamMemberName,
+                                        member.position
+                                    )
+                                }
+                            >
+                                Delete
+                            </button>
 							</div>
 						))}
 				</div>

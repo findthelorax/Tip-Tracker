@@ -6,8 +6,8 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: {
         type: String,
-        enum: ['manager', 'worker'], // The role must be either 'manager' or 'worker'
-        default: 'worker' // By default, a user is a 'worker'
+        enum: ['manager', 'worker'],
+        default: 'worker'
     }
 });
 

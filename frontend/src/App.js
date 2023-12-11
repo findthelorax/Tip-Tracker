@@ -1,124 +1,136 @@
-// import React, { useState } from "react";
-// import Header from "./components/header";
-// import TeamOperations from "./components/teamMembers";
-// import DatabaseOperations from "./components/databaseOps";
-// import WeeklySales from "./components/weeklySales";
-// import DailyTotals from "./components/dailyTotals";
-// import ErrorComponent from "./components/errorComponent";
-// import { TeamContext } from "./components/teamContext";
-// import { ErrorProvider, ErrorContext } from "./components/ErrorContext";
+import React, { useReducer, useMemo } from 'react';
+import Header from './components/header';
+import TeamOperations from './components/teamMembers';
+import DatabaseOperations from './components/databaseOps';
+import WeeklySales from './components/weeklySales';
+import DailyTotals from './components/dailyTotals';
+import ErrorComponent from './components/errorComponent';
+import { TeamProvider } from './components/contexts/TeamContext';
+import { DailyTotalsProvider } from './components/contexts/DailyTotalsContext';
+import { ErrorProvider } from './components/contexts/ErrorContext';
+import { RefreshProvider } from './components/contexts/RefreshContext';
 
-// function App() {
-//     const [team, setTeam] = useState([]);
-//     const [name, setName] = useState("");
-//     const [position, setPosition] = useState("bartender");
-//     const [error, setError] = useState(null);
-//     const [refresh, setRefresh] = useState(false);
+const initialState = {
+	team: [],
+	error: null,
+	refresh: false,
+};
 
-//     return (
-//         <div className="App">
-//             <TeamContext.Provider value={{ team, setTeam }}>
-//                 <Header />
+function reducer(state, action) {
+	switch (action.type) {
+		case 'updateTeam':
+			return { ...state, team: action.payload };
+		case 'updateDailyTotals':
+			return { ...state, dailyTotals: action.payload };
+		case 'updateWeeklySales':
+			return { ...state, weeklySales: action.payload };
+		case 'updateError':
+			return { ...state, error: action.payload };
+		case 'updateRefresh':
+			return { ...state, refresh: action.payload };
+		default:
+			return state;
+	}
+}
 
-//                 <DatabaseOperations setRefresh={setRefresh} />
+// Action creators
+function updateTeam(value) {
+	return { type: 'updateTeam', payload: value };
+}
 
-//                 <TeamOperations
-//                     team={team}
-//                     setTeam={setTeam}
-//                     name={name}
-//                     setName={setName}
-//                     position={position}
-//                     setPosition={setPosition}
-//                     refresh={refresh}
-//                     setRefresh={setRefresh}
-//                     // addTeamMember={addTeamMember}
-//                     // displayTeam={displayTeam}
-//                     // fetchTeamMembers={fetchTeamMembers}
-//                     // deleteTeamMember={deleteTeamMember}
-//                 />
+function updateError(value) {
+	return { type: 'updateError', payload: value };
+}
 
-//                 <DailyTotals
-//                     team={team}
-//                     setTeam={setTeam}
-//                     setError={setError}
-//                     refresh={refresh}
-//                     setRefresh={setRefresh}
-//                 />
+function updateRefresh(value) {
+	return { type: 'updateRefresh', payload: value };
+}
 
-//                 <WeeklySales refresh={refresh} setRefresh={setRefresh} />
+function updateDailyTotals(value) {
+	return { type: 'updateDailyTotals', payload: value };
+}
 
-//                 <ErrorComponent error={error} />
-//             </TeamContext.Provider>
-//         </div>
-//     );
+// function updateWeeklySales(value) {
+//     return { type: 'updateWeeklySales', payload: value };
 // }
 
-// export default App;
+// function updateTeamMembers(value) {
+//     return { type: 'updateTeamMembers', payload: value };
+// }
 
-import React, { useState } from "react";
-import Header from "./components/header";
-import TeamOperations from "./components/teamMembers";
-import DatabaseOperations from "./components/databaseOps";
-import WeeklySales from "./components/weeklySales";
-import DailyTotals from "./components/dailyTotals";
-import ErrorComponent from "./components/errorComponent";
-import { TeamContext } from "./components/teamContext";
-import { ErrorProvider, ErrorContext } from "./components/ErrorContext";
+// function updateDailyTotalsAll(value) {
+//     return { type: 'updateDailyTotalsAll', payload: value };
+// }
 
 function App() {
-    const [team, setTeam] = useState([]);
-	const [name, setName] = useState("");
-    const [position, setPosition] = useState("bartender");
-    const [error, setError] = useState(null);
-    const [refresh, setRefresh] = useState(false);
+	const [state, dispatch] = useReducer(reducer, initialState);
 
-    const updateTeam = (newTeam) => {
-        setTeam(newTeam);
-    };
+	// Memoized context values
+	const refreshContextValue = useMemo(
+		() => ({
+			refresh: state.refresh,
+			setRefresh: (value) => dispatch(updateRefresh(value)),
+		}),
+		[state.refresh]
+	);
 
-    const updateName = (newName) => {
-        setName(newName);
-    };
+	const teamContextValue = useMemo(
+		() => ({
+			team: state.team,
+			setTeam: (value) => dispatch(updateTeam(value)),
+		}),
+		[state.team]
+	);
 
-    const updatePosition = (newPosition) => {
-        setPosition(newPosition);
-    };
+	const errorContextValue = useMemo(
+		() => ({
+			error: state.error,
+			setError: (value) => dispatch(updateError(value)),
+		}),
+		[state.error]
+	);
 
-    const updateRefresh = (newRefresh) => {
-        setRefresh(newRefresh);
-    };
+	const dailyTotalsContextValue = useMemo(
+		() => ({
+			dailyTotals: state.dailyTotals,
+			setDailyTotals: (value) => dispatch(updateDailyTotals(value)),
+		}),
+		[state.dailyTotals]
+	);
 
-    return (
-        <ErrorProvider>
-            <div className="App">
-                <TeamContext.Provider value={{ team, setTeam }}>
-                    <Header />
+	// const weeklySalesContextValue = useMemo(() => ({
+	//     weeklySales: state.weeklySales,
+	//     setWeeklySales: (value) => dispatch(updateWeeklySales(value)),
+	// }), [state.weeklySales]);
 
-                    <DatabaseOperations 
-						updateRefresh={updateRefresh}
-					/>
+	// const dailyTotalsAllContextValue = useMemo(() => ({
+	//     dailyTotalsAll: state.dailyTotalsAll,
+	//     setDailyTotalsAll: (value) => dispatch(updateDailyTotalsAll(value)),
+	// }), [state.dailyTotalsAll]);
 
-                    <TeamOperations
-                        updateTeam={updateTeam}
-                        updateName={updateName}
-                        updatePosition={updatePosition}
-                        updateRefresh={updateRefresh}
-                    />
+	// const teamMembersContextValue = useMemo(() => ({
+	//     teamMembers: state.teamMembers,
+	//     setTeamMembers: (value) => dispatch(updateTeamMembers(value)),
+	// }), [state.teamMembers]);
 
-                    <DailyTotals
-                        updateTeam={updateTeam}
-                        setError={setError}
-                        refresh={refresh}
-                        setRefresh={updateRefresh}
-                    />
-
-                    <WeeklySales refresh={refresh} setRefresh={updateRefresh} />
-
-                    <ErrorComponent error={error} />
-                </TeamContext.Provider>
-            </div>
-        </ErrorProvider>
-    );
+	return (
+		<RefreshProvider value={refreshContextValue}>
+			<ErrorProvider value={errorContextValue}>
+				<TeamProvider value={teamContextValue}>
+					<DailyTotalsProvider value={dailyTotalsContextValue}>
+						<div className="App">
+							<Header />
+							<DatabaseOperations />
+							<TeamOperations />
+							<DailyTotals refresh={state.refresh} />
+							<WeeklySales refresh={state.refresh} />
+							<ErrorComponent error={state.error} />
+						</div>
+					</DailyTotalsProvider>
+				</TeamProvider>
+			</ErrorProvider>
+		</RefreshProvider>
+	);
 }
 
 export default App;

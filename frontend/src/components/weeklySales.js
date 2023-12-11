@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// import React, { useState } from "react";
+// import React, { useState, useEffect, useContext, useCallback } from "react";
+// import { useRefresh } from './contexts/RefreshContext';
+// import { ErrorContext } from './contexts/ErrorContext';
+// import { TeamContext } from './contexts/TeamContext';
+// import { DailyTotalsContext } from './contexts/DailyTotalsContext';
+// import { getDatabases, deleteDatabase } from './api';
+
+
 
 function WeeklyTotals() {
-	const [weeklyTotals, setWeeklyTotals] = useState([]);
+	// const { error, setError } = useContext(ErrorContext);
+    // const { refresh } = useRefresh();
+    // const { refreshTeamMembers, setRefreshTeamMembers } = useContext(TeamContext);
+	// const [weeklyTotals, setWeeklyTotals] = useState([]);
 
-	const handleWeeklyTotalsChange = (field, value) => {
-		setWeeklyTotals({
-			...weeklyTotals,
-			[field]: value,
-		});
-	};
+	// const handleWeeklyTotalsChange = (field, value) => {
+	// 	setWeeklyTotals({
+	// 		...weeklyTotals,
+	// 		[field]: value,
+	// 	});
+	// };
 
 	return (
 		<div className="sales-card">

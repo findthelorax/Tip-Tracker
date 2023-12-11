@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 mongoose = require('mongoose');
 
-router.get('/listDatabases', async (req, res) => {
+router.get('/getDatabases', async (req, res) => {
     try {
         const admin = mongoose.connection.getClient().db().admin();
         const databaseList = await admin.listDatabases();

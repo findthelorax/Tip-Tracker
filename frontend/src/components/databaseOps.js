@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+// import { useRefresh } from './contexts/RefreshContext';
+import { ErrorContext } from './contexts/ErrorContext';
+import { TeamContext } from './contexts/TeamContext';
+import { DailyTotalsContext } from './contexts/DailyTotalsContext';
+import { getDatabases, deleteDatabase } from './api';
+
 
 function DatabaseOperations() {
     const [databases, setDatabases] = useState([]);
-    const [error, setError] = useState(null);
-	const [refresh, setRefresh] = useState(false);
+    const { error, setError } = useContext(ErrorContext);
+    const { setRefreshTeamMembers } = useContext(TeamContext);
+    const { setRefreshDailyTotals } = useContext(DailyTotalsContext);
+
+    const fetchDatabases = useCallback(async () => {
+        try {
+            const response = await getDatabases();
+            setDatabases(response);
+        } catch (error) {
+            setError(error.message);
+        }
+    }, [setError]);
 
     useEffect(() => {
         fetchDatabases();
-    }, [refresh]);
+    }, [fetchDatabases]);
 
-    const fetchDatabases = async () => {
-        try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_SERVER_URL}/api/listDatabases`
-            );
-            setDatabases(response.data.databases);
-            setError(null); // Clear the error when the request is successful
-        } catch (error) {
-            console.error("Error fetching databases:", error);
-            setError("Failed to fetch databases"); // Set the error message
-        }
-    };
-
-    const deleteDatabase = async (databaseName) => {
+    const handleDeleteDatabase = async (databaseName) => {
         const confirmation = window.confirm(
             `ARE YOU SURE YOU WANT TO DELETE:\n\n${databaseName.toUpperCase()}?`
         );
@@ -31,25 +33,17 @@ function DatabaseOperations() {
             return;
         }
 
-		try {
-			await axios
-				.delete(
-					`${process.env.REACT_APP_SERVER_URL}/api/deleteDatabase/${databaseName}`
-				)
-				.then((response) => {
-					setDatabases((prevDatabases) =>
-						prevDatabases.filter(
-							(database) => database.name !== databaseName
-						)
-					);
-					setError(null);
-					setRefresh((prev) => !prev); // Toggle refresh state
-				});
-		} catch (error) {
-			console.error("Error deleting database:", error);
-			setError("Failed to delete database");
-		}
-	};
+        try {
+            await deleteDatabase(databaseName);
+            setDatabases((prevDatabases) =>
+                prevDatabases.filter((database) => database.name !== databaseName)
+            );
+            // setRefreshDailyTotals((prev) => !prev);
+            setRefreshTeamMembers((prev) => !prev);
+        } catch (error) {
+            setError(error.message);
+        }
+    };
 
     return (
         <div className="databases-card">
@@ -68,7 +62,7 @@ function DatabaseOperations() {
                             <div>
                                 <button
                                     onClick={() =>
-                                        deleteDatabase(database.name)
+                                        handleDeleteDatabase(database.name)
                                     }
                                 >
                                     Delete Database

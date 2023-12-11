@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const teamMembersRoutes = require('./routes/teamMembers');
-const weeklyTotalsRoutes = require('./routes/weeklyTotals');
 const databaseRoutes = require('./routes/database');
 const loginRoutes = require('./routes/login');
 const dotenv = require('dotenv').config();
@@ -15,7 +14,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use('/api/teamMembers', teamMembersRoutes);
-app.use('/api/weeklyTotals', weeklyTotalsRoutes);
 app.use('/api', databaseRoutes);
 app.use('/api', loginRoutes);
 

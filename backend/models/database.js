@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-
-async function listDatabases() {
+async function getDatabases() {
 	const client = new MongoClient('mongodb://localhost:27017');
 	try {
 		await client.connect();
@@ -11,7 +9,7 @@ async function listDatabases() {
 	}
 }
 
-async function clearDatabases(databaseNames) {
+async function deleteDatabases(databaseNames) {
 	const client = new MongoClient('mongodb://localhost:27017');
 	try {
 		await client.connect();
@@ -29,4 +27,4 @@ async function clearDatabases(databaseNames) {
 	}
 }
 
-module.exports = { listDatabases, clearDatabases };
+module.exports = { getDatabases, deleteDatabases };

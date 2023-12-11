@@ -1,21 +1,28 @@
 import React from 'react';
 
+const POSITIONS = ['Bartender', 'Runner', 'Server', 'Host'];
+
 function TeamMemberForm({
-	name,
+	teamMemberName,
+	setTeamMemberName,
 	position,
-	setName,
 	setPosition,
 	addTeamMember,
 }) {
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		addTeamMember();
+	};
+
 	return (
-		<div className="input-card">
+		<form className="input-card" onSubmit={handleSubmit}>
 			<label htmlFor="name">Name:</label>
 			<input
 				type="text"
-				id="name"
+				id="teamMemberName"
 				placeholder="Enter name"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
+				value={teamMemberName}
+				onChange={(e) => setTeamMemberName(e.target.value)}
 			/>
 			<label htmlFor="position">Position:</label>
 			<select
@@ -24,13 +31,12 @@ function TeamMemberForm({
 				onChange={(e) => setPosition(e.target.value)}
 			>
 				<option value="" disabled>Select a position</option>
-				<option value="bartender">Bartender</option>
-				<option value="runner">Runner</option>
-				<option value="server">Server</option>
-				<option value="host">Host</option>
+				{POSITIONS.map((position) => (
+					<option key={position} value={position.toLowerCase()}>{position}</option>
+				))}
 			</select>
-			<button onClick={addTeamMember}>Add to Team</button>
-		</div>
+			<button type="submit">Add to Team</button>
+		</form>
 	);
 };
 
