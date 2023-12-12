@@ -57,9 +57,8 @@ router.delete("/:id", async (req, res) => {
 router.get("/:id/dailyTotals", async (req, res) => {
     try {
         const { id } = req.params;
-        const teamMember = await TeamMember.findById(id).populate(
-            "teamMemberName"
-        );
+        const teamMember = await TeamMember.findById(id);
+
         if (!teamMember) {
             return res.status(404).json({ error: "Team member not found" });
         }
@@ -145,50 +144,6 @@ router.delete("/:id/dailyTotals/:dailyTotalId", async (req, res) => {
             success: false,
             message: "Internal Server Error",
         });
-    }
-});
-
-router.get('/dailyTotalsAll', async (req, res) => {
-    try {
-        // Fetch all team members
-        const teamMembers = await TeamMember.find().lean();
-
-        // Create an array to store results for all team members
-        const allDailyTotals = [];
-
-        // Iterate through each team member
-        for (const teamMember of teamMembers) {
-
-            // Fetch dailyTotals is a subdocument in the TeamMember document, so you should fetch it from there
-            const dailyTotals = teamMember.dailyTotals;
-
-            // Create an object with team member details and their daily totals
-            const teamMemberData = {
-                teamMemberName: teamMember.teamMemberName,
-                position: teamMember.position,
-                dailyTotals: dailyTotals.map(total => ({
-                    date: total.date,
-                    barSales: total.barSales,
-                    foodSales: total.foodSales,
-                    nonCashTips: total.nonCashTips,
-                    cashTips: total.cashTips,
-                    barTipOut: total.barTipOut,
-                    runnerTipOut: total.runnerTipOut,
-                    hostTipOut: total.hostTipOut,
-                    totalTipOut: total.totalTipOut,
-                    tipsReceived: total.tipsReceived,
-                })),
-            };
-
-            // Push the team member data to the array
-            allDailyTotals.push(teamMemberData);
-        }
-
-        // Send the array of daily totals for all team members in the response
-        res.json(allDailyTotals);
-    } catch (error) {
-        console.error('Error fetching daily totals for all team members:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch daily totals for all team members' });
     }
 });
 

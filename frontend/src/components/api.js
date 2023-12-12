@@ -65,12 +65,8 @@ export const deleteTeamMember = async (id) => {
 export const fetchDailyTotalsAll = async () => {
     try {
         const response = await axios.get(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/dailyTotalsAll`
+            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
         );
-        console.log(
-            `fetchDailyTotalsAll: ${JSON.stringify(response.data, null, 2)}`
-        ); // This will log the response data to the console in a readable format
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error(`Error fetching daily totals: ${error.message}`);

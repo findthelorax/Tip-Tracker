@@ -34,6 +34,34 @@
 	- populate weeklyTotals table with the data from a selected week. Automatically populated with the current week Sunday to Saturday.
 	- add in logic for calculating tipOuts
 	- replace alerts with a modal
+
+
+
+# FIX
+    - Fix fetchDailyTotals /teamMembers and fetchDailyTotals returns the same data.
+	- Move teamMember.js api calls to a separate file
+	- Display daily totals table
+	- Move submit daily totals function
+
+    - in dailyTotals.js and databaseOps.js the useEffect is rendering twice in a row
+```
+	useEffect(() => {
+		fetchTotals();
+	}, [fetchTotals]);
+```
+```
+    useEffect(() => {
+        fetchDatabases();
+    }, [fetchDatabases]);
+```
+
+
+## Notes
+	- reducer is a function that determines how the application's state should change in response to an action. It takes the current state and an action as arguments, and returns the new state.
+
+	- dispatch is a function from the useReducer hook. When you call dispatch with an action, React will call your reducer with the current state and that action. The reducer returns the new state, and React updates the component with the new state.
+
+### Modal
 ```
 npm install react-modal
 
@@ -96,15 +124,3 @@ Remember to initialize Modal with Modal.setAppElement('#root') or your app's roo
 	- Modal.setAppElement('#root');
 Please note that you should replace #root with the id of your app's root element.
 ```
-
-
-# FIX
-	- Move teamMember.js api calls to a separate file
-	- Display daily totals table
-	- Move submit daily totals function
-
-
-## Notes
-	- reducer is a function that determines how the application's state should change in response to an action. It takes the current state and an action as arguments, and returns the new state.
-
-	- dispatch is a function from the useReducer hook. When you call dispatch with an action, React will call your reducer with the current state and that action. The reducer returns the new state, and React updates the component with the new state.

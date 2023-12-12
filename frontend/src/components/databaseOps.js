@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-// import { useRefresh } from './contexts/RefreshContext';
 import { ErrorContext } from './contexts/ErrorContext';
 import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { getDatabases, deleteDatabase } from './api';
-
 
 function DatabaseOperations() {
     const [databases, setDatabases] = useState([]);
     const { error, setError } = useContext(ErrorContext);
     const { setRefreshTeamMembers } = useContext(TeamContext);
     const { setRefreshDailyTotals } = useContext(DailyTotalsContext);
+    const [ isShown, setIsShown ] = useState(false);
+    
 
     const fetchDatabases = useCallback(async () => {
         try {
@@ -38,10 +38,17 @@ function DatabaseOperations() {
             setDatabases((prevDatabases) =>
                 prevDatabases.filter((database) => database.name !== databaseName)
             );
-            // setRefreshDailyTotals((prev) => !prev);
+            setRefreshDailyTotals((prev) => !prev);
             setRefreshTeamMembers((prev) => !prev);
         } catch (error) {
             setError(error.message);
+        }
+    };
+
+    const handleListDatabases = () => {
+        setIsShown(!isShown);
+        if (!isShown) {
+            fetchDatabases();
         }
     };
 
@@ -49,8 +56,10 @@ function DatabaseOperations() {
         <div className="databases-card">
             {error && <p>{error}</p>}
             <h2>Databases</h2>
-            <button onClick={fetchDatabases}>List Databases</button>
-            {databases.length > 0 && (
+            <button onClick={handleListDatabases}>
+                {isShown ? 'Hide Databases' : 'List Databases'}
+            </button>
+            {isShown && databases.length > 0 && (
                 <div className="databases-table">
                     <div className="database-header">
                         <div>Database Name</div>

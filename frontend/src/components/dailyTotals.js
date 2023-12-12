@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import { FormattedDate } from './dateUtils';
 import DailyTotalsForm from './dailyTotalsForm';
-import { useRefresh } from './contexts/RefreshContext';
 import { ErrorContext } from './contexts/ErrorContext';
 import {
 	fetchDailyTotalsAll,
@@ -41,10 +40,9 @@ const CurrencyColumn = memo(({ className, value }) => (
 function DailyTotals() {
 	const { team, setTeam } = useContext(TeamContext);
 	const { setError } = useContext(ErrorContext);
-	const { refresh } = useRefresh();
 	const [dailyTotalsAll, setDailyTotalsAll] = useState([]);
 	const [dailyTotals, setDailyTotals] = useState({
-		teamMember: '',
+		teamMemberName: '',
 		position: '',
 		date: localDate,
 		foodSales: '',
@@ -59,133 +57,140 @@ function DailyTotals() {
 		totalPayrollTips: '',
 	});
 
-	const fetchTotals = useCallback(async () => {
+	const fetchDailyTotals = useCallback(async () => {
 		try {
-			const totals = await fetchDailyTotalsAll();
-			setDailyTotalsAll(totals);
+			const data = await fetchDailyTotalsAll();
+			const updatedData = data.map((dailyTotal) => ({
+				...dailyTotal,
+				teamMemberName: dailyTotal.teamMemberName,
+				position: dailyTotal.position,
+			}));
+			// console.log(`Fetched Totals:`, updatedData);
+			setDailyTotalsAll(updatedData);
 		} catch (error) {
-			setError('Failed to fetch daily totals');
+			console.error(error);
+			setError(error.message);
 		}
 	}, [setError]);
 
 	useEffect(() => {
-		fetchTotals();
-	}, [fetchTotals]);
+		fetchDailyTotals();
+	}, [fetchDailyTotals]);
 
+	// submitDailyTotals function breakdown
 	const submitDailyTotals = useCallback(
 		async (dailyTotals) => {
+			if (!validateDailyTotals(dailyTotals, dailyTotalsAll)) {
+				return;
+			}
+
+			const selectedTeamMember = findSelectedTeamMember(
+				team,
+				dailyTotals
+			);
+
+			if (!selectedTeamMember) {
+				alert('Selected team member not found in the team list.');
+				return;
+			}
+
+			const newDailyTotals = prepareDailyTotals(
+				selectedTeamMember,
+				dailyTotals
+			);
+
 			try {
-				// Validate if teamMember is selected
-				if (!dailyTotals.teamMemberName) {
-					alert('Please select a team member');
-					return;
-				}
-
-				const isDuplicateDailyTotal = dailyTotalsAll.find(
-					(total) =>
-						total.teamMemberName === dailyTotals.teamMemberName &&
-						total.position === dailyTotals.position &&
-						total.date === dailyTotals.date
-				);
-
-				if (isDuplicateDailyTotal) {
-					alert(
-						`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMemberName} - ${isDuplicateDailyTotal.position} already exist.`
-					);
-					return;
-				}
-
-				// Find the selected team member by name and position to get their ID
-				const selectedTeamMember = team.find(
-					(member) =>
-						member.teamMemberName === dailyTotals.teamMemberName
-				);
-
-				if (!selectedTeamMember) {
-					alert('Team member not found');
-					return;
-				}
-
-				// Prepare daily total object
-				const newDailyTotals = {
-					teamMemberName: selectedTeamMember.teamMemberName,
-					position: selectedTeamMember.position,
-					date: dailyTotals.date,
-					foodSales: dailyTotals.foodSales,
-					barSales: dailyTotals.barSales,
-					nonCashTips: dailyTotals.nonCashTips,
-					cashTips: dailyTotals.cashTips,
-					barTipOuts: dailyTotals.barTipOuts,
-					runnerTipOuts: dailyTotals.runnerTipOuts,
-					hostTipOuts: dailyTotals.hostTipOuts,
-					totalTipOuts: dailyTotals.totalTipOuts,
-					tipsReceived: dailyTotals.tipsReceived,
-					totalPayrollTips: dailyTotals.totalPayrollTips,
-				};
-
 				await submitDailyTotalToServer(
 					selectedTeamMember._id,
 					newDailyTotals
 				);
-
-				// Clear the form fields
-				setDailyTotals({
-					teamMember: '',
-					date: new Date(),
-					foodSales: '',
-					barSales: '',
-					nonCashTips: '',
-					cashTips: '',
-				});
-
-				// Refresh the daily totals list
-				fetchTotals();
+				clearFormFields(setDailyTotals);
+				fetchDailyTotals();
 			} catch (error) {
-				if (error.response && error.response.status === 400) {
-					alert(
-						`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
-					);
-				} else {
-					alert('An error occurred while submitting daily totals.');
-				}
-				console.error(error);
+				handleSubmissionError(error, dailyTotals);
 			}
 		},
-		[team, dailyTotalsAll, fetchTotals]
+		[team, dailyTotalsAll, fetchDailyTotals]
 	);
 
-	const sortedDailyTotals = useMemo(() => {
-		return [...dailyTotalsAll].sort((a, b) => {
-			const correspondingTeamMemberA = team.find(
-				(member) => member.teamMemberName === a.teamMember
-			);
-			const correspondingTeamMemberB = team.find(
-				(member) => member.teamMemberName === b.teamMember
-			);
+	const validateDailyTotals = (dailyTotals, dailyTotalsAll) => {
+		if (
+			!dailyTotals.teamMemberName &&
+			!dailyTotals.position &&
+			!dailyTotals.date
+		) {
+			alert('INVALID DATA!');
+			console.log(dailyTotals);
+			return false;
+		}
 
-			if (!correspondingTeamMemberA || !correspondingTeamMemberB) {
-				return 0;
-			}
+		const isDuplicateDailyTotal = dailyTotalsAll.find(
+			(total) =>
+				total.teamMemberName === dailyTotals.teamMemberName &&
+				total.position === dailyTotals.position &&
+				total.date === dailyTotals.date
+		);
 
-			const nameComparison =
-				correspondingTeamMemberA.teamMemberName.localeCompare(
-					correspondingTeamMemberB.teamMemberName
-				);
-			if (nameComparison !== 0) {
-				return nameComparison;
-			}
-
-			return correspondingTeamMemberA.position.localeCompare(
-				correspondingTeamMemberB.position
+		if (isDuplicateDailyTotal) {
+			alert(
+				`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMemberName} - ${isDuplicateDailyTotal.position} already exist.`
 			);
+			return false;
+		}
+		return true;
+	};
+
+	const findSelectedTeamMember = (team, dailyTotals) => {
+		return team.find(
+			(member) => member.teamMemberName === dailyTotals.teamMemberName
+		);
+	};
+
+	const prepareDailyTotals = (selectedTeamMember, dailyTotals) => {
+		return {
+			teamMemberName: selectedTeamMember.teamMemberName,
+			position: selectedTeamMember.position,
+			date: dailyTotals.date,
+			foodSales: dailyTotals.foodSales,
+			barSales: dailyTotals.barSales,
+			nonCashTips: dailyTotals.nonCashTips,
+			cashTips: dailyTotals.cashTips,
+			barTipOuts: dailyTotals.barTipOuts,
+			runnerTipOuts: dailyTotals.runnerTipOuts,
+			hostTipOuts: dailyTotals.hostTipOuts,
+			totalTipOuts: dailyTotals.totalTipOuts,
+			tipsReceived: dailyTotals.tipsReceived,
+			totalPayrollTips: dailyTotals.totalPayrollTips,
+		};
+	};
+
+	const clearFormFields = (setDailyTotals) => {
+		setDailyTotals({
+			teamMember: '',
+			date: new Date(),
+			foodSales: '',
+			barSales: '',
+			nonCashTips: '',
+			cashTips: '',
 		});
-	}, [dailyTotalsAll, team]);
+	};
+
+	const handleSubmissionError = (error, dailyTotals) => {
+		if (error.response && error.response.status === 400) {
+			alert(
+				`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
+			);
+		} else {
+			alert('An error occurred while submitting daily totals.');
+		}
+		console.error(error);
+	};
 
 	const deleteDailyTotal = useCallback(
 		async (dailyTotal, correspondingTeamMember) => {
 			const formattedDate = FormattedDate(dailyTotal.date);
 			const confirmation = window.confirm(
-				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${dailyTotal.teamMember.toUpperCase()}		ON:		${formattedDate.toUpperCase()}?`
+				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${dailyTotal.teamMemberName.toUpperCase()}		ON:		${formattedDate.toUpperCase()}?`
 			);
 			if (!confirmation) {
 				return;
@@ -207,15 +212,57 @@ function DailyTotals() {
 					dailyTotal._id
 				);
 
-				fetchTotals();
+				fetchDailyTotals();
 				console.log(`deleteDailyTotal: ${response.data}`);
 			} catch (error) {
 				setError(`Error deleting daily total: ${error.message}`);
 				alert(`Failed to delete daily totals: ${error.message}`);
 			}
 		},
-		[setError, fetchTotals]
+		[setError, fetchDailyTotals]
 	);
+
+	//TODO: FIX DAILY TOTALS SORTING
+	// sortedDailyTotals.map callback breakdown
+	const findCorrespondingTeamMember = (team, dailyTotal) => {
+		return team.find((member) => member._id === dailyTotal._id);
+	};
+
+	const checkIfFirstItem = (dailyTotal, index, array) => {
+		return (
+			index === 0 ||
+			array[index - 1].teamMemberName !== dailyTotal.teamMemberName
+		);
+	};
+
+	const sortedDailyTotals = useMemo(() => {
+		const sorted = [...dailyTotalsAll].sort((a, b) => {
+			const correspondingTeamMemberA = team.find(
+				(member) => member._id === a._id
+			);
+			const correspondingTeamMemberB = team.find(
+				(member) => member._id === b._id
+			);
+
+			if (!correspondingTeamMemberA || !correspondingTeamMemberB) {
+				return 0;
+			}
+
+			const positionComparison =
+				correspondingTeamMemberA.position.localeCompare(
+					correspondingTeamMemberB.position
+				);
+			if (positionComparison !== 0) {
+				return positionComparison;
+			}
+
+			return correspondingTeamMemberA.teamMemberName.localeCompare(
+				correspondingTeamMemberB.teamMemberName
+			);
+		});
+		// console.log(`SORTED: ${JSON.stringify(sorted, null, 2)}`);
+		return sorted;
+	}, [dailyTotalsAll, team]);
 
 	return (
 		<div>
@@ -225,7 +272,6 @@ function DailyTotals() {
 				submitDailyTotals={submitDailyTotals}
 				team={team}
 				setTeam={setTeam}
-				refresh={refresh}
 			/>
 
 			<h2>Daily Totals</h2>
@@ -247,99 +293,136 @@ function DailyTotals() {
 					</tr>
 				</thead>
 				<tbody>
-					{sortedDailyTotals.map((dailyTotal, index, array) => {
-						const correspondingTeamMember = team.find(
-							(member) =>
-								member.teamMemberName === dailyTotal.teamMember
+					{/* {sortedDailyTotals.map((dailyTotal, index, array) => {
+						console.log(`dailyTotal at index ${index}:`, JSON.stringify(dailyTotal, null, 2));
+						 */}
+					{sortedDailyTotals.map((teamMember, index) => {
+						// console.log('sortedDailyTotals:', JSON.stringify(sortedDailyTotals, null, 2));
+
+						console.log(
+							`teamMember at index ${index}:`,
+							JSON.stringify(teamMember, null, 2)
 						);
 
-						const isFirstItem =
-							index === 0 ||
-							array[index - 1].teamMember !==
-								dailyTotal.teamMember;
+						return teamMember.dailyTotals.map(
+							(dailyTotal, dailyTotalIndex) => {
+								console.log(
+									`dailyTotal at index ${dailyTotalIndex} for teamMember at index ${index}:`,
+									JSON.stringify(dailyTotal, null, 2)
+								);
 
-						return (
-							<React.Fragment key={dailyTotal._id || index}>
-								{isFirstItem && (
-									<tr>
-										<td colSpan="12">
-											<div className="teamMember-separator">
-												<hr />
-												<p>{`${
-													dailyTotal.teamMember
-												} - ${
-													correspondingTeamMember
-														? correspondingTeamMember.position ||
-														  'No Position'
-														: 'Unknown Team Member'
-												}`}</p>
-												<hr />
-											</div>
-										</td>
-									</tr>
-								)}
-								<tr className="flex-table-row">
-									<td className="date-column">
-										{dailyTotal.date
-											? FormattedDate(dailyTotal.date)
-											: 'Invalid Date'}
-									</td>
+								const correspondingTeamMember =
+									findCorrespondingTeamMember(
+										team,
+										dailyTotal
+									);
 
-									<CurrencyColumn
-										className="foodSales-column"
-										value={dailyTotal.foodSales}
-									/>
-									<CurrencyColumn
-										className="barSales-column"
-										value={dailyTotal.barSales}
-									/>
-									<CurrencyColumn
-										className="nonCashTips-column"
-										value={dailyTotal.nonCashTips}
-									/>
-									<CurrencyColumn
-										className="cashTips-column"
-										value={dailyTotal.cashTips}
-									/>
-									<CurrencyColumn
-										className="barTipOuts-column"
-										value={dailyTotal.barTipOuts}
-									/>
-									<CurrencyColumn
-										className="runnerTipOuts-column"
-										value={dailyTotal.runnerTipOuts}
-									/>
-									<CurrencyColumn
-										className="hostTipOuts-column"
-										value={dailyTotal.hostTipOuts}
-									/>
-									<CurrencyColumn
-										className="totalTipOuts-column"
-										value={dailyTotal.totalTipOuts}
-									/>
-									<CurrencyColumn
-										className="tipsReceived-column"
-										value={dailyTotal.tipsReceived}
-									/>
-									<CurrencyColumn
-										className="totalPayrollTips-column"
-										value={dailyTotal.totalPayrollTips}
-									/>
+								if (!correspondingTeamMember) {
+									return null;
+								}
 
-									<td className="delete-button-column">
-										<button
-											onClick={() =>
-												deleteDailyTotal(
-													dailyTotal,
-													correspondingTeamMember
-												)
-											}
-										>
-											Delete
-										</button>
-									</td>
-								</tr>
-							</React.Fragment>
+								const isFirstItem = checkIfFirstItem(
+									dailyTotal,
+									index,
+									teamMember
+									// array
+								);
+
+								const currencyColumns = [
+									{
+										className: 'foodSales-column',
+										value: dailyTotal.foodSales,
+									},
+									{
+										className: 'barSales-column',
+										value: dailyTotal.barSales,
+									},
+									{
+										className: 'nonCashTips-column',
+										value: dailyTotal.nonCashTips,
+									},
+									{
+										className: 'cashTips-column',
+										value: dailyTotal.cashTips,
+									},
+									{
+										className: 'barTipOuts-column',
+										value: dailyTotal.barTipOuts,
+									},
+									{
+										className: 'runnerTipOuts-column',
+										value: dailyTotal.runnerTipOuts,
+									},
+									{
+										className: 'hostTipOuts-column',
+										value: dailyTotal.hostTipOuts,
+									},
+									{
+										className: 'totalTipOuts-column',
+										value: dailyTotal.totalTipOuts,
+									},
+									{
+										className: 'tipsReceived-column',
+										value: dailyTotal.tipsReceived,
+									},
+									{
+										className: 'totalPayrollTips-column',
+										value: dailyTotal.totalPayrollTips,
+									},
+								];
+
+								return (
+									<React.Fragment
+										key={dailyTotal._id || index}
+									>
+										{isFirstItem && (
+											<tr>
+												<td colSpan="12">
+													<div className="teamMember-separator">
+														<hr />
+														<p>{`${
+															dailyTotal.teamMemberName
+														} - ${
+															correspondingTeamMember
+																? correspondingTeamMember.position ||
+																  'No Position'
+																: 'Unknown Team Member'
+														}`}</p>
+														<hr />
+													</div>
+												</td>
+											</tr>
+										)}
+										<tr className="flex-table-row">
+											<td className="date-column">
+												{dailyTotal.date
+													? FormattedDate(
+															dailyTotal.date
+													  )
+													: dailyTotal.date}
+											</td>
+											{currencyColumns.map((column) => (
+												<CurrencyColumn
+													className={column.className}
+													value={column.value}
+												/>
+											))}
+											<td className="delete-button-column">
+												<button
+													onClick={() =>
+														deleteDailyTotal(
+															dailyTotal,
+															correspondingTeamMember
+														)
+													}
+												>
+													Delete
+												</button>
+											</td>
+										</tr>
+									</React.Fragment>
+								);
+							}
 						);
 					})}
 				</tbody>

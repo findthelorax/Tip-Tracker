@@ -8,7 +8,6 @@ import ErrorComponent from './components/errorComponent';
 import { TeamProvider } from './components/contexts/TeamContext';
 import { DailyTotalsProvider } from './components/contexts/DailyTotalsContext';
 import { ErrorProvider } from './components/contexts/ErrorContext';
-import { RefreshProvider } from './components/contexts/RefreshContext';
 
 const initialState = {
 	team: [],
@@ -26,8 +25,6 @@ function reducer(state, action) {
 			return { ...state, weeklySales: action.payload };
 		case 'updateError':
 			return { ...state, error: action.payload };
-		case 'updateRefresh':
-			return { ...state, refresh: action.payload };
 		default:
 			return state;
 	}
@@ -40,10 +37,6 @@ function updateTeam(value) {
 
 function updateError(value) {
 	return { type: 'updateError', payload: value };
-}
-
-function updateRefresh(value) {
-	return { type: 'updateRefresh', payload: value };
 }
 
 function updateDailyTotals(value) {
@@ -66,14 +59,6 @@ function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	// Memoized context values
-	const refreshContextValue = useMemo(
-		() => ({
-			refresh: state.refresh,
-			setRefresh: (value) => dispatch(updateRefresh(value)),
-		}),
-		[state.refresh]
-	);
-
 	const teamContextValue = useMemo(
 		() => ({
 			team: state.team,
@@ -114,7 +99,6 @@ function App() {
 	// }), [state.teamMembers]);
 
 	return (
-		<RefreshProvider value={refreshContextValue}>
 			<ErrorProvider value={errorContextValue}>
 				<TeamProvider value={teamContextValue}>
 					<DailyTotalsProvider value={dailyTotalsContextValue}>
@@ -129,7 +113,6 @@ function App() {
 					</DailyTotalsProvider>
 				</TeamProvider>
 			</ErrorProvider>
-		</RefreshProvider>
 	);
 }
 

@@ -834,6 +834,89 @@ export default App;
 	//     fetchDailyTotalsAll();
 	// }, [fetchDailyTotalsAll, refresh]);
 ```
+```
+	// const submitDailyTotals = useCallback(
+	// 	async (dailyTotals) => {
+	// 		try {
+	// 			// Validate if teamMember is selected
+	// 			if (!dailyTotals.teamMemberName) {
+	// 				alert('Please select a team member');
+	// 				return;
+	// 			}
+
+	// 			const isDuplicateDailyTotal = dailyTotalsAll.find(
+	// 				(total) =>
+	// 					total.teamMemberName === dailyTotals.teamMemberName &&
+	// 					total.position === dailyTotals.position &&
+	// 					total.date === dailyTotals.date
+	// 			);
+
+	// 			if (isDuplicateDailyTotal) {
+	// 				alert(
+	// 					`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMemberName} - ${isDuplicateDailyTotal.position} already exist.`
+	// 				);
+	// 				return;
+	// 			}
+
+	// 			// Find the selected team member by name and position to get their ID
+	// 			const selectedTeamMember = team.find(
+	// 				(member) =>
+	// 					member.teamMemberName === dailyTotals.teamMemberName
+	// 			);
+
+	// 			if (!selectedTeamMember) {
+	// 				alert('Team member not found');
+	// 				return;
+	// 			}
+
+	// 			// Prepare daily total object
+	// 			const newDailyTotals = {
+	// 				teamMemberName: selectedTeamMember.teamMemberName,
+	// 				position: selectedTeamMember.position,
+	// 				date: dailyTotals.date,
+	// 				foodSales: dailyTotals.foodSales,
+	// 				barSales: dailyTotals.barSales,
+	// 				nonCashTips: dailyTotals.nonCashTips,
+	// 				cashTips: dailyTotals.cashTips,
+	// 				barTipOuts: dailyTotals.barTipOuts,
+	// 				runnerTipOuts: dailyTotals.runnerTipOuts,
+	// 				hostTipOuts: dailyTotals.hostTipOuts,
+	// 				totalTipOuts: dailyTotals.totalTipOuts,
+	// 				tipsReceived: dailyTotals.tipsReceived,
+	// 				totalPayrollTips: dailyTotals.totalPayrollTips,
+	// 			};
+
+	// 			await submitDailyTotalToServer(
+	// 				selectedTeamMember._id,
+	// 				newDailyTotals
+	// 			);
+
+	// 			// Clear the form fields
+	// 			setDailyTotals({
+	// 				teamMemberName: '',
+	// 				date: new Date(),
+	// 				foodSales: '',
+	// 				barSales: '',
+	// 				nonCashTips: '',
+	// 				cashTips: '',
+	// 			});
+
+	// 			// Refresh the daily totals list
+	// 			// fetchTotals();
+	// 		} catch (error) {
+	// 			if (error.response && error.response.status === 400) {
+	// 				alert(
+	// 					`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
+	// 				);
+	// 			} else {
+	// 				alert('An error occurred while submitting daily totals.');
+	// 			}
+	// 			console.error(error);
+	// 		}
+	// 	},
+	// 	[team, dailyTotalsAll]
+	// );
+```
 
 ### teamMembers.js
 
