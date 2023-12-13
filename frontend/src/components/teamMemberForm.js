@@ -1,37 +1,64 @@
 import React from 'react';
+import {
+	TextField,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
+	Button,
+	Box,
+} from '@material-ui/core';
+
+const POSITIONS = ['Bartender', 'Runner', 'Server', 'Host'];
 
 function TeamMemberForm({
-	name,
+	teamMemberName,
+	setTeamMemberName,
 	position,
-	setName,
 	setPosition,
 	addTeamMember,
 }) {
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		addTeamMember();
+	};
+
 	return (
-		<div className="input-card">
-			<label htmlFor="name">Name:</label>
-			<input
-				type="text"
-				id="name"
+		<form onSubmit={handleSubmit}>
+			<TextField
+				id="teamMemberName"
+				label="Name"
 				placeholder="Enter name"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
+				value={teamMemberName}
+				onChange={(e) => setTeamMemberName(e.target.value)}
+				fullWidth
+				margin="normal"
 			/>
-			<label htmlFor="position">Position:</label>
-			<select
-				id="position"
-				value={position}
-				onChange={(e) => setPosition(e.target.value)}
-			>
-				<option value="" disabled>Select a position</option>
-				<option value="bartender">Bartender</option>
-				<option value="runner">Runner</option>
-				<option value="server">Server</option>
-				<option value="host">Host</option>
-			</select>
-			<button onClick={addTeamMember}>Add to Team</button>
-		</div>
+			<FormControl fullWidth margin="normal">
+				<InputLabel id="position">Position</InputLabel>
+				<Select
+					labelId="position"
+					id="position"
+					value={position}
+					onChange={(e) => setPosition(e.target.value)}
+				>
+					<MenuItem value="" disabled>
+						Select a position
+					</MenuItem>
+					{POSITIONS.map((position) => (
+						<MenuItem key={position} value={position.toLowerCase()}>
+							{position}
+						</MenuItem>
+					))}
+				</Select>
+			</FormControl>
+			<Box mt={2}>
+				<Button variant="contained" color="primary" type="submit">
+					Add to Team
+				</Button>
+			</Box>
+		</form>
 	);
-};
+}
 
 export default TeamMemberForm;

@@ -1,30 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, {
+	useState,
+	useEffect,
+	useContext,
+	useMemo,
+	useCallback,
+} from 'react';
 import TeamMemberForm from './teamMemberForm';
+import { TeamContext } from './contexts/TeamContext';
+import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
+import { Card, CardContent, Typography, Button } from '@material-ui/core';
+
+const POSITIONS = ['bartender', 'host', 'server', 'runner'];
+
+const capitalizeFirstLetter = (string) =>
+	string.charAt(0).toUpperCase() + string.slice(1);
 
 function TeamOperations() {
-	const [team, setTeam] = useState([]);
-	const [name, setName] = useState('');
+	const { team, setTeam } = useContext(TeamContext);
+	const [teamMemberName, setTeamMemberName] = useState('');
+
 	const [position, setPosition] = useState('bartender');
+
 	const clearInputs = () => {
-		setName('');
+		setTeamMemberName('');
 		setPosition('server');
 	};
 
 	useEffect(() => {
-		fetchTeamMembers();
-		displayTeam();
-	}, []);
-
-	const addTeamMember = async () => {
-		if (name && position) {
+		const fetchTeamMembers = async () => {
 			try {
-				const response = await axios.post(
-					`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`,
-					{ name, position }
-				);
-				setTeam([...team, response.data]);
-				console.log(response.data);
+				const teamMembers = await getTeamMembers();
+				setTeam(teamMembers);
+			} catch (error) {
+				console.error('Error fetching team members:', error);
+			}
+		};
+
+		fetchTeamMembers();
+	}, [setTeam]);
+
+	const teamByPosition = useMemo(() => {
+		const teamByPosition = POSITIONS.reduce((acc, position) => {
+			acc[position] = [];
+			return acc;
+		}, {});
+
+		team.forEach((member) => {
+			teamByPosition[member.position].push(member);
+		});
+
+		return Object.fromEntries(
+			Object.entries(teamByPosition).map(([position, members]) => [
+				position,
+				[...members].sort((a, b) => {
+					// Check if teamMemberName exists before comparing
+					if (a.teamMemberName && b.teamMemberName) {
+						return a.teamMemberName.localeCompare(b.teamMemberName);
+					} else {
+						// If teamMemberName doesn't exist, don't compare
+						return 0;
+					}
+				}),
+			])
+		);
+	}, [team]);
+
+	const addTeamMemberToTeam = useCallback(async () => {
+		if (teamMemberName && position) {
+			try {
+				const newMember = await addTeamMember(teamMemberName, position);
+				setTeam((prevTeam) => [...prevTeam, newMember]);
 				clearInputs();
 			} catch (error) {
 				console.error('Error adding team member:', error);
@@ -33,86 +78,75 @@ function TeamOperations() {
 		} else {
 			alert('Please enter both name and position');
 		}
-	};
+	}, [teamMemberName, position, setTeam]);
 
-	const displayTeam = async () => {
-		try {
-			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
+	const deleteTeamMemberFromTeam = useCallback(
+		async (id, teamMemberName, position) => {
+			const confirmation = window.confirm(
+				`ARE YOU SURE YOU WANT TO DELETE:\n\n${
+					teamMemberName ? teamMemberName.toUpperCase() : 'Unknown'
+				} - ${position}?`
 			);
-			setTeam(response.data);
-		} catch (error) {
-			console.error('Error fetching team members:', error);
-			alert(`Failed to fetch team members: ${error.message}`);
-		}
-	};
+			if (!confirmation) {
+				return;
+			}
 
-	const fetchTeamMembers = async () => {
-		try {
-			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
-			);
-			setTeam(response.data);
-		} catch (error) {
-			console.error('Error fetching team members:', error);
-			alert('Failed to fetch team members');
-		}
-	};
+			try {
+				await deleteTeamMember(id);
+				setTeam((prevTeam) =>
+					prevTeam.filter((member) => member._id !== id)
+				);
+			} catch (error) {
+				console.error('Error deleting team member:', error);
+				alert('Failed to delete team member');
+			}
+		},
+		[setTeam]
+	);
 
-	const deleteTeamMember = async (id, name, position) => {
-		const confirmation = window.confirm(
-			`ARE YOU SURE YOU WANT TO DELETE:\n\n${name.toUpperCase()}	-	${position}?`
-		);
-		if (!confirmation) {
-			return;
-		}
-
-		try {
-			// Send a DELETE request to the server to delete the team member by ID
-			await axios.delete(
-				`${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${id}`
-			);
-			// Remove the deleted team member from the local state
-			setTeam((prevTeam) =>
-				prevTeam.filter((member) => member._id !== id)
-			);
-		} catch (error) {
-			console.error('Error deleting team member:', error);
-			alert('Failed to delete team member');
-		}
-	};
+	const handleDelete = useCallback((member) => {
+		deleteTeamMemberFromTeam(member._id);
+	}, [deleteTeamMemberFromTeam]);
 
 	return (
-		<div className="team-card">
-			<TeamMemberForm
-				name={name}
-				position={position}
-				setName={setName}
-				setPosition={setPosition}
-				addTeamMember={addTeamMember}
-			/>
-			{team.map((member) => (
-				<div key={member._id} className="member-card">
-					<strong>
-						{member.name.charAt(0).toUpperCase() +
-							member.name.slice(1)}
-					</strong>{' '}
-					- {member.position}
-					<button
-						onClick={() =>
-							deleteTeamMember(
-								member._id,
-								member.name,
-								member.position
-							)
-						}
-					>
-						Delete
-					</button>
-				</div>
-			))}
-		</div>
+		<Card className="team-card">
+			<CardContent>
+				<TeamMemberForm
+					teamMemberName={teamMemberName}
+					setTeamMemberName={setTeamMemberName}
+					position={position}
+					setPosition={setPosition}
+					addTeamMember={addTeamMemberToTeam}
+				/>
+				{POSITIONS.map((position) => (
+					<div key={position}>
+						<Typography variant="h5">
+							{capitalizeFirstLetter(position)}s
+						</Typography>
+						{teamByPosition[position].map((member) => (
+							<div key={member._id} className="member-card">
+								<Typography variant="body1">
+									{member.teamMemberName
+										? capitalizeFirstLetter(
+												member.teamMemberName
+										  )
+										: 'Unknown'}
+								</Typography>{' '}
+								- {member.position}
+								<Button
+									variant="contained"
+									color="secondary"
+									onClick={() => handleDelete(member)}
+								>
+									Delete
+								</Button>
+							</div>
+						))}
+					</div>
+				))}
+			</CardContent>
+		</Card>
 	);
-};
+}
 
 export default TeamOperations;

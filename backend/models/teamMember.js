@@ -1,46 +1,44 @@
 const mongoose = require('mongoose');
-const DailyTotals = require('./dailyTotals'); // import the DailyTotal model
-const WeeklyTotals = require('./weeklyTotals'); // import the DailyTotal model
 
+const dailyTotalSchema = new mongoose.Schema({
+    date: Date,
+    foodSales: Number,
+    barSales: Number,
+    nonCashTips: Number,
+    cashTips: Number,
+    barTipOuts: Number,
+    runnerTipOuts: Number,
+    hostTipOuts: Number,
+    totalTipOut: Number,
+    tipsReceived: Number,
+    tipsPayroll: Number,
+}, { _id: false }); // Prevent creation of id for subdocument
+
+const weeklyTotalSchema = new mongoose.Schema({
+    date: Date,
+    foodSales: Number,
+    barSales: Number,
+    nonCashTips: Number,
+    cashTips: Number,
+    barTipOuts: Number,
+    runnerTipOuts: Number,
+    hostTipOuts: Number,
+    totalTipOut: Number,
+    tipsReceived: Number,
+    tipsPayroll: Number,
+}, { _id: false }); // Prevent creation of id for subdocument
 
 const teamMemberSchema = new mongoose.Schema({
-    name: String,
+    teamMemberName: String,
     position: String,
-	dailyTotals: [{ 	
-	teamMember: {
-		type: String,
-		required: true,
-	},
-	position: {
-		type: String,
-		required: true,
-	},
-	date: String,
-	foodSales: Number,
-	barSales: Number,
-	nonCashTips: Number,
-	cashTips: Number,
-	barTipOuts: Number,
-	runnerTipOuts: Number,
-	hostTipOuts: Number,
-	totalTipOut: Number,
-	tipsReceived: Number,
-	tipsPayroll: Number, }],
-	weeklyTotals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WeeklyTotals' }],
+    dailyTotals: [dailyTotalSchema],
+    weeklyTotals: [weeklyTotalSchema],
 });
-
-teamMemberSchema.methods.addDailyTotal = function (dailyTotalData) {
-    this.dailyTotals.push({
-        ...dailyTotalData,
-        teamMember: this.name,
-        position: this.position,
-    });
-};
 
 // Add pre save middleware to capitalize name
 teamMemberSchema.pre('save', function (next) {
-    if (this.name && this.isModified('name')) {
-        this.name = this.name.charAt(0).toUpperCase() + this.name.slice(1);
+    if (this.teamMemberName && this.isModified('teamMemberName')) {
+        this.teamMemberName = this.teamMemberName.charAt(0).toUpperCase() + this.teamMemberName.slice(1);
     }
     next();
 });

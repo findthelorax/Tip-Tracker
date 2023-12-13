@@ -2,27 +2,66 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #ffffff;
+  background-color: #fff3f7;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  /* align-items: center; */
   min-height: 100vh;
 }
+
+@media (min-width: 768px) {
+  body {
+    justify-content: center;
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-.team-card {
-  padding-top: 20px;
+
+header {
+  background: linear-gradient(to right, #fffc47, #9400f7);
+  color: #fff;
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.databases-table {
+.card {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.team-card,
+.sales-card,
+.database-header,
+.database-row,
+.header-row,
+.flex-table-row {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.team-card {
+  padding-top: 20px;
+  background-color: #E0F7FA;
+}
+
+.databases-table,
+.sales-table {
   display: flex;
   flex-direction: column;
   margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .database-header,
-.database-row {
+.database-row,
+.header-row,
+.flex-table-row {
   display: flex;
   justify-content: space-between;
   padding: 5px;
@@ -31,6 +70,7 @@ code {
 
 .database-header {
   font-weight: bold;
+  background-color: #ada667;
 }
 
 .database-row {
@@ -39,29 +79,16 @@ code {
 
 .sales-card {
   margin-top: 20px;
-}
-
-.sales-table {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #ddd;
+  background-color: #3eb5c5;
 }
 
 .header-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: #f2f2f2;
+  background-color: #a45555;
   font-weight: bold;
   height: 40px;
-  flex: 1;
 }
 
 .flex-table-row {
-  display: flex;
-  flex: 1;
-  justify-content: space-between;
-  padding: 10px;
   border-bottom: 1px solid #ddd;
 }
 
@@ -72,7 +99,13 @@ code {
 .barSales-column,
 .nonCashTips-column,
 .cashTips-column,
-.totals-column {
+.barTipOuts-column,
+.runnerTipOuts-column,
+.hostTipOuts-column,
+.totalTipOuts-column,
+.tipsReceived-column,
+.totalPayrollTips-column,
+.action-column {
   flex: 1;
   min-width: 100px;
 }
@@ -83,4 +116,13 @@ justify-content: flex-end;
 }
 .date-column {
   min-width: 100px;
+}
+
+footer {
+  background: linear-gradient(to right, #d447ff, #00eff7);
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
