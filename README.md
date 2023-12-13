@@ -20,15 +20,25 @@
 
 # Tip Tracker
 
--   I believe I ran:
+-  I ran:
 
     -   npx create-react-app tip-tracker
     -   cd frontend | cd backend
     -   in each folder
 
     ```
-    npm install express mongoose cors axios body-parser react bootstrap mongodb date-fns-tz
+    npm install
     ```
+    - express
+    - mongoose
+    - react
+    - bootstrap
+    - materialui / icons
+    - cors
+    - mongodb
+    - axios
+    - body-parser
+    - date-fns-tz
 
     ### frontend
 
@@ -66,26 +76,6 @@
     - add in logic for calculating tipOuts
     - replace alerts with a modal
 
-# FIX
-
-    - Fix fetchDailyTotals /teamMembers and fetchDailyTotals returns the same data.
-    - Move teamMember.js api calls to a separate file
-    - Display daily totals table
-    - Move submit daily totals function
-
-    - in dailyTotals.js and databaseOps.js the useEffect is rendering twice in a row
-
-```
-	useEffect(() => {
-		fetchTotals();
-	}, [fetchTotals]);
-```
-
-```
-    useEffect(() => {
-        fetchDatabases();
-    }, [fetchDatabases]);
-```
 
 ## Notes
 
