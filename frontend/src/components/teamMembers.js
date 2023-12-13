@@ -8,6 +8,7 @@ import React, {
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
 import { getTeamMembers, addTeamMember, deleteTeamMember } from './api';
+import { Card, CardContent, Typography, Button } from '@material-ui/core';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
@@ -78,67 +79,75 @@ function TeamOperations() {
 		}
 	}, [teamMemberName, position, setTeam]);
 
-    const deleteTeamMemberFromTeam = useCallback(
-        async (id, teamMemberName, position) => {
-            const confirmation = window.confirm(
-                `ARE YOU SURE YOU WANT TO DELETE:\n\n${teamMemberName ? teamMemberName.toUpperCase() : 'Unknown'} - ${position}?`
-            );
-            if (!confirmation) {
-                return;
-            }
-    
-            try {
-                await deleteTeamMember(id);
-                setTeam((prevTeam) =>
-                    prevTeam.filter((member) => member._id !== id)
-                );
-            } catch (error) {
-                console.error('Error deleting team member:', error);
-                alert('Failed to delete team member');
-            }
-        },
-        [setTeam]
-    );
+	const deleteTeamMemberFromTeam = useCallback(
+		async (id, teamMemberName, position) => {
+			const confirmation = window.confirm(
+				`ARE YOU SURE YOU WANT TO DELETE:\n\n${
+					teamMemberName ? teamMemberName.toUpperCase() : 'Unknown'
+				} - ${position}?`
+			);
+			if (!confirmation) {
+				return;
+			}
+
+			try {
+				await deleteTeamMember(id);
+				setTeam((prevTeam) =>
+					prevTeam.filter((member) => member._id !== id)
+				);
+			} catch (error) {
+				console.error('Error deleting team member:', error);
+				alert('Failed to delete team member');
+			}
+		},
+		[setTeam]
+	);
 
 	return (
-		<div className="team-card">
-			<TeamMemberForm
-				teamMemberName={teamMemberName}
-				setTeamMemberName={setTeamMemberName}
-				position={position}
-				setPosition={setPosition}
-				addTeamMember={addTeamMemberToTeam}
-			/>
-			{POSITIONS.map((position) => (
-				<div key={position}>
-					<h2>{capitalizeFirstLetter(position)}s</h2>
-					{teamByPosition[position].map((member) => (
-						<div key={member._id} className="member-card">
-							<strong>
-								{/* Check if teamMemberName exists before trying to capitalize it */}
-								{member.teamMemberName
-									? capitalizeFirstLetter(
-											member.teamMemberName
-									  )
-									: 'Unknown'}
-							</strong>{' '}
-							- {member.position}
-							<button
-								onClick={() =>
-									deleteTeamMemberFromTeam(
-										member._id,
-										member.teamMemberName,
-										member.position
-									)
-								}
-							>
-								Delete
-							</button>
-						</div>
-					))}
-				</div>
-			))}
-		</div>
+		<Card className="team-card">
+			<CardContent>
+				<TeamMemberForm
+					teamMemberName={teamMemberName}
+					setTeamMemberName={setTeamMemberName}
+					position={position}
+					setPosition={setPosition}
+					addTeamMember={addTeamMemberToTeam}
+				/>
+				{POSITIONS.map((position) => (
+					<div key={position}>
+						<Typography variant="h5">
+							{capitalizeFirstLetter(position)}s
+						</Typography>
+						{teamByPosition[position].map((member) => (
+							<div key={member._id} className="member-card">
+								<Typography variant="body1">
+									{/* Check if teamMemberName exists before trying to capitalize it */}
+									{member.teamMemberName
+										? capitalizeFirstLetter(
+												member.teamMemberName
+										  )
+										: 'Unknown'}
+								</Typography>{' '}
+								- {member.position}
+								<Button
+									variant="contained"
+									color="secondary"
+									onClick={() =>
+										deleteTeamMemberFromTeam(
+											member._id,
+											member.teamMemberName,
+											member.position
+										)
+									}
+								>
+									Delete
+								</Button>
+							</div>
+						))}
+					</div>
+				))}
+			</CardContent>
+		</Card>
 	);
 }
 

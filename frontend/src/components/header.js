@@ -1,7 +1,16 @@
 import React from 'react';
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
 
 function Header() {
-    return <h1>Restaurant Team Management</h1>;
+    return (
+        <AppBar position="static">
+            <Toolbar>
+                <Typography variant="h6">
+                    Restaurant Team Management
+                </Typography>
+            </Toolbar>
+        </AppBar>
+    );
 };
 
 export default Header;

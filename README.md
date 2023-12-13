@@ -1,67 +1,100 @@
 # Tip Tracker
-- I believe I ran:
-	- npx create-react-app tip-tracker
-	- cd frontend | cd backend
-	- in each folder
-	```
-	npm install express mongoose cors axios body-parser react bootstrap mongodb date-fns-tz
-	```
 
-	### frontend
-		- nodemon
+-   I believe I ran:
 
-	### backend
-		- nodemon server.js
+    -   npx create-react-app tip-tracker
+    -   cd frontend | cd backend
+    -   in each folder
+
+    ```
+    npm install express mongoose cors axios body-parser react bootstrap mongodb date-fns-tz
+    ```
+
+    ### frontend
+
+        - nodemon
+
+    ### backend
+
+        - nodemon server.js
 
 # Tip Tracker
-- I believe I ran:
-	- npx create-react-app tip-tracker
-	- cd frontend | cd backend
-	- in each folder
-	```
-	npm install express mongoose cors axios body-parser react bootstrap mongodb date-fns-tz
-	```
 
-	### frontend
-		- nodemon
+-   I believe I ran:
 
-	### backend
-		- nodemon server.js
+    -   npx create-react-app tip-tracker
+    -   cd frontend | cd backend
+    -   in each folder
 
+    ```
+    npm install express mongoose cors axios body-parser react bootstrap mongodb date-fns-tz
+    ```
+
+    ### frontend
+
+    - nodemon
+        - removed dependency for material-ui
+            ```
+            "@testing-library/react": "^14.1.2",
+            npm install react@17.0.0 react-dom@17.0.0
+            npm install @material-ui/core
+            npm install @material-ui/icons
+            ```
+
+    - src/index.js
+        - FROM
+            ```
+            import ReactDOM from 'react-dom/client';
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(
+            );
+            ```
+        - TO
+            ```
+            import ReactDOM from 'react-dom';
+            ReactDOM.render(<App />, document.getElementById('root'));
+            ```
+
+    ### backend
+
+        - nodemon server.js
 
 # To-Do
-	- add tipOut data to dailyTotals array and table
-	- populate weeklyTotals table with the data from a selected week. Automatically populated with the current week Sunday to Saturday.
-	- add in logic for calculating tipOuts
-	- replace alerts with a modal
 
-
+    - add tipOut data to dailyTotals array and table
+    - populate weeklyTotals table with the data from a selected week. Automatically populated with the current week Sunday to Saturday.
+    - add in logic for calculating tipOuts
+    - replace alerts with a modal
 
 # FIX
+
     - Fix fetchDailyTotals /teamMembers and fetchDailyTotals returns the same data.
-	- Move teamMember.js api calls to a separate file
-	- Display daily totals table
-	- Move submit daily totals function
+    - Move teamMember.js api calls to a separate file
+    - Display daily totals table
+    - Move submit daily totals function
 
     - in dailyTotals.js and databaseOps.js the useEffect is rendering twice in a row
+
 ```
 	useEffect(() => {
 		fetchTotals();
 	}, [fetchTotals]);
 ```
+
 ```
     useEffect(() => {
         fetchDatabases();
     }, [fetchDatabases]);
 ```
 
-
 ## Notes
-	- reducer is a function that determines how the application's state should change in response to an action. It takes the current state and an action as arguments, and returns the new state.
 
-	- dispatch is a function from the useReducer hook. When you call dispatch with an action, React will call your reducer with the current state and that action. The reducer returns the new state, and React updates the component with the new state.
+    - reducer is a function that determines how the application's state should change in response to an action. It takes the current state and an action as arguments, and returns the new state.
+
+    - dispatch is a function from the useReducer hook. When you call dispatch with an action, React will call your reducer with the current state and that action. The reducer returns the new state, and React updates the component with the new state.
 
 ### Modal
+
 ```
 npm install react-modal
 

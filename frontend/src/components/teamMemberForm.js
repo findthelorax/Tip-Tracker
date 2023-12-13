@@ -1,4 +1,13 @@
 import React from 'react';
+import {
+	TextField,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
+	Button,
+	Box,
+} from '@material-ui/core';
 
 const POSITIONS = ['Bartender', 'Runner', 'Server', 'Host'];
 
@@ -15,29 +24,41 @@ function TeamMemberForm({
 	};
 
 	return (
-		<form className="input-card" onSubmit={handleSubmit}>
-			<label htmlFor="name">Name:</label>
-			<input
-				type="text"
+		<form onSubmit={handleSubmit}>
+			<TextField
 				id="teamMemberName"
+				label="Name"
 				placeholder="Enter name"
 				value={teamMemberName}
 				onChange={(e) => setTeamMemberName(e.target.value)}
+				fullWidth
+				margin="normal"
 			/>
-			<label htmlFor="position">Position:</label>
-			<select
-				id="position"
-				value={position}
-				onChange={(e) => setPosition(e.target.value)}
-			>
-				<option value="" disabled>Select a position</option>
-				{POSITIONS.map((position) => (
-					<option key={position} value={position.toLowerCase()}>{position}</option>
-				))}
-			</select>
-			<button type="submit">Add to Team</button>
+			<FormControl fullWidth margin="normal">
+				<InputLabel id="position">Position</InputLabel>
+				<Select
+					labelId="position"
+					id="position"
+					value={position}
+					onChange={(e) => setPosition(e.target.value)}
+				>
+					<MenuItem value="" disabled>
+						Select a position
+					</MenuItem>
+					{POSITIONS.map((position) => (
+						<MenuItem key={position} value={position.toLowerCase()}>
+							{position}
+						</MenuItem>
+					))}
+				</Select>
+			</FormControl>
+			<Box mt={2}>
+				<Button variant="contained" color="primary" type="submit">
+					Add to Team
+				</Button>
+			</Box>
 		</form>
 	);
-};
+}
 
 export default TeamMemberForm;

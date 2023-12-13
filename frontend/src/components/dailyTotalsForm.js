@@ -1,51 +1,83 @@
 import React from 'react';
+import {
+	TextField,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
+	Button,
+	Typography,
+	Box,
+} from '@material-ui/core';
 
-function InputField({ id, value, onChange, label, type = 'number', parseValue = parseFloat }) {
+function InputField({
+	id,
+	value,
+	onChange,
+	label,
+	type = 'number',
+	parseValue = parseFloat,
+}) {
 	return (
-		<div>
-			<label htmlFor={id}>{label}:</label>
-			<input
-				type={type}
-				id={id}
-				value={value}
-				onChange={(e) => onChange(id, parseValue(e.target.value))}
-			/>
-		</div>
+		<TextField
+			type={type}
+			id={id}
+			label={label}
+			value={value}
+			onChange={(e) => onChange(id, parseValue(e.target.value))}
+			fullWidth
+			margin="normal"
+		/>
 	);
 }
 
 function TeamMemberSelect({ team, value, onChange }) {
 	return (
-		<div>
-			<label htmlFor="teamMemberName">Team Member:</label>
-			<select
+		<FormControl fullWidth margin="normal">
+			<InputLabel id="teamMemberName">Team Member</InputLabel>
+			<Select
+				labelId="teamMemberName"
 				id="teamMemberName"
 				value={value}
 				onChange={(e) => onChange('teamMemberName', e.target.value)}
 			>
-				<option value="" disabled>Select Team Member</option>
+				<MenuItem value="" disabled>
+					Select Team Member
+				</MenuItem>
 				{team.map((member) => (
-					<option key={member._id} value={member.teamMemberName}>
+					<MenuItem key={member._id} value={member.teamMemberName}>
 						{`${member.teamMemberName} - ${member.position}`}
-					</option>
+					</MenuItem>
 				))}
-			</select>
-		</div>
+			</Select>
+		</FormControl>
 	);
 }
 
-function DailyTotalsForm({ team, dailyTotals, setDailyTotals, submitDailyTotals }) {
+function DailyTotalsForm({
+	team,
+	dailyTotals,
+	setDailyTotals,
+	submitDailyTotals,
+}) {
 	const handleDailyTotalsChange = (field, value) => {
 		let updates = { [field]: value };
 
 		if (field === 'teamMemberName') {
-			const selectedMember = team.find((member) => member.teamMemberName === value);
+			const selectedMember = team.find(
+				(member) => member.teamMemberName === value
+			);
 			updates = {
-				teamMemberName: selectedMember ? selectedMember.teamMemberName : '',
+				teamMemberName: selectedMember
+					? selectedMember.teamMemberName
+					: '',
 				position: selectedMember ? selectedMember.position : '',
 			};
 		}
-		setDailyTotals((prevDailyTotals) => ({ ...prevDailyTotals, ...updates }));
+		setDailyTotals((prevDailyTotals) => ({
+			...prevDailyTotals,
+			...updates,
+		}));
 	};
 
 	const handleSubmit = (event) => {
@@ -55,7 +87,9 @@ function DailyTotalsForm({ team, dailyTotals, setDailyTotals, submitDailyTotals 
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<h2>Daily Totals</h2>
+			<Typography variant="h5" gutterBottom>
+				Daily Totals
+			</Typography>
 			<TeamMemberSelect
 				team={team}
 				value={dailyTotals.teamMemberName}
@@ -93,7 +127,11 @@ function DailyTotalsForm({ team, dailyTotals, setDailyTotals, submitDailyTotals 
 				onChange={handleDailyTotalsChange}
 				label="Cash Tips"
 			/>
-			<button type="submit">Submit Daily Totals</button>
+			<Box mt={2}>
+				<Button variant="contained" color="primary" type="submit">
+					Submit Daily Totals
+				</Button>
+			</Box>{' '}
 		</form>
 	);
 }

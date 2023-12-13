@@ -1,20 +1,18 @@
-import React, {
-	useState,
-	useEffect,
-	useContext,
-	useMemo,
-	useCallback,
-	memo,
-} from 'react';
-import { FormattedDate } from './dateUtils';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Typography } from '@material-ui/core';
 import DailyTotalsForm from './dailyTotalsForm';
-import { ErrorContext } from './contexts/ErrorContext';
-import {
-	fetchDailyTotalsAll,
-	deleteDailyTotalFromServer,
-	submitDailyTotalToServer,
-} from './api';
+import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from './contexts/TeamContext';
+import { ErrorContext } from './contexts/ErrorContext';
+
+const useStyles = makeStyles({
+	tableRow: {
+		'&:nth-of-type(odd)': {
+			backgroundColor: '#f4f4f4', // change this to your desired color
+		},
+	},
+});
 
 const today = new Date();
 const localDate = new Date(
@@ -26,18 +24,8 @@ const localDate = new Date(
 	.split('T')[0];
 // const timeZone = "America/New_York";
 
-const CurrencyColumn = memo(({ className, value }) => (
-	<td className={className}>
-		{value
-			? Number(value).toLocaleString('en-US', {
-					style: 'currency',
-					currency: 'USD',
-			  })
-			: 'N/A'}
-	</td>
-));
-
 function DailyTotals() {
+	const classes = useStyles();
 	const { team, setTeam } = useContext(TeamContext);
 	const { setError } = useContext(ErrorContext);
 	const [dailyTotalsAll, setDailyTotalsAll] = useState([]);
@@ -60,13 +48,7 @@ function DailyTotals() {
 	const fetchDailyTotals = useCallback(async () => {
 		try {
 			const data = await fetchDailyTotalsAll();
-			const updatedData = data.map((dailyTotal) => ({
-				...dailyTotal,
-				teamMemberName: dailyTotal.teamMemberName,
-				position: dailyTotal.position,
-			}));
-			// console.log(`Fetched Totals:`, updatedData);
-			setDailyTotalsAll(updatedData);
+			setDailyTotalsAll(data);
 		} catch (error) {
 			console.error(error);
 			setError(error.message);
@@ -84,10 +66,14 @@ function DailyTotals() {
 				return;
 			}
 
-			const selectedTeamMember = findSelectedTeamMember(
+			const selectedTeamMember = findCorrespondingTeamMember(
 				team,
 				dailyTotals
 			);
+
+			console.log('team SUBMIT:', team);
+			console.log('dailyTotals SUBMIT:', dailyTotals);
+			console.log('selectedTeamMember SUBMIT:', selectedTeamMember);
 
 			if (!selectedTeamMember) {
 				alert('Selected team member not found in the team list.');
@@ -138,12 +124,6 @@ function DailyTotals() {
 			return false;
 		}
 		return true;
-	};
-
-	const findSelectedTeamMember = (team, dailyTotals) => {
-		return team.find(
-			(member) => member.teamMemberName === dailyTotals.teamMemberName
-		);
 	};
 
 	const prepareDailyTotals = (selectedTeamMember, dailyTotals) => {
@@ -203,7 +183,7 @@ function DailyTotals() {
 				}
 				if (!dailyTotal || !dailyTotal._id) {
 					console.error(
-						`dailyTotal._id is undefined: , ${dailyTotal}, ${dailyTotal}`
+						`dailyTotal._id is undefined: , ${dailyTotal}, ID: ,  ${dailyTotal._id}`
 					);
 					return;
 				}
@@ -222,213 +202,33 @@ function DailyTotals() {
 		[setError, fetchDailyTotals]
 	);
 
-	//TODO: FIX DAILY TOTALS SORTING
-	// sortedDailyTotals.map callback breakdown
 	const findCorrespondingTeamMember = (team, dailyTotal) => {
-		return team.find((member) => member._id === dailyTotal._id);
+		const result = team.find((member) => member._id === dailyTotal._id);
+		console.log('findCorrespondingTeamMember:', result);
+		return result;
 	};
 
-	const checkIfFirstItem = (dailyTotal, index, array) => {
-		return (
-			index === 0 ||
-			array[index - 1].teamMemberName !== dailyTotal.teamMemberName
-		);
-	};
+    return (
+        <React.Fragment>
+            <DailyTotalsForm
+                dailyTotals={dailyTotals}
+                setDailyTotals={setDailyTotals}
+                submitDailyTotals={submitDailyTotals}
+                team={team}
+                setTeam={setTeam}
+            />
 
-	const sortedDailyTotals = useMemo(() => {
-		const sorted = [...dailyTotalsAll].sort((a, b) => {
-			const correspondingTeamMemberA = team.find(
-				(member) => member._id === a._id
-			);
-			const correspondingTeamMemberB = team.find(
-				(member) => member._id === b._id
-			);
+            <Typography variant="h1" component="h2" gutterBottom>
+                DAILY TOTALS
+            </Typography>
 
-			if (!correspondingTeamMemberA || !correspondingTeamMemberB) {
-				return 0;
-			}
-
-			const positionComparison =
-				correspondingTeamMemberA.position.localeCompare(
-					correspondingTeamMemberB.position
-				);
-			if (positionComparison !== 0) {
-				return positionComparison;
-			}
-
-			return correspondingTeamMemberA.teamMemberName.localeCompare(
-				correspondingTeamMemberB.teamMemberName
-			);
-		});
-		// console.log(`SORTED: ${JSON.stringify(sorted, null, 2)}`);
-		return sorted;
-	}, [dailyTotalsAll, team]);
-
-	return (
-		<div>
-			<DailyTotalsForm
-				dailyTotals={dailyTotals}
-				setDailyTotals={setDailyTotals}
-				submitDailyTotals={submitDailyTotals}
-				team={team}
-				setTeam={setTeam}
-			/>
-
-			<h2>Daily Totals</h2>
-			<table className="sales-table">
-				<thead>
-					<tr className="header-row">
-						<th>Date</th>
-						<th>Food Sales</th>
-						<th>Bar Sales</th>
-						<th>Non-Cash Tips</th>
-						<th>Cash Tips</th>
-						<th>Bar Tip Outs</th>
-						<th>Runner Tip Outs</th>
-						<th>Host Tip Outs</th>
-						<th>Total Tip Outs</th>
-						<th>Tips Received</th>
-						<th>Total Payroll Tips</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					{/* {sortedDailyTotals.map((dailyTotal, index, array) => {
-						console.log(`dailyTotal at index ${index}:`, JSON.stringify(dailyTotal, null, 2));
-						 */}
-					{sortedDailyTotals.map((teamMember, index) => {
-						// console.log('sortedDailyTotals:', JSON.stringify(sortedDailyTotals, null, 2));
-
-						console.log(
-							`teamMember at index ${index}:`,
-							JSON.stringify(teamMember, null, 2)
-						);
-
-						return teamMember.dailyTotals.map(
-							(dailyTotal, dailyTotalIndex) => {
-								console.log(
-									`dailyTotal at index ${dailyTotalIndex} for teamMember at index ${index}:`,
-									JSON.stringify(dailyTotal, null, 2)
-								);
-
-								const correspondingTeamMember =
-									findCorrespondingTeamMember(
-										team,
-										dailyTotal
-									);
-
-								if (!correspondingTeamMember) {
-									return null;
-								}
-
-								const isFirstItem = checkIfFirstItem(
-									dailyTotal,
-									index,
-									teamMember
-									// array
-								);
-
-								const currencyColumns = [
-									{
-										className: 'foodSales-column',
-										value: dailyTotal.foodSales,
-									},
-									{
-										className: 'barSales-column',
-										value: dailyTotal.barSales,
-									},
-									{
-										className: 'nonCashTips-column',
-										value: dailyTotal.nonCashTips,
-									},
-									{
-										className: 'cashTips-column',
-										value: dailyTotal.cashTips,
-									},
-									{
-										className: 'barTipOuts-column',
-										value: dailyTotal.barTipOuts,
-									},
-									{
-										className: 'runnerTipOuts-column',
-										value: dailyTotal.runnerTipOuts,
-									},
-									{
-										className: 'hostTipOuts-column',
-										value: dailyTotal.hostTipOuts,
-									},
-									{
-										className: 'totalTipOuts-column',
-										value: dailyTotal.totalTipOuts,
-									},
-									{
-										className: 'tipsReceived-column',
-										value: dailyTotal.tipsReceived,
-									},
-									{
-										className: 'totalPayrollTips-column',
-										value: dailyTotal.totalPayrollTips,
-									},
-								];
-
-								return (
-									<React.Fragment
-										key={dailyTotal._id || index}
-									>
-										{isFirstItem && (
-											<tr>
-												<td colSpan="12">
-													<div className="teamMember-separator">
-														<hr />
-														<p>{`${
-															dailyTotal.teamMemberName
-														} - ${
-															correspondingTeamMember
-																? correspondingTeamMember.position ||
-																  'No Position'
-																: 'Unknown Team Member'
-														}`}</p>
-														<hr />
-													</div>
-												</td>
-											</tr>
-										)}
-										<tr className="flex-table-row">
-											<td className="date-column">
-												{dailyTotal.date
-													? FormattedDate(
-															dailyTotal.date
-													  )
-													: dailyTotal.date}
-											</td>
-											{currencyColumns.map((column) => (
-												<CurrencyColumn
-													className={column.className}
-													value={column.value}
-												/>
-											))}
-											<td className="delete-button-column">
-												<button
-													onClick={() =>
-														deleteDailyTotal(
-															dailyTotal,
-															correspondingTeamMember
-														)
-													}
-												>
-													Delete
-												</button>
-											</td>
-										</tr>
-									</React.Fragment>
-								);
-							}
-						);
-					})}
-				</tbody>
-			</table>
-		</div>
-	);
-}
+            <DailyTotalsTable
+                team={team}
+                classes={classes}
+                deleteDailyTotal={deleteDailyTotal}
+            />
+        </React.Fragment>
+    );
+};
 
 export default DailyTotals;

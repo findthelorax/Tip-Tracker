@@ -1,13 +1,14 @@
 import React, { useReducer, useMemo } from 'react';
-import Header from './components/header';
-import TeamOperations from './components/teamMembers';
-import DatabaseOperations from './components/databaseOps';
-import WeeklySales from './components/weeklySales';
-import DailyTotals from './components/dailyTotals';
-import ErrorComponent from './components/errorComponent';
-import { TeamProvider } from './components/contexts/TeamContext';
-import { DailyTotalsProvider } from './components/contexts/DailyTotalsContext';
-import { ErrorProvider } from './components/contexts/ErrorContext';
+import Header from '../header';
+import TeamOperations from '../teamMembers';
+import DatabaseOperations from '../databaseOps';
+import WeeklySales from '../weeklySales';
+import DailyTotals from '../dailyTotals';
+import ErrorComponent from '../errorComponent';
+import { TeamProvider } from '../contexts/TeamContext';
+import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
+import { ErrorProvider } from '../contexts/ErrorContext';
+import logo from '../../logo.svg';
 
 const initialState = {
 	team: [],
