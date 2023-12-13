@@ -1,14 +1,9 @@
-import React, { useReducer, useMemo } from 'react';
-import Header from '../header';
-import TeamOperations from '../teamMembers';
-import DatabaseOperations from '../databaseOps';
-import WeeklySales from '../weeklySales';
-import DailyTotals from '../dailyTotals';
-import ErrorComponent from '../errorComponent';
+import React, { useReducer, useMemo, useState } from 'react';
 import { TeamProvider } from '../contexts/TeamContext';
 import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
 import { ErrorProvider } from '../contexts/ErrorContext';
-import logo from '../../logo.svg';
+import Dashboard from './Dashboard';
+// import logo from '../../logo.svg';
 
 const initialState = {
 	team: [],
@@ -22,8 +17,8 @@ function reducer(state, action) {
 			return { ...state, team: action.payload };
 		case 'updateDailyTotals':
 			return { ...state, dailyTotals: action.payload };
-		case 'updateWeeklySales':
-			return { ...state, weeklySales: action.payload };
+		case 'updateWeeklyTotals':
+			return { ...state, WeeklyTotals: action.payload };
 		case 'updateError':
 			return { ...state, error: action.payload };
 		default:
@@ -44,20 +39,13 @@ function updateDailyTotals(value) {
 	return { type: 'updateDailyTotals', payload: value };
 }
 
-// function updateWeeklySales(value) {
-//     return { type: 'updateWeeklySales', payload: value };
-// }
-
-// function updateTeamMembers(value) {
-//     return { type: 'updateTeamMembers', payload: value };
-// }
-
-// function updateDailyTotalsAll(value) {
-//     return { type: 'updateDailyTotalsAll', payload: value };
+// function updateWeeklyTotals(value) {
+// 	return { type: 'updateWeeklyTotals', payload: value };
 // }
 
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const [selectedTeamMember, setSelectedTeamMember] = useState(null);
 
 	// Memoized context values
 	const teamContextValue = useMemo(
@@ -80,40 +68,30 @@ function App() {
 		() => ({
 			dailyTotals: state.dailyTotals,
 			setDailyTotals: (value) => dispatch(updateDailyTotals(value)),
+			selectedTeamMember,
+			setSelectedTeamMember,
 		}),
-		[state.dailyTotals]
+		[state.dailyTotals, selectedTeamMember]
 	);
 
-	// const weeklySalesContextValue = useMemo(() => ({
-	//     weeklySales: state.weeklySales,
-	//     setWeeklySales: (value) => dispatch(updateWeeklySales(value)),
-	// }), [state.weeklySales]);
-
-	// const dailyTotalsAllContextValue = useMemo(() => ({
-	//     dailyTotalsAll: state.dailyTotalsAll,
-	//     setDailyTotalsAll: (value) => dispatch(updateDailyTotalsAll(value)),
-	// }), [state.dailyTotalsAll]);
-
-	// const teamMembersContextValue = useMemo(() => ({
-	//     teamMembers: state.teamMembers,
-	//     setTeamMembers: (value) => dispatch(updateTeamMembers(value)),
-	// }), [state.teamMembers]);
+	// const weeklyTotalsContextValue = useMemo(
+	// 	() => ({
+	// 		weekltTotals: state.weeklyTotals,
+	// 		setWeeklyTotals: (value) => dispatch(updateWeeklyTotals(value)),
+	// 	}),
+	// 	[state.weeklyTotals]
+	// );
 
 	return (
-			<ErrorProvider value={errorContextValue}>
-				<TeamProvider value={teamContextValue}>
-					<DailyTotalsProvider value={dailyTotalsContextValue}>
-						<div className="App">
-							<Header />
-							<DatabaseOperations />
-							<TeamOperations />
-							<DailyTotals refresh={state.refresh} />
-							<WeeklySales refresh={state.refresh} />
-							<ErrorComponent error={state.error} />
-						</div>
-					</DailyTotalsProvider>
-				</TeamProvider>
-			</ErrorProvider>
+		<ErrorProvider value={errorContextValue}>
+			<TeamProvider value={teamContextValue}>
+				<DailyTotalsProvider value={dailyTotalsContextValue}>
+					<div className="App">
+                    <Dashboard refresh={state.refresh} error={state.error} />
+					</div>
+				</DailyTotalsProvider>
+			</TeamProvider>
+		</ErrorProvider>
 	);
 }
 

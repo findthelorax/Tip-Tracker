@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
-import { getTeamMembers, addTeamMember, deleteTeamMember } from './api';
+import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
 import { Card, CardContent, Typography, Button } from '@material-ui/core';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
@@ -18,6 +18,7 @@ const capitalizeFirstLetter = (string) =>
 function TeamOperations() {
 	const { team, setTeam } = useContext(TeamContext);
 	const [teamMemberName, setTeamMemberName] = useState('');
+
 	const [position, setPosition] = useState('bartender');
 
 	const clearInputs = () => {
@@ -103,6 +104,10 @@ function TeamOperations() {
 		[setTeam]
 	);
 
+	const handleDelete = useCallback((member) => {
+		deleteTeamMemberFromTeam(member._id);
+	}, [deleteTeamMemberFromTeam]);
+
 	return (
 		<Card className="team-card">
 			<CardContent>
@@ -121,7 +126,6 @@ function TeamOperations() {
 						{teamByPosition[position].map((member) => (
 							<div key={member._id} className="member-card">
 								<Typography variant="body1">
-									{/* Check if teamMemberName exists before trying to capitalize it */}
 									{member.teamMemberName
 										? capitalizeFirstLetter(
 												member.teamMemberName
@@ -132,13 +136,7 @@ function TeamOperations() {
 								<Button
 									variant="contained"
 									color="secondary"
-									onClick={() =>
-										deleteTeamMemberFromTeam(
-											member._id,
-											member.teamMemberName,
-											member.position
-										)
-									}
+									onClick={() => handleDelete(member)}
 								>
 									Delete
 								</Button>

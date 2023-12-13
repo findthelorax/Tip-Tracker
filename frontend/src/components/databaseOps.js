@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { ErrorContext } from './contexts/ErrorContext';
 import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { getDatabases, deleteDatabase } from './api';
+import { getDatabases, deleteDatabase } from './utils/api';
 import {
 	Button,
 	Card,

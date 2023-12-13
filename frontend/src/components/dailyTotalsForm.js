@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
 	TextField,
 	FormControl,
@@ -9,6 +9,25 @@ import {
 	Typography,
 	Box,
 } from '@material-ui/core';
+// eslint-disable-next-line
+import { TeamContext } from './contexts/TeamContext';
+// import { ErrorContext } from './contexts/ErrorContext';
+import { DailyTotalsContext } from './contexts/DailyTotalsContext';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(2),
+    backgroundColor: '#f5f5f5',
+    borderRadius: '5px',
+  },
+  input: {
+    margin: theme.spacing(1),
+  },
+}));
 
 function InputField({
 	id,
@@ -17,35 +36,46 @@ function InputField({
 	label,
 	type = 'number',
 	parseValue = parseFloat,
-}) {
+  }) {
+	const classes = useStyles();
 	return (
-		<TextField
-			type={type}
-			id={id}
-			label={label}
-			value={value}
-			onChange={(e) => onChange(id, parseValue(e.target.value))}
-			fullWidth
-			margin="normal"
-		/>
+	  <TextField
+		type={type}
+		id={id}
+		label={label}
+		value={value}
+		onChange={(e) => onChange(id, parseValue(e.target.value))}
+		fullWidth
+		margin="normal"
+		className={classes.input}
+		inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} // This will bring up the numeric keypad on mobile devices
+	  />
 	);
-}
+  }
 
-function TeamMemberSelect({ team, value, onChange }) {
+function TeamMemberSelect({ team, value = '', onChange }) {
+	const { setSelectedTeamMember } = useContext(DailyTotalsContext);
+	const handleTeamMemberSelect = (event) => {
+		const selectedMember = team.find(
+			(member) => member._id === event.target.value
+		);
+		setSelectedTeamMember(selectedMember);
+		onChange('teamMemberID', selectedMember ? selectedMember._id : '');
+	};
 	return (
 		<FormControl fullWidth margin="normal">
-			<InputLabel id="teamMemberName">Team Member</InputLabel>
+			<InputLabel id="teamMemberSelectName">Team Member</InputLabel>
 			<Select
-				labelId="teamMemberName"
-				id="teamMemberName"
+				labelId="teamMemberSelectName"
+				id="teamMemberSelectName"
 				value={value}
-				onChange={(e) => onChange('teamMemberName', e.target.value)}
+				onChange={handleTeamMemberSelect}
 			>
 				<MenuItem value="" disabled>
 					Select Team Member
 				</MenuItem>
 				{team.map((member) => (
-					<MenuItem key={member._id} value={member.teamMemberName}>
+					<MenuItem key={member._id} value={member._id}>
 						{`${member.teamMemberName} - ${member.position}`}
 					</MenuItem>
 				))}
@@ -59,40 +89,33 @@ function DailyTotalsForm({
 	dailyTotals,
 	setDailyTotals,
 	submitDailyTotals,
+	selectedTeamMember,
+	setSelectedTeamMember,
 }) {
+	const classes = useStyles();
+	
 	const handleDailyTotalsChange = (field, value) => {
 		let updates = { [field]: value };
 
-		if (field === 'teamMemberName') {
-			const selectedMember = team.find(
-				(member) => member.teamMemberName === value
-			);
-			updates = {
-				teamMemberName: selectedMember
-					? selectedMember.teamMemberName
-					: '',
-				position: selectedMember ? selectedMember.position : '',
-			};
-		}
 		setDailyTotals((prevDailyTotals) => ({
 			...prevDailyTotals,
 			...updates,
 		}));
 	};
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		submitDailyTotals(dailyTotals);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		await submitDailyTotals(dailyTotals, selectedTeamMember);
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<Typography variant="h5" gutterBottom>
+		<form onSubmit={handleSubmit} className={classes.form}>
+		<Typography variant="h5" gutterBottom>
 				Daily Totals
 			</Typography>
 			<TeamMemberSelect
 				team={team}
-				value={dailyTotals.teamMemberName}
+				value={selectedTeamMember._id}
 				onChange={handleDailyTotalsChange}
 			/>
 			<InputField

@@ -4,7 +4,14 @@ import { Typography } from '@material-ui/core';
 import DailyTotalsForm from './dailyTotalsForm';
 import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from './contexts/TeamContext';
+import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { ErrorContext } from './contexts/ErrorContext';
+import {
+	fetchDailyTotalsAll,
+	deleteDailyTotalFromServer,
+	submitDailyTotalToServer,
+} from './utils/api';
+import { FormattedDate } from './utils/dateUtils';
 
 const useStyles = makeStyles({
 	tableRow: {
@@ -27,23 +34,33 @@ const localDate = new Date(
 function DailyTotals() {
 	const classes = useStyles();
 	const { team, setTeam } = useContext(TeamContext);
+	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll } = useContext(DailyTotalsContext);
 	const { setError } = useContext(ErrorContext);
-	const [dailyTotalsAll, setDailyTotalsAll] = useState([]);
 	const [dailyTotals, setDailyTotals] = useState({
-		teamMemberName: '',
-		position: '',
 		date: localDate,
-		foodSales: '',
-		barSales: '',
-		nonCashTips: '',
-		cashTips: '',
-		barTipOuts: '',
-		runnerTipOuts: '',
-		hostTipOuts: '',
-		totalTipOuts: '',
-		tipsReceived: '',
-		totalPayrollTips: '',
+		foodSales: 0,
+		barSales: 0,
+		nonCashTips: 0,
+		cashTips: 0,
+		barTipOuts: 0,
+		runnerTipOuts: 0,
+		hostTipOuts: 0,
+		totalTipOuts: 0,
+		tipsReceived: 0,
+		totalPayrollTips: 0,
 	});
+
+	
+	const handleSubmissionError = useCallback((error, dailyTotals) => {
+		if (error.response && error.response.status === 400) {
+			alert(
+				`Totals on ${dailyTotals.date} for ${selectedTeamMember.teamMemberName} - ${selectedTeamMember.position} already exists.`
+			);
+		} else {
+			alert('An error occurred while submitting daily totals.');
+		}
+		console.error(error);
+	}, [selectedTeamMember]);
 
 	const fetchDailyTotals = useCallback(async () => {
 		try {
@@ -53,7 +70,7 @@ function DailyTotals() {
 			console.error(error);
 			setError(error.message);
 		}
-	}, [setError]);
+	}, [setError, setDailyTotalsAll]);
 
 	useEffect(() => {
 		fetchDailyTotals();
@@ -61,29 +78,24 @@ function DailyTotals() {
 
 	// submitDailyTotals function breakdown
 	const submitDailyTotals = useCallback(
-		async (dailyTotals) => {
-			if (!validateDailyTotals(dailyTotals, dailyTotalsAll)) {
-				return;
-			}
-
-			const selectedTeamMember = findCorrespondingTeamMember(
-				team,
-				dailyTotals
+		async (dailyTotals, selectedTeamMember) => {
+			const existingTeamMember = team.find(
+				(member) => member._id === selectedTeamMember._id
 			);
-
-			console.log('team SUBMIT:', team);
-			console.log('dailyTotals SUBMIT:', dailyTotals);
-			console.log('selectedTeamMember SUBMIT:', selectedTeamMember);
 
 			if (!selectedTeamMember) {
 				alert('Selected team member not found in the team list.');
 				return;
 			}
 
-			const newDailyTotals = prepareDailyTotals(
-				selectedTeamMember,
-				dailyTotals
-			);
+			if (existingTeamMember._id !== selectedTeamMember._id) {
+				alert(
+					'Selected team member does not match the existing team member.'
+				);
+				return;
+			}
+
+			const newDailyTotals = prepareDailyTotals(dailyTotals);
 
 			try {
 				await submitDailyTotalToServer(
@@ -96,40 +108,11 @@ function DailyTotals() {
 				handleSubmissionError(error, dailyTotals);
 			}
 		},
-		[team, dailyTotalsAll, fetchDailyTotals]
+		[team, fetchDailyTotals, handleSubmissionError]
 	);
 
-	const validateDailyTotals = (dailyTotals, dailyTotalsAll) => {
-		if (
-			!dailyTotals.teamMemberName &&
-			!dailyTotals.position &&
-			!dailyTotals.date
-		) {
-			alert('INVALID DATA!');
-			console.log(dailyTotals);
-			return false;
-		}
-
-		const isDuplicateDailyTotal = dailyTotalsAll.find(
-			(total) =>
-				total.teamMemberName === dailyTotals.teamMemberName &&
-				total.position === dailyTotals.position &&
-				total.date === dailyTotals.date
-		);
-
-		if (isDuplicateDailyTotal) {
-			alert(
-				`${isDuplicateDailyTotal.date} totals for ${isDuplicateDailyTotal.teamMemberName} - ${isDuplicateDailyTotal.position} already exist.`
-			);
-			return false;
-		}
-		return true;
-	};
-
-	const prepareDailyTotals = (selectedTeamMember, dailyTotals) => {
+	const prepareDailyTotals = (dailyTotals) => {
 		return {
-			teamMemberName: selectedTeamMember.teamMemberName,
-			position: selectedTeamMember.position,
 			date: dailyTotals.date,
 			foodSales: dailyTotals.foodSales,
 			barSales: dailyTotals.barSales,
@@ -148,26 +131,21 @@ function DailyTotals() {
 		setDailyTotals({
 			teamMember: '',
 			date: new Date(),
-			foodSales: '',
-			barSales: '',
-			nonCashTips: '',
-			cashTips: '',
+			foodSales: 0,
+			barSales: 0,
+			nonCashTips: 0,
+			cashTips: 0,
+			barTipOuts: 0,
+			runnerTipOuts: 0,
+			hostTipOuts: 0,
+			totalTipOuts: 0,
+			tipsReceived: 0,
+			totalPayrollTips: 0,
 		});
 	};
 
-	const handleSubmissionError = (error, dailyTotals) => {
-		if (error.response && error.response.status === 400) {
-			alert(
-				`Totals on ${dailyTotals.date} for ${dailyTotals.teamMember} - ${dailyTotals.position} already exists.`
-			);
-		} else {
-			alert('An error occurred while submitting daily totals.');
-		}
-		console.error(error);
-	};
-
 	const deleteDailyTotal = useCallback(
-		async (dailyTotal, correspondingTeamMember) => {
+		async (dailyTotal, existingTeamMember) => {
 			const formattedDate = FormattedDate(dailyTotal.date);
 			const confirmation = window.confirm(
 				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${dailyTotal.teamMemberName.toUpperCase()}		ON:		${formattedDate.toUpperCase()}?`
@@ -176,8 +154,8 @@ function DailyTotals() {
 				return;
 			}
 			try {
-				if (!correspondingTeamMember) {
-					console.error('Corresponding team member not found');
+				if (!existingTeamMember) {
+					console.error('Existing team member not found');
 					alert('Failed to delete daily total');
 					return;
 				}
@@ -188,12 +166,11 @@ function DailyTotals() {
 					return;
 				}
 				const response = await deleteDailyTotalFromServer(
-					correspondingTeamMember._id,
+					existingTeamMember._id,
 					dailyTotal._id
 				);
-
+				console.log(response);
 				fetchDailyTotals();
-				console.log(`deleteDailyTotal: ${response.data}`);
 			} catch (error) {
 				setError(`Error deleting daily total: ${error.message}`);
 				alert(`Failed to delete daily totals: ${error.message}`);
@@ -202,33 +179,29 @@ function DailyTotals() {
 		[setError, fetchDailyTotals]
 	);
 
-	const findCorrespondingTeamMember = (team, dailyTotal) => {
-		const result = team.find((member) => member._id === dailyTotal._id);
-		console.log('findCorrespondingTeamMember:', result);
-		return result;
-	};
+	return (
+		<React.Fragment>
+			<DailyTotalsForm
+				dailyTotals={dailyTotals}
+				setDailyTotals={setDailyTotals}
+				submitDailyTotals={submitDailyTotals}
+				team={team}
+				setTeam={setTeam}
+				selectedTeamMember={selectedTeamMember}
+				setSelectedTeamMember={setSelectedTeamMember}
+			/>
 
-    return (
-        <React.Fragment>
-            <DailyTotalsForm
-                dailyTotals={dailyTotals}
-                setDailyTotals={setDailyTotals}
-                submitDailyTotals={submitDailyTotals}
-                team={team}
-                setTeam={setTeam}
-            />
+			<Typography variant="h1" component="h2" gutterBottom>
+				DAILY TOTALS
+			</Typography>
 
-            <Typography variant="h1" component="h2" gutterBottom>
-                DAILY TOTALS
-            </Typography>
-
-            <DailyTotalsTable
-                team={team}
-                classes={classes}
-                deleteDailyTotal={deleteDailyTotal}
-            />
-        </React.Fragment>
-    );
-};
+			<DailyTotalsTable
+				team={team}
+				classes={classes}
+				deleteDailyTotal={deleteDailyTotal}
+			/>
+		</React.Fragment>
+	);
+}
 
 export default DailyTotals;
