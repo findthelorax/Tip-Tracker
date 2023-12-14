@@ -105,7 +105,7 @@ function TeamOperations() {
 	);
 
 	const handleDelete = useCallback((member) => {
-		deleteTeamMemberFromTeam(member._id);
+		deleteTeamMemberFromTeam(member._id, member.teamMemberName, member.position);
 	}, [deleteTeamMemberFromTeam]);
 
 	return (

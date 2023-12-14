@@ -11,7 +11,7 @@ const dailyTotalSchema = new mongoose.Schema({
     hostTipOuts: Number,
     totalTipOut: Number,
     tipsReceived: Number,
-    tipsPayroll: Number,
+    totalPayrollTips: Number,
 }, { _id: false }); // Prevent creation of id for subdocument
 
 const weeklyTotalSchema = new mongoose.Schema({
@@ -25,7 +25,7 @@ const weeklyTotalSchema = new mongoose.Schema({
     hostTipOuts: Number,
     totalTipOut: Number,
     tipsReceived: Number,
-    tipsPayroll: Number,
+    totalPayrollTips: Number,
 }, { _id: false }); // Prevent creation of id for subdocument
 
 const teamMemberSchema = new mongoose.Schema({

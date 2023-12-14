@@ -3,15 +3,17 @@ import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, D
 import Header from './header';
 import TeamOperations from '../teamMembers';
 import DatabaseOperations from '../databaseOps';
-import WeeklyTotals from '../weeklyTotals';
+import { WeeklyTotals, TipsCard } from '../weeklyTotals';
 import DailyTotals from '../dailyTotals';
 import ErrorComponent from '../utils/errorComponent';
 import PeopleIcon from '@material-ui/icons/People';
 import SettingsIcon from '@material-ui/icons/Settings';
 import StorageIcon from '@material-ui/icons/Storage';
 import BarChartIcon from '@material-ui/icons/BarChart';
+import { TeamContext } from '../contexts/TeamContext';
 
 function Dashboard({ refresh, error }) {
+    const { team } = React.useContext(TeamContext);
     return (
         <Grid container>
             <Grid item xs={2}>
@@ -53,7 +55,10 @@ function Dashboard({ refresh, error }) {
                         <DailyTotals refresh={refresh} />
                     </Grid>
                     <Grid item xs={12}>
-                        <WeeklyTotals refresh={refresh} />
+                        <WeeklyTotals team={team} refresh={refresh} />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TipsCard team={team} refresh={refresh}/>
                     </Grid>
                     <Grid item xs={12}>
                         <ErrorComponent error={error} />

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useContext, useEffect } from 'react';
 import {
 	Table,
 	TableBody,
@@ -12,6 +12,7 @@ import {
 	makeStyles,
 } from '@material-ui/core';
 import { FormattedDate } from './utils/dateUtils';
+import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 
 const useStyles = makeStyles({
 	tableRow: {
@@ -29,14 +30,12 @@ const useStyles = makeStyles({
 });
 
 const CurrencyColumn = memo(({ className, value }) => (
-	<TableCell className={className}>
-		{value !== null && value !== undefined
-			? Number(value).toLocaleString('en-US', {
-					style: 'currency',
-					currency: 'USD',
-			  })
-			: 'N/A'}
-	</TableCell>
+    <TableCell className={className}>
+        {Number(value || 0).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        })}
+    </TableCell>
 ));
 
 const columnNames = {
@@ -47,13 +46,17 @@ const columnNames = {
 	barTipOuts: 'Bar Tip Outs',
 	runnerTipOuts: 'Runner Tip Outs',
 	hostTipOuts: 'Host Tip Outs',
-	totalTipOuts: 'Total Tip Outs',
+	totalTipOut: 'Total Tip Out',
 	tipsReceived: 'Tips Received',
 	totalPayrollTips: 'Total Payroll Tips',
 };
 
 function DailyTotalsTable({ team, deleteDailyTotal }) {
 	const classes = useStyles();
+	const { refreshDailyTotals } = useContext(DailyTotalsContext);
+
+	useEffect(() => {
+	}, [refreshDailyTotals]);
 
 	return (
 		<TableContainer component={Paper}>
@@ -108,8 +111,8 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 											className={classes.deleteButton}
 											onClick={() =>
 												deleteDailyTotal(
-													dailyTotal,
-													teamMember
+													teamMember,
+													dailyTotal.date
 												)
 											}
 										>

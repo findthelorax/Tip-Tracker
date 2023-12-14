@@ -13,7 +13,7 @@ const weeklyTotalsSchema = new mongoose.Schema({
 	hostTipOuts: Number,
 	totalTipOut: Number,
 	tipsReceived: Number,
-	tipsPayroll: Number,
+	totalPayrollTips: Number,
 });
 
 const WeeklyTotals = mongoose.model('WeeklyTotals', weeklyTotalsSchema);

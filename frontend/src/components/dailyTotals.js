@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import DailyTotalsForm from './dailyTotalsForm';
@@ -6,11 +6,7 @@ import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { ErrorContext } from './contexts/ErrorContext';
-import {
-	fetchDailyTotalsAll,
-	deleteDailyTotalFromServer,
-	submitDailyTotalToServer,
-} from './utils/api';
+import { fetchDailyTotalsAll, deleteDailyTotalFromServer, submitDailyTotalToServer } from './utils/api';
 import { FormattedDate } from './utils/dateUtils';
 
 const useStyles = makeStyles({
@@ -19,48 +15,64 @@ const useStyles = makeStyles({
 			backgroundColor: '#f4f4f4', // change this to your desired color
 		},
 	},
+	card: {
+		minWidth: 275,
+		marginBottom: 12,
+		backgroundColor: '#fff', // change this to your desired color
+		// Add more styles as needed
+	},
 });
 
 const today = new Date();
-const localDate = new Date(
-	today.getFullYear(),
-	today.getMonth(),
-	today.getDate()
-)
-	.toISOString()
-	.split('T')[0];
+const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
 // const timeZone = "America/New_York";
+
+const initialDailyTotals = {
+	date: localDate,
+    foodSales: '',
+    barSales: '',
+    nonCashTips: '',
+    cashTips: '',
+    barTipOuts: 0,
+    runnerTipOuts: 0,
+    hostTipOuts: 0,
+    totalTipOut: 0,
+    tipsReceived: 0,
+    totalPayrollTips: 0,
+};
 
 function DailyTotals() {
 	const classes = useStyles();
 	const { team, setTeam } = useContext(TeamContext);
-	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll } = useContext(DailyTotalsContext);
+	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll, refreshDailyTotals, setRefreshDailyTotals } = useContext(DailyTotalsContext);
 	const { setError } = useContext(ErrorContext);
-	const [dailyTotals, setDailyTotals] = useState({
-		date: localDate,
-		foodSales: 0,
-		barSales: 0,
-		nonCashTips: 0,
-		cashTips: 0,
-		barTipOuts: 0,
-		runnerTipOuts: 0,
-		hostTipOuts: 0,
-		totalTipOuts: 0,
-		tipsReceived: 0,
-		totalPayrollTips: 0,
-	});
+	const [dailyTotals, setDailyTotals] = useState(initialDailyTotals);
 
-	
-	const handleSubmissionError = useCallback((error, dailyTotals) => {
-		if (error.response && error.response.status === 400) {
-			alert(
-				`Totals on ${dailyTotals.date} for ${selectedTeamMember.teamMemberName} - ${selectedTeamMember.position} already exists.`
-			);
-		} else {
-			alert('An error occurred while submitting daily totals.');
+	const calculateTipOuts = useMemo(() => {
+		let tipOuts = 0;
+		if (selectedTeamMember.position === 'bartender') {
+			tipOuts = Number(dailyTotals.barSales) * 0.05;
+		} else if (selectedTeamMember.position === 'host') {
+			tipOuts = Number(dailyTotals.foodSales) * 0.015;
+		} else if (selectedTeamMember.position === 'runner') {
+			tipOuts = Number(dailyTotals.foodSales) * 0.04;
 		}
-		console.error(error);
-	}, [selectedTeamMember]);
+		return tipOuts;
+	}, [dailyTotals, selectedTeamMember]);
+
+	const handleSubmissionError = useCallback(
+		(error, dailyTotals) => {
+			if (error.response && error.response.status === 400) {
+				alert(
+					`Totals on ${dailyTotals.date} for ${selectedTeamMember.teamMemberName} - ${selectedTeamMember.position} already exists.`
+				);
+			} else {
+				alert('An error occurred while submitting daily totals.');
+			}
+			console.error(error);
+		},
+		[selectedTeamMember]
+	);
 
 	const fetchDailyTotals = useCallback(async () => {
 		try {
@@ -74,14 +86,12 @@ function DailyTotals() {
 
 	useEffect(() => {
 		fetchDailyTotals();
-	}, [fetchDailyTotals]);
+	}, [fetchDailyTotals, refreshDailyTotals]);
 
 	// submitDailyTotals function breakdown
 	const submitDailyTotals = useCallback(
 		async (dailyTotals, selectedTeamMember) => {
-			const existingTeamMember = team.find(
-				(member) => member._id === selectedTeamMember._id
-			);
+			const existingTeamMember = team.find((member) => member._id === selectedTeamMember._id);
 
 			if (!selectedTeamMember) {
 				alert('Selected team member not found in the team list.');
@@ -89,88 +99,96 @@ function DailyTotals() {
 			}
 
 			if (existingTeamMember._id !== selectedTeamMember._id) {
-				alert(
-					'Selected team member does not match the existing team member.'
-				);
+				alert('Selected team member does not match the existing team member.');
 				return;
+			}
+
+			if (selectedTeamMember.position === 'server') {
+				dailyTotals.barTipOuts = 0;
+				dailyTotals.runnerTipOuts = 0;
+				dailyTotals.hostTipOuts = 0;
+	
+				for (const member of team) {
+					// Check if the team member worked on the same date
+					const workedSameDate = member.dailyTotals.some(
+						(total) => total.date === dailyTotals.date
+					);
+	
+					if (workedSameDate) {
+						if (member.position === 'bartender') {
+							dailyTotals.barTipOuts += calculateTipOuts(dailyTotals, 'bartender');
+						} else if (member.position === 'host') {
+							dailyTotals.hostTipOuts += calculateTipOuts(dailyTotals, 'host');
+						} else if (member.position === 'runner') {
+							dailyTotals.runnerTipOuts += calculateTipOuts(dailyTotals, 'runner');
+						}
+					}
+				}
+			} else {
+				dailyTotals.barTipOuts = 0;
+				dailyTotals.runnerTipOuts = 0;
+				dailyTotals.hostTipOuts = 0;
 			}
 
 			const newDailyTotals = prepareDailyTotals(dailyTotals);
 
 			try {
-				await submitDailyTotalToServer(
-					selectedTeamMember._id,
-					newDailyTotals
-				);
-				clearFormFields(setDailyTotals);
+				await submitDailyTotalToServer(selectedTeamMember._id, newDailyTotals);
+				console.log("🚀 ~ file: dailyTotals.js:119 ~ selectedTeamMember._id:", selectedTeamMember._id)
+				console.log("🚀 ~ file: dailyTotals.js:119 ~ newDailyTotals:", newDailyTotals)
+				setRefreshDailyTotals(prevState => !prevState);
+				// setRefreshDailyTotals(newDailyTotals);
+
+				clearFormFields();
 				fetchDailyTotals();
 			} catch (error) {
 				handleSubmissionError(error, dailyTotals);
 			}
 		},
-		[team, fetchDailyTotals, handleSubmissionError]
+		[team, fetchDailyTotals, handleSubmissionError, calculateTipOuts, setRefreshDailyTotals]
 	);
 
 	const prepareDailyTotals = (dailyTotals) => {
+		const totalTipOut = Number(dailyTotals.barTipOuts) + Number(dailyTotals.runnerTipOuts) + Number(dailyTotals.hostTipOuts);
+		const tipsReceived = Number(dailyTotals.nonCashTips) + Number(dailyTotals.cashTips);
+		const totalPayrollTips = tipsReceived - totalTipOut;
+				
 		return {
-			date: dailyTotals.date,
-			foodSales: dailyTotals.foodSales,
-			barSales: dailyTotals.barSales,
-			nonCashTips: dailyTotals.nonCashTips,
-			cashTips: dailyTotals.cashTips,
-			barTipOuts: dailyTotals.barTipOuts,
-			runnerTipOuts: dailyTotals.runnerTipOuts,
-			hostTipOuts: dailyTotals.hostTipOuts,
-			totalTipOuts: dailyTotals.totalTipOuts,
-			tipsReceived: dailyTotals.tipsReceived,
-			totalPayrollTips: dailyTotals.totalPayrollTips,
+			...dailyTotals,
+			totalTipOut,
+			tipsReceived,
+			totalPayrollTips,
 		};
 	};
 
-	const clearFormFields = (setDailyTotals) => {
-		setDailyTotals({
-			teamMember: '',
-			date: new Date(),
-			foodSales: 0,
-			barSales: 0,
-			nonCashTips: 0,
-			cashTips: 0,
-			barTipOuts: 0,
-			runnerTipOuts: 0,
-			hostTipOuts: 0,
-			totalTipOuts: 0,
-			tipsReceived: 0,
-			totalPayrollTips: 0,
-		});
+	const clearFormFields = () => {
+		setDailyTotals(initialDailyTotals);
 	};
 
 	const deleteDailyTotal = useCallback(
-		async (dailyTotal, existingTeamMember) => {
-			const formattedDate = FormattedDate(dailyTotal.date);
+		async (teamMember, date) => {
 			const confirmation = window.confirm(
-				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${dailyTotal.teamMemberName.toUpperCase()}		ON:		${formattedDate.toUpperCase()}?`
+				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${teamMember.teamMemberName.toUpperCase()}		ON:		${FormattedDate(date).toUpperCase()}?`
 			);
 			if (!confirmation) {
 				return;
 			}
+
 			try {
-				if (!existingTeamMember) {
-					console.error('Existing team member not found');
+				if (!teamMember._id || !date) {
+					console.error('teamMember or date is undefined');
 					alert('Failed to delete daily total');
 					return;
 				}
-				if (!dailyTotal || !dailyTotal._id) {
-					console.error(
-						`dailyTotal._id is undefined: , ${dailyTotal}, ID: ,  ${dailyTotal._id}`
-					);
-					return;
+
+				try {
+					const response = await deleteDailyTotalFromServer(teamMember._id, date);
+					console.log(response);
+					fetchDailyTotals();
+				} catch (error) {
+					setError(`Error deleting daily total: ${error.message}`);
+					alert(`Failed to delete daily totals: ${error.message}`);
 				}
-				const response = await deleteDailyTotalFromServer(
-					existingTeamMember._id,
-					dailyTotal._id
-				);
-				console.log(response);
-				fetchDailyTotals();
 			} catch (error) {
 				setError(`Error deleting daily total: ${error.message}`);
 				alert(`Failed to delete daily totals: ${error.message}`);
@@ -194,12 +212,7 @@ function DailyTotals() {
 			<Typography variant="h1" component="h2" gutterBottom>
 				DAILY TOTALS
 			</Typography>
-
-			<DailyTotalsTable
-				team={team}
-				classes={classes}
-				deleteDailyTotal={deleteDailyTotal}
-			/>
+			<DailyTotalsTable team={team} classes={classes} deleteDailyTotal={deleteDailyTotal} />
 		</React.Fragment>
 	);
 }

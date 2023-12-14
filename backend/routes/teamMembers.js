@@ -37,6 +37,34 @@ router.post("/", async (req, res) => {
     res.json(teamMember);
 });
 
+router.get("/:id", async (req, res) => {
+    const memberId = req.params.id;
+    if (!memberId) {
+        return res.status(400).json({
+            success: false,
+            message: "Member ID is required",
+        });
+    }
+    await TeamMember.findById(memberId, (err, teamMember) => {
+        if (err) {
+            return res.status(400).json({
+                success: false,
+                error: err,
+            });
+        }
+        if (!teamMember) {
+            return res.status(404).json({
+                success: false,
+                message: "Team member not found",
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: teamMember,
+        });
+    }).catch((err) => console.log(err));
+});
+
 router.delete("/:id", async (req, res) => {
     const memberId = req.params.id;
     const teamMember = await TeamMember.findById(memberId); // Check if the team member exists
@@ -115,25 +143,28 @@ router.post(`/:id/dailyTotals`, async (req, res) => {
     }
 });
 
-// Endpoint for deleting a specific daily total
-router.delete("/:id/dailyTotals/:dailyTotalId", async (req, res) => {
-    const memberId = req.params.id;
-    const dailyTotalId = req.params.dailyTotalId;
-
-    // Find the team member by ID
+// Server route for handling daily totals deletion for a specific team member
+router.delete('/:id/dailyTotals/:date', async (req, res) => {
     try {
-        const result = await TeamMember.updateOne(
-            { _id: memberId },
-            { $pull: { dailyTotals: { _id: dailyTotalId } } }
-        );
-    
-        if (result.nModified === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Daily total not found",
-            });
+        const { id: teamMemberId, date } = req.params;
+        const teamMember = await TeamMember.findById(teamMemberId);
+
+        if (!teamMember) {
+            return res.status(404).json({ message: 'Team member not found' });
         }
-    
+
+        const dateString = new Date(date).toISOString();
+        teamMember.dailyTotals = teamMember.dailyTotals.filter(
+            (dailyTotal) => new Date(dailyTotal.date).toISOString() !== dateString
+        );
+
+        try {
+            await teamMember.save();
+        } catch (saveError) {
+            console.error("Error saving team member:", saveError);
+            throw saveError;
+        }
+
         res.status(200).json({
             success: true,
             message: "Daily total deleted successfully",
@@ -243,7 +274,7 @@ router.get('/weeklyTotalsAll', async (req, res) => {
                     hostTipOuts: (total.hostTipOuts || 0) + dailyTotal.hostTipOuts,
                     totalTipOut: (total.totalTipOut || 0) + dailyTotal.totalTipOut,
                     tipsReceived: (total.tipsReceived || 0) + dailyTotal.tipsReceived,
-                    tipsPayroll: (total.tipsPayroll || 0) + dailyTotal.tipsPayroll,
+                    totalPayrollTips: (total.totalPayrollTips || 0) + dailyTotal.totalPayrollTips,
                 };
             }, {});
 

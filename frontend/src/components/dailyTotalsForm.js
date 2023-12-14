@@ -1,64 +1,50 @@
 import React, { useContext } from 'react';
-import {
-	TextField,
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
-	Button,
-	Typography,
-	Box,
-} from '@material-ui/core';
-// eslint-disable-next-line
-import { TeamContext } from './contexts/TeamContext';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography, Box } from '@material-ui/core';
 // import { ErrorContext } from './contexts/ErrorContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { makeStyles } from '@material-ui/core/styles';
+import { FormInputDate } from './utils/dateUtils';
 
 const useStyles = makeStyles((theme) => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: theme.spacing(2),
-    backgroundColor: '#f5f5f5',
-    borderRadius: '5px',
-  },
-  input: {
-    margin: theme.spacing(1),
-  },
+	form: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		padding: theme.spacing(2),
+		backgroundColor: '#f5f5f5',
+		borderRadius: '5px',
+	},
+	input: {
+		margin: theme.spacing(1),
+	},
 }));
 
-function InputField({
-	id,
-	value,
-	onChange,
-	label,
-	type = 'number',
-	parseValue = parseFloat,
-  }) {
+function InputField({ id, value, onChange, label, type = 'number', parseValue = parseFloat }) {
 	const classes = useStyles();
 	return (
-	  <TextField
-		type={type}
-		id={id}
-		label={label}
-		value={value}
-		onChange={(e) => onChange(id, parseValue(e.target.value))}
-		fullWidth
-		margin="normal"
-		className={classes.input}
-		inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} // This will bring up the numeric keypad on mobile devices
-	  />
+		<TextField
+			type={type}
+			id={id}
+			label={label}
+			value={value}
+			onChange={(e) => onChange(id, parseValue(e.target.value))}
+			fullWidth
+			margin="normal"
+			className={classes.input}
+			inputProps={{
+				inputMode: 'numeric',
+				pattern: '[0-9]*',
+				onFocus: (event) => event.target.select(), // Auto select all the data inside when it's clicked
+			}} // This will bring up the numeric keypad on mobile devices
+			placeholder="0" // Use 0 as a placeholder
+		/>
 	);
-  }
+}
 
 function TeamMemberSelect({ team, value = '', onChange }) {
 	const { setSelectedTeamMember } = useContext(DailyTotalsContext);
 	const handleTeamMemberSelect = (event) => {
-		const selectedMember = team.find(
-			(member) => member._id === event.target.value
-		);
+		const selectedMember = team.find((member) => member._id === event.target.value);
 		setSelectedTeamMember(selectedMember);
 		onChange('teamMemberID', selectedMember ? selectedMember._id : '');
 	};
@@ -93,9 +79,9 @@ function DailyTotalsForm({
 	setSelectedTeamMember,
 }) {
 	const classes = useStyles();
-	
+
 	const handleDailyTotalsChange = (field, value) => {
-		let updates = { [field]: value };
+		let updates = { [field]: value === '' ? 0 : value };
 
 		setDailyTotals((prevDailyTotals) => ({
 			...prevDailyTotals,
@@ -110,17 +96,13 @@ function DailyTotalsForm({
 
 	return (
 		<form onSubmit={handleSubmit} className={classes.form}>
-		<Typography variant="h5" gutterBottom>
+			<Typography variant="h5" gutterBottom>
 				Daily Totals
 			</Typography>
-			<TeamMemberSelect
-				team={team}
-				value={selectedTeamMember._id}
-				onChange={handleDailyTotalsChange}
-			/>
+			<TeamMemberSelect team={team} value={selectedTeamMember._id} onChange={handleDailyTotalsChange} />
 			<InputField
 				id="date"
-				value={dailyTotals.date}
+				value={dailyTotals.date || FormInputDate()}
 				onChange={handleDailyTotalsChange}
 				label="Date"
 				type="date"
