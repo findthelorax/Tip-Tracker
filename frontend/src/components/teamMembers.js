@@ -8,7 +8,7 @@ import React, {
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
 import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
-import { Card, CardContent, Typography, Button } from '@material-ui/core';
+import { Card, CardContent, Typography, Button } from '@mui/material';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 

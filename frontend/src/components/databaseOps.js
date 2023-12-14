@@ -13,8 +13,8 @@ import {
 	ListItemText,
 	ListItemSecondaryAction,
 	IconButton,
-} from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+} from '@mui/material';
+import Delete from '@mui/icons-material/Delete';
 
 function DatabaseOperations() {
 	const [databases, setDatabases] = useState([]);
@@ -90,7 +90,7 @@ function DatabaseOperations() {
 											handleDeleteDatabase(database.name)
 										}
 									>
-										<DeleteIcon />
+										<Delete />
 									</IconButton>
 								</ListItemSecondaryAction>
 							</ListItem>

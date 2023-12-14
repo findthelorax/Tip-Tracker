@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@material-ui/core';
+import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import Header from './header';
 import TeamOperations from '../teamMembers';
 import DatabaseOperations from '../databaseOps';
 import { WeeklyTotals, TipsCard } from '../weeklyTotals';
 import DailyTotals from '../dailyTotals';
 import ErrorComponent from '../utils/errorComponent';
-import PeopleIcon from '@material-ui/icons/People';
-import SettingsIcon from '@material-ui/icons/Settings';
-import StorageIcon from '@material-ui/icons/Storage';
-import BarChartIcon from '@material-ui/icons/BarChart';
+import People from '@mui/icons-material/People';
+import Settings from '@mui/icons-material/Settings';
+import Storage from '@mui/icons-material/Storage';
+import BarChart from '@mui/icons-material/BarChart';
 import { TeamContext } from '../contexts/TeamContext';
 
 function Dashboard({ refresh, error }) {
@@ -44,24 +44,24 @@ function Dashboard({ refresh, error }) {
                     <Typography variant="h6">Menu</Typography>
                     <List>
                     <ListItem button onClick={() => setSelectedMenu('Dashboard')}>
-                            <ListItemIcon><PeopleIcon /></ListItemIcon>
+                            <ListItemIcon><People /></ListItemIcon>
                             <ListItemText primary="Dashboard" />
                         </ListItem>
                         <ListItem button onClick={() => setSelectedMenu('Team Members')}>
-                            <ListItemIcon><PeopleIcon /></ListItemIcon>
+                            <ListItemIcon><People /></ListItemIcon>
                             <ListItemText primary="Team Members" />
                         </ListItem>
                         <ListItem button onClick={() => setSelectedMenu('Totals')}>
-                            <ListItemIcon><BarChartIcon /></ListItemIcon>
+                            <ListItemIcon><BarChart /></ListItemIcon>
                             <ListItemText primary="Totals" />
                         </ListItem>
                         <Divider />
                         <ListItem button onClick={() => setSelectedMenu('Database')}>
-                            <ListItemIcon><StorageIcon /></ListItemIcon>
+                            <ListItemIcon><Storage /></ListItemIcon>
                             <ListItemText primary="Database" />
                         </ListItem>
                         <ListItem button onClick={() => setSelectedMenu('Settings')}>
-                            <ListItemIcon><SettingsIcon /></ListItemIcon>
+                            <ListItemIcon><Settings /></ListItemIcon>
                             <ListItemText primary="Settings" />
                         </ListItem>
                     </List>

@@ -13,7 +13,7 @@ import {
 	List,
 	ListItem,
 	Box,
-} from '@material-ui/core';
+} from '@mui/material';
 import { TeamContext } from './contexts/TeamContext';
 
 const ListItemCell = ({ children, index }) => (

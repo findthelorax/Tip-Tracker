@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 import DailyTotalsForm from './dailyTotalsForm';
 import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from './contexts/TeamContext';
@@ -8,20 +7,6 @@ import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { ErrorContext } from './contexts/ErrorContext';
 import { fetchDailyTotalsAll, deleteDailyTotalFromServer, submitDailyTotalToServer } from './utils/api';
 import { FormattedDate } from './utils/dateUtils';
-
-const useStyles = makeStyles({
-	tableRow: {
-		'&:nth-of-type(odd)': {
-			backgroundColor: '#f4f4f4', // change this to your desired color
-		},
-	},
-	card: {
-		minWidth: 275,
-		marginBottom: 12,
-		backgroundColor: '#fff', // change this to your desired color
-		// Add more styles as needed
-	},
-});
 
 const today = new Date();
 const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
@@ -42,7 +27,6 @@ const initialDailyTotals = {
 };
 
 function DailyTotals() {
-	const classes = useStyles();
 	const { team, setTeam } = useContext(TeamContext);
 	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll, refreshDailyTotals, setRefreshDailyTotals } = useContext(DailyTotalsContext);
 	const { setError } = useContext(ErrorContext);
@@ -209,10 +193,10 @@ function DailyTotals() {
 				setSelectedTeamMember={setSelectedTeamMember}
 			/>
 
-			<Typography variant="h1" component="h2" gutterBottom>
+			<Typography variant="h1" component="h2" gutterBottom sx={{ marginBottom: '0.35em' }}>
 				DAILY TOTALS
 			</Typography>
-			<DailyTotalsTable team={team} classes={classes} deleteDailyTotal={deleteDailyTotal} />
+			<DailyTotalsTable team={team} deleteDailyTotal={deleteDailyTotal} />
 		</React.Fragment>
 	);
 }

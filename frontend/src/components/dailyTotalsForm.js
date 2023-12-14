@@ -1,28 +1,12 @@
 import React, { useContext } from 'react';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography, Box } from '@material-ui/core';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography } from '@mui/material';
 // import { ErrorContext } from './contexts/ErrorContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { makeStyles } from '@material-ui/core/styles';
 import { FormInputDate } from './utils/dateUtils';
 import { NumericFormat } from 'react-number-format';
-
-const useStyles = makeStyles((theme) => ({
-	form: {
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'center',
-		padding: theme.spacing(2),
-		backgroundColor: '#f5f5f5',
-		borderRadius: '5px',
-	},
-	input: {
-		margin: theme.spacing(1),
-	},
-}));
+import { Box } from '@mui/system';
 
 function InputField({ id, value, onChange, label, type = 'number', parseValue = parseFloat }) {
-    const classes = useStyles();
-
     if (type === 'date') {
         return (
             <TextField
@@ -33,7 +17,7 @@ function InputField({ id, value, onChange, label, type = 'number', parseValue = 
                 onChange={(event) => onChange(id, event.target.value)}
                 fullWidth
                 margin="normal"
-                className={classes.input}
+                sx={{ margin: 1 }}
                 InputLabelProps={{
                     shrink: true,
                 }}
@@ -49,8 +33,8 @@ function InputField({ id, value, onChange, label, type = 'number', parseValue = 
             onValueChange={(values) => onChange(id, parseValue(values.value))}
             fullWidth
             margin="normal"
-            className={classes.input}
-            customInput={TextField}
+            sx={{ margin: 1 }}
+			customInput={TextField}
             thousandSeparator={true}
             prefix="$"
             inputProps={{
@@ -98,7 +82,6 @@ function DailyTotalsForm({
 	selectedTeamMember,
 	setSelectedTeamMember,
 }) {
-	const classes = useStyles();
 
 	const handleDailyTotalsChange = (field, value) => {
 		let updates = { [field]: value === '' ? 0 : value };
@@ -114,51 +97,63 @@ function DailyTotalsForm({
 		await submitDailyTotals(dailyTotals, selectedTeamMember);
 	};
 
-	return (
-		<form onSubmit={handleSubmit} className={classes.form}>
-			<Typography variant="h5" gutterBottom>
-				Daily Totals
-			</Typography>
-			<TeamMemberSelect team={team} value={selectedTeamMember._id} onChange={handleDailyTotalsChange} />
-			<InputField
-				id="date"
-				value={dailyTotals.date || FormInputDate()}
-				onChange={handleDailyTotalsChange}
-				label="Date"
-				type="date"
-				parseValue={(value) => value}
-			/>
-			<InputField
-				id="foodSales"
-				value={dailyTotals.foodSales}
-				onChange={handleDailyTotalsChange}
-				label="Food Sales"
-			/>
-			<InputField
-				id="barSales"
-				value={dailyTotals.barSales}
-				onChange={handleDailyTotalsChange}
-				label="Bar Sales"
-			/>
-			<InputField
-				id="nonCashTips"
-				value={dailyTotals.nonCashTips}
-				onChange={handleDailyTotalsChange}
-				label="Non-Cash Tips"
-			/>
-			<InputField
-				id="cashTips"
-				value={dailyTotals.cashTips}
-				onChange={handleDailyTotalsChange}
-				label="Cash Tips"
-			/>
-			<Box mt={2}>
-				<Button variant="contained" color="primary" type="submit">
-					Submit Daily Totals
-				</Button>
-			</Box>{' '}
-		</form>
-	);
+    return (
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: 2,
+                backgroundColor: '#f5f5f5',
+                borderRadius: '5px',
+            }}
+        >
+            <Typography variant="h5" gutterBottom>
+                Daily Totals
+            </Typography>
+            <TeamMemberSelect team={team} value={selectedTeamMember._id} onChange={handleDailyTotalsChange} />
+            <InputField
+                id="date"
+                value={dailyTotals.date || FormInputDate()}
+                onChange={handleDailyTotalsChange}
+                label="Date"
+                type="date"
+                parseValue={(value) => value}
+            />
+            <InputField
+                id="foodSales"
+                value={dailyTotals.foodSales}
+                onChange={handleDailyTotalsChange}
+                label="Food Sales"
+            />
+            <InputField
+                id="barSales"
+                value={dailyTotals.barSales}
+                onChange={handleDailyTotalsChange}
+                label="Bar Sales"
+            />
+            <InputField
+                id="nonCashTips"
+                value={dailyTotals.nonCashTips}
+                onChange={handleDailyTotalsChange}
+                label="Non-Cash Tips"
+            />
+            <InputField
+                id="cashTips"
+                value={dailyTotals.cashTips}
+                onChange={handleDailyTotalsChange}
+                label="Cash Tips"
+            />
+            <Box mt={2}>
+                <Button variant="contained" color="primary" type="submit">
+                    Submit Daily Totals
+                </Button>
+            </Box>
+        </Box>
+    );
 }
+
 
 export default DailyTotalsForm;

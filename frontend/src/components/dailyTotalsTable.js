@@ -9,25 +9,9 @@ import {
 	Paper,
 	Button,
 	Divider,
-	makeStyles,
-} from '@material-ui/core';
+} from '@mui/material';
 import { FormattedDate } from './utils/dateUtils';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-
-const useStyles = makeStyles({
-	tableRow: {
-		'&:nth-of-type(odd)': {
-			backgroundColor: '#f7f7f7',
-		},
-	},
-	deleteButton: {
-		color: '#fff',
-		backgroundColor: '#f44336',
-		'&:hover': {
-			backgroundColor: '#d32f2f',
-		},
-	},
-});
 
 const CurrencyColumn = memo(({ className, value }) => (
     <TableCell className={className}>
@@ -52,7 +36,6 @@ const columnNames = {
 };
 
 function DailyTotalsTable({ team, deleteDailyTotal }) {
-	const classes = useStyles();
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
 
 	useEffect(() => {
@@ -90,7 +73,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 										</TableRow>
 									</>
 								)}
-								<TableRow className={classes.tableRow}>
+                                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 									<TableCell component="th" scope="row">
 										{dailyTotal.date
 											? FormattedDate(dailyTotal.date)
@@ -108,7 +91,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 									<TableCell align="right">
 										<Button
 											variant="contained"
-											className={classes.deleteButton}
+                                            sx={{ bgcolor: 'error.main', color: 'white' }}
 											onClick={() =>
 												deleteDailyTotal(
 													teamMember,
