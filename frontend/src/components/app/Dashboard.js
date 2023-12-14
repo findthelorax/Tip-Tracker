@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { Grid, GridCol, Paper, Text, List, ListItem, Divider } from '@mantine/core';
+import { FaTachometerAlt, FaUsers, FaDatabase, FaCog, FaChartBar } from 'react-icons/fa';
 import Header from './header';
 import TeamOperations from '../teamMembers';
 import DatabaseOperations from '../databaseOps';
 import { WeeklyTotals, TipsCard } from '../weeklyTotals';
 import DailyTotals from '../dailyTotals';
 import ErrorComponent from '../utils/errorComponent';
-import People from '@mui/icons-material/People';
-import Settings from '@mui/icons-material/Settings';
-import Storage from '@mui/icons-material/Storage';
-import BarChart from '@mui/icons-material/BarChart';
 import { TeamContext } from '../contexts/TeamContext';
 
 function Dashboard({ refresh, error }) {
@@ -38,49 +35,38 @@ function Dashboard({ refresh, error }) {
     }
 
     return (
-        <Grid container>
-            <Grid item xs={2}>
-                <Drawer variant="permanent" anchor="left" style={{ backgroundColor: '#f4f4f4' }}>
-                    <Typography variant="h6">Menu</Typography>
+        <Grid gutter="md">
+            <GridCol span={2}>
+                <Paper padding="md" style={{ height: '100vh' }}>
+                    <Text size="xl">Menu</Text>
                     <List>
-                    <ListItem button onClick={() => setSelectedMenu('Dashboard')}>
-                            <ListItemIcon><People /></ListItemIcon>
-                            <ListItemText primary="Dashboard" />
+                        <ListItem onClick={() => setSelectedMenu('Dashboard')}>
+                            <FaTachometerAlt /> Dashboard
                         </ListItem>
-                        <ListItem button onClick={() => setSelectedMenu('Team Members')}>
-                            <ListItemIcon><People /></ListItemIcon>
-                            <ListItemText primary="Team Members" />
+                        <ListItem onClick={() => setSelectedMenu('Team Members')}>
+                            <FaUsers /> Team Members
                         </ListItem>
-                        <ListItem button onClick={() => setSelectedMenu('Totals')}>
-                            <ListItemIcon><BarChart /></ListItemIcon>
-                            <ListItemText primary="Totals" />
+                        <ListItem onClick={() => setSelectedMenu('Totals')}>
+                            <FaChartBar /> Totals
                         </ListItem>
                         <Divider />
-                        <ListItem button onClick={() => setSelectedMenu('Database')}>
-                            <ListItemIcon><Storage /></ListItemIcon>
-                            <ListItemText primary="Database" />
+                        <ListItem onClick={() => setSelectedMenu('Database')}>
+                            <FaDatabase /> Database
                         </ListItem>
-                        <ListItem button onClick={() => setSelectedMenu('Settings')}>
-                            <ListItemIcon><Settings /></ListItemIcon>
-                            <ListItemText primary="Settings" />
+                        <ListItem onClick={() => setSelectedMenu('Settings')}>
+                            <FaCog /> Settings
                         </ListItem>
                     </List>
-                </Drawer>
-            </Grid>
-            <Grid item xs={10}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <Header />
-                    </Grid>
-                    <Grid item xs={12}>
-                        {renderSelectedComponent()}
-                    </Grid>
-                    <Grid item xs={12}>
-                        <ErrorComponent error={error} />
-                    </Grid>
+                </Paper>
+            </GridCol>
+            <GridCol span={10}>
+                <div style={{ padding: '1rem' }}>
+                    <Header />
+                    {renderSelectedComponent()}
+                    <ErrorComponent error={error} />
                     {/* Add extra pages here */}
-                </Grid>
-            </Grid>
+                </div>
+            </GridCol>
         </Grid>
     );
 }

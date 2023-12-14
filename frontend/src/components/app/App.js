@@ -1,4 +1,5 @@
 import React, { useReducer, useMemo, useState } from 'react';
+import { MantineProvider } from '@mantine/core';
 import { TeamProvider } from '../contexts/TeamContext';
 import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
 import { ErrorProvider } from '../contexts/ErrorContext';
@@ -83,15 +84,17 @@ function App() {
 	// );
 
 	return (
-		<ErrorProvider value={errorContextValue}>
-			<TeamProvider value={teamContextValue}>
-				<DailyTotalsProvider value={dailyTotalsContextValue}>
-					<div className="App">
-                    <Dashboard refresh={state.refresh} error={state.error} />
-					</div>
-				</DailyTotalsProvider>
-			</TeamProvider>
-		</ErrorProvider>
+		<MantineProvider>
+			<ErrorProvider value={errorContextValue}>
+				<TeamProvider value={teamContextValue}>
+					<DailyTotalsProvider value={dailyTotalsContextValue}>
+						<div className="App">
+							<Dashboard refresh={state.refresh} error={state.error} />
+						</div>
+					</DailyTotalsProvider>
+				</TeamProvider>
+			</ErrorProvider>
+		</MantineProvider>
 	);
 }
 

@@ -1,15 +1,17 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import { Paper, Grid, GridCol, Text } from '@mantine/core';
 
 function Header() {
     return (
-        <AppBar position="static">
-            <Toolbar>
-                <Typography variant="h6">
-                    Restaurant Team Management
-                </Typography>
-            </Toolbar>
-        </AppBar>
+        <Paper padding="md" style={{ marginBottom: '1rem' }}>
+            <Grid>
+                <GridCol>
+                    <Text size="xl" align="center">
+                        Restaurant Team Management
+                    </Text>
+                </GridCol>
+            </Grid>
+        </Paper>
     );
 };
 

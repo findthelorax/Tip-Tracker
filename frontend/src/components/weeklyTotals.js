@@ -1,24 +1,7 @@
 import React, { useContext, useMemo } from 'react';
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Paper,
-	Card,
-	CardContent,
-	Typography,
-	List,
-	ListItem,
-	Box,
-} from '@mui/material';
+import { Paper, Text, Table, TableTbody, TableTd, TableTh, TableThead, TableTr, Card, CardSection } from '@mantine/core';
 import { TeamContext } from './contexts/TeamContext';
 
-const ListItemCell = ({ children, index }) => (
-	<ListItem style={{ backgroundColor: index % 2 === 0 ? '#f0f0f0' : '#ffffff' }}>{children}</ListItem>
-);
 const titleToPropName = {
 	'Bar Sales': 'barSales',
 	'Food Sales': 'foodSales',
@@ -61,105 +44,91 @@ function WeeklyTotals() {
 	}, [team]);
 
 	return (
-		<TableContainer component={Paper}>
+		<Paper padding="md" style={{ marginBottom: '1rem' }}>
 			<Table>
-				<TableHead>
-					<TableRow>
-						<TableCell>Sales / Tips</TableCell>
+				<TableThead>
+					<TableTr>
+						<TableTh>Sales / Tips</TableTh>
 						{daysOfWeek.map((day, index) => (
-							<TableCell key={index}>{day}</TableCell>
+							<TableTh key={day + index}>{day}</TableTh>
 						))}
-						<TableCell>Total</TableCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
+						<TableTh>Total</TableTh>
+					</TableTr>
+				</TableThead>
+				<TableTbody>
 					{titles.map((title, i) => (
-						<TableRow key={i}>
-							<TableCell>
-								<ListItemCell index={i}>{title}</ListItemCell>
-							</TableCell>
+						<TableTr key={i}>
+							<TableTd key={title + i}>{title}</TableTd>
 							{weeklyTotals.map((total, index) => (
-								<TableCell>
-									<Box display="flex" flexDirection="column" alignItems="stretch" p={0}>
-										<List>
-											<ListItem style={{ backgroundColor: i % 2 === 0 ? '#f0f0f0' : '#ffffff' }}>
-												{total[titleToPropName[title]]}
-											</ListItem>
-										</List>
-									</Box>
-								</TableCell>
+								<TableTd key={title + i + index}>{total[titleToPropName[title]]}</TableTd>
 							))}
-							<TableCell>
-							<List>
-									<ListItem style={{ backgroundColor: i % 2 === 0 ? '#f0f0f0' : '#ffffff' }}>
-										{weeklyTotals.reduce((sum, total) => sum + total[titleToPropName[title]], 0)}
-									</ListItem>
-								</List>
-							</TableCell>
-						</TableRow>
+							<TableTd key={title + 'total'}>
+								{weeklyTotals.reduce((sum, total) => sum + total[titleToPropName[title]], 0)}
+							</TableTd>
+						</TableTr>
 					))}
-				</TableBody>
+				</TableTbody>
 			</Table>
-		</TableContainer>
+		</Paper>
 	);
 }
 
 function TipsCard({ team }) {
-    let tips = team
-        .sort((a, b) => {
-            const positions = ['bartender', 'host', 'runner', 'server'];
-            const positionA = positions.indexOf(a.position);
-            const positionB = positions.indexOf(b.position);
+	let tips = team
+		.sort((a, b) => {
+			const positions = ['bartender', 'host', 'runner', 'server'];
+			const positionA = positions.indexOf(a.position);
+			const positionB = positions.indexOf(b.position);
 
-            if (positionA !== positionB) {
-                return positionA - positionB;
-            }
+			if (positionA !== positionB) {
+				return positionA - positionB;
+			}
 
-            return a.teamMemberName.localeCompare(b.teamMemberName);
-        })
-        .map((member) => {
-            let memberTips = {
-                name: member.teamMemberName,
-                position: member.position,
-            };
+			return a.teamMemberName.localeCompare(b.teamMemberName);
+		})
+		.map((member) => {
+			let memberTips = {
+				name: member.teamMemberName,
+				position: member.position,
+			};
 
-            Object.keys(titleToPropName).forEach((key) => {
-                memberTips[key] = member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]], 0);
-            });
-            return memberTips;
-        });
+			Object.keys(titleToPropName).forEach((key) => {
+				memberTips[key] = member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]], 0);
+			});
+			return memberTips;
+		});
 
-    return (
-        <Card>
-            <CardContent>
-                <Typography variant="h5" component="h2">
-                    Weekly Tips
-                </Typography>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Position</TableCell>
-                            {Object.keys(titleToPropName).map((title, index) => (
-                                <TableCell key={index}>{title}</TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {tips.map((tip, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{tip.name}</TableCell>
-                                <TableCell>{tip.position}</TableCell>
-                                {Object.keys(titleToPropName).map((title, index) => (
-                                    <TableCell key={index}>{tip[title]}</TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
-    );
+	// return (
+	// 	<Card>
+	// 		<CardSection>
+	// 			<Text size="xl" align="center">
+	// 				Weekly Tips
+	// 			</Text>
+	// 			<Table>
+	// 				<TableThead>
+	// 					<TableTr>
+	// 						<TableTh>Name</TableTh>
+	// 						<TableTh>Position</TableTh>
+	// 						{Object.keys(titleToPropName).map((title, index) => (
+	// 							<TableTh key={index}>{title}</TableTh>
+	// 						))}
+	// 					</TableTr>
+	// 				</TableThead>
+	// 				<TableTbody>
+	// 					{tips.map((tip, index) => (
+	// 						<TableTr key={index}>
+	// 							<TableTd>{tip.name}</TableTd>
+	// 							<TableTd>{tip.position}</TableTd>
+	// 							{Object.keys(titleToPropName).map((title, index) => (
+	// 								<TableTd key={index}>{tip[title]}</TableTd>
+	// 							))}
+	// 						</TableTr>
+	// 					))}
+	// 				</TableTbody>
+	// 			</Table>
+	// 		</CardSection>
+	// 	</Card>
+	// );
 }
 
 export { WeeklyTotals, TipsCard };

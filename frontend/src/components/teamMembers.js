@@ -1,19 +1,12 @@
-import React, {
-	useState,
-	useEffect,
-	useContext,
-	useMemo,
-	useCallback,
-} from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
 import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
-import { Card, CardContent, Typography, Button } from '@mui/material';
+import { Grid, Card, Paper, Text, Button } from '@mantine/core';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
-const capitalizeFirstLetter = (string) =>
-	string.charAt(0).toUpperCase() + string.slice(1);
+const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 function TeamOperations() {
 	const { team, setTeam } = useContext(TeamContext);
@@ -93,9 +86,7 @@ function TeamOperations() {
 
 			try {
 				await deleteTeamMember(id);
-				setTeam((prevTeam) =>
-					prevTeam.filter((member) => member._id !== id)
-				);
+				setTeam((prevTeam) => prevTeam.filter((member) => member._id !== id));
 			} catch (error) {
 				console.error('Error deleting team member:', error);
 				alert('Failed to delete team member');
@@ -104,48 +95,53 @@ function TeamOperations() {
 		[setTeam]
 	);
 
-	const handleDelete = useCallback((member) => {
-		deleteTeamMemberFromTeam(member._id, member.teamMemberName, member.position);
-	}, [deleteTeamMemberFromTeam]);
+	const handleDelete = useCallback(
+		(member) => {
+			deleteTeamMemberFromTeam(member._id, member.teamMemberName, member.position);
+		},
+		[deleteTeamMemberFromTeam]
+	);
 
 	return (
-		<Card className="team-card">
-			<CardContent>
-				<TeamMemberForm
-					teamMemberName={teamMemberName}
-					setTeamMemberName={setTeamMemberName}
-					position={position}
-					setPosition={setPosition}
-					addTeamMember={addTeamMemberToTeam}
-				/>
-				{POSITIONS.map((position) => (
-					<div key={position}>
-						<Typography variant="h5">
-							{capitalizeFirstLetter(position)}s
-						</Typography>
+		<Paper
+			padding="md"
+			style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+		>
+			<TeamMemberForm
+				teamMemberName={teamMemberName}
+				setTeamMemberName={setTeamMemberName}
+				position={position}
+				setPosition={setPosition}
+				addTeamMember={addTeamMemberToTeam}
+			/>
+			{POSITIONS.map((position) => (
+				<div key={position}>
+					<Text size="xl">{capitalizeFirstLetter(position)}s</Text>
+					<Grid gutter="md">
 						{teamByPosition[position].map((member) => (
-							<div key={member._id} className="member-card">
-								<Typography variant="body1">
-									{member.teamMemberName
-										? capitalizeFirstLetter(
-												member.teamMemberName
-										  )
-										: 'Unknown'}
-								</Typography>{' '}
+							<Grid.Col
+								span={12}
+								key={member._id}
+								style={{
+									marginBottom: '1rem',
+									display: 'flex',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+								}}
+							>
+								<Text>
+									{member.teamMemberName ? capitalizeFirstLetter(member.teamMemberName) : 'Unknown'}
+								</Text>{' '}
 								- {member.position}
-								<Button
-									variant="contained"
-									color="secondary"
-									onClick={() => handleDelete(member)}
-								>
+								<Button color="red" onClick={() => handleDelete(member)}>
 									Delete
 								</Button>
-							</div>
+							</Grid.Col>
 						))}
-					</div>
-				))}
-			</CardContent>
-		</Card>
+					</Grid>
+				</div>
+			))}
+		</Paper>
 	);
 }
 

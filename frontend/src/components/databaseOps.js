@@ -3,18 +3,8 @@ import { ErrorContext } from './contexts/ErrorContext';
 import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { getDatabases, deleteDatabase } from './utils/api';
-import {
-	Button,
-	Card,
-	CardContent,
-	Typography,
-	List,
-	ListItem,
-	ListItemText,
-	ListItemSecondaryAction,
-	IconButton,
-} from '@mui/material';
-import Delete from '@mui/icons-material/Delete';
+import { Button, Paper, Text, GridCol, List, ListItem, ActionIcon } from '@mantine/core';
+import { FiTrash2 } from 'react-icons/fi';
 
 function DatabaseOperations() {
 	const [databases, setDatabases] = useState([]);
@@ -66,39 +56,33 @@ function DatabaseOperations() {
 	};
 
 	return (
-		<Card className="databases-card">
-			{error && <Typography color="error">{error}</Typography>}
-			<CardContent>
-				<Typography variant="h5">Databases</Typography>
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={handleListDatabases}
-				>
+		<Paper padding="md" style={{ marginBottom: '1rem' }}>
+			{error && <Text color="red">{error}</Text>}
+			<GridCol>
+				<Text size="xl" align="center">Databases</Text>
+				<Button color="blue" onClick={handleListDatabases}>
 					{isShown ? 'Hide Databases' : 'List Databases'}
 				</Button>
 				{isShown && databases.length > 0 && (
 					<List>
 						{databases.map((database) => (
 							<ListItem key={database.name}>
-								<ListItemText primary={database.name} />
-								<ListItemSecondaryAction>
-									<IconButton
-										edge="end"
-										aria-label="delete"
-										onClick={() =>
-											handleDeleteDatabase(database.name)
-										}
-									>
-										<Delete />
-									</IconButton>
-								</ListItemSecondaryAction>
+								<Text>{database.name}</Text>
+								<ActionIcon
+									variant="transparent"
+									color="red"
+									onClick={() =>
+										handleDeleteDatabase(database.name)
+									}
+								>
+                                    <FiTrash2 />
+								</ActionIcon>
 							</ListItem>
 						))}
 					</List>
 				)}
-			</CardContent>
-		</Card>
+			</GridCol>
+		</Paper>
 	);
 }
 

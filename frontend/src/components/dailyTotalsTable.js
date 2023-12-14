@@ -1,25 +1,15 @@
 import React, { memo, useContext, useEffect } from 'react';
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Paper,
-	Button,
-	Divider,
-} from '@mui/material';
 import { FormattedDate } from './utils/dateUtils';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
+import { Table, Grid, GridCol, Paper, Button, Divider } from '@mantine/core';
 
 const CurrencyColumn = memo(({ className, value }) => (
-    <TableCell className={className}>
-        {Number(value || 0).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        })}
-    </TableCell>
+	<GridCol className={className}>
+		{Number(value || 0).toLocaleString('en-US', {
+			style: 'currency',
+			currency: 'USD',
+		})}
+	</GridCol>
 ));
 
 const columnNames = {
@@ -41,75 +31,52 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 	useEffect(() => {
 	}, [refreshDailyTotals]);
 
-	return (
-		<TableContainer component={Paper}>
-			<Table className="sales-table" aria-label="simple table">
-				<TableHead>
-					<TableRow className="header-row">
-						<TableCell>Date</TableCell>
-						{Object.entries(columnNames).map(([key, name]) => (
-							<TableCell key={key} align="right">
-								{name}
-							</TableCell>
-						))}
-						<TableCell align="right">Action</TableCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
-					{team.map((teamMember) =>
-						teamMember.dailyTotals.map((dailyTotal, index) => (
-							<React.Fragment key={`${dailyTotal.date}-${index}`}>
-								{index === 0 && (
-									<>
-										<TableRow>
-											<TableCell colSpan={12}>
-												{`${teamMember.teamMemberName} - ${teamMember.position}`}
-											</TableCell>
-										</TableRow>
-										<TableRow>
-											<TableCell colSpan={12}>
-												<Divider />
-											</TableCell>
-										</TableRow>
-									</>
-								)}
-                                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-									<TableCell component="th" scope="row">
-										{dailyTotal.date
-											? FormattedDate(dailyTotal.date)
-											: dailyTotal.date}
-									</TableCell>
-									{Object.entries(columnNames).map(
-										([key, name]) => (
-											<CurrencyColumn
-												key={`${dailyTotal.date}-${key}`}
-												className={`${key}-column`}
-												value={dailyTotal[key]}
-											/>
-										)
-									)}
-									<TableCell align="right">
-										<Button
-											variant="contained"
-                                            sx={{ bgcolor: 'error.main', color: 'white' }}
-											onClick={() =>
-												deleteDailyTotal(
-													teamMember,
-													dailyTotal.date
-												)
-											}
-										>
-											Delete
-										</Button>
-									</TableCell>
-								</TableRow>
-							</React.Fragment>
-						))
-					)}
-				</TableBody>
-			</Table>
-		</TableContainer>
-	);
+    return (
+        <Paper padding="md" style={{ marginBottom: '1rem' }}>
+            {team.map((teamMember) =>
+                teamMember.dailyTotals.map((dailyTotal, index) => (
+                    <React.Fragment key={`${dailyTotal.date}-${index}`}>
+                        {index === 0 && (
+                            <>
+                                <Grid gutter="md">
+                                    <Grid.Col span={12}>
+                                        {`${teamMember.teamMemberName} - ${teamMember.position}`}
+                                    </Grid.Col>
+                                </Grid>
+                                <Divider />
+                            </>
+                        )}
+                        <Grid gutter="md">
+                            <Grid.Col span={3}>
+                                {dailyTotal.date
+                                    ? FormattedDate(dailyTotal.date)
+                                    : dailyTotal.date}
+                            </Grid.Col>
+                            {Object.entries(columnNames).map(
+                                ([key, name]) => (
+                                    <CurrencyColumn
+                                        key={`${dailyTotal.date}-${key}`}
+                                        className={`${key}-column`}
+                                        value={dailyTotal[key]}
+                                    />
+                                )
+                            )}
+                            <Grid.Col span={3} align="right">
+                                <Button color="red" onClick={() =>
+                                    deleteDailyTotal(
+                                        teamMember,
+                                        dailyTotal.date
+                                    )
+                                }>
+                                    Delete
+                                </Button>
+                            </Grid.Col>
+                        </Grid>
+                    </React.Fragment>
+                ))
+            )}
+        </Paper>
+    );
 }
 
 export default DailyTotalsTable;

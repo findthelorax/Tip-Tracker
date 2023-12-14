@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import { Typography } from '@mui/material';
+import { Paper, Grid, GridCol, Text } from '@mantine/core';
 import DailyTotalsForm from './dailyTotalsForm';
 import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from './contexts/TeamContext';
@@ -192,10 +192,16 @@ function DailyTotals() {
 				selectedTeamMember={selectedTeamMember}
 				setSelectedTeamMember={setSelectedTeamMember}
 			/>
-
-			<Typography variant="h1" component="h2" gutterBottom sx={{ marginBottom: '0.35em' }}>
-				DAILY TOTALS
-			</Typography>
+	
+			<Paper padding="md" style={{ marginBottom: '1rem' }}>
+				<Grid>
+					<GridCol>
+						<Text size="xl" align="center">
+							DAILY TOTALS
+						</Text>
+					</GridCol>
+				</Grid>
+			</Paper>
 			<DailyTotalsTable team={team} deleteDailyTotal={deleteDailyTotal} />
 		</React.Fragment>
 	);
