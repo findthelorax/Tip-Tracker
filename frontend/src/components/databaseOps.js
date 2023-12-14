@@ -13,6 +13,8 @@ import {
 	ListItemText,
 	ListItemSecondaryAction,
 	IconButton,
+	Grid,
+	Skeleton,
 } from '@mui/material';
 import Delete from '@mui/icons-material/Delete';
 
@@ -37,20 +39,14 @@ function DatabaseOperations() {
 	}, [fetchDatabases]);
 
 	const handleDeleteDatabase = async (databaseName) => {
-		const confirmation = window.confirm(
-			`ARE YOU SURE YOU WANT TO DELETE:\n\n${databaseName.toUpperCase()}?`
-		);
+		const confirmation = window.confirm(`ARE YOU SURE YOU WANT TO DELETE:\n\n${databaseName.toUpperCase()}?`);
 		if (!confirmation) {
 			return;
 		}
 
 		try {
 			await deleteDatabase(databaseName);
-			setDatabases((prevDatabases) =>
-				prevDatabases.filter(
-					(database) => database.name !== databaseName
-				)
-			);
+			setDatabases((prevDatabases) => prevDatabases.filter((database) => database.name !== databaseName));
 			setRefreshDailyTotals((prev) => !prev);
 			setRefreshTeamMembers((prev) => !prev);
 		} catch (error) {
@@ -66,39 +62,76 @@ function DatabaseOperations() {
 	};
 
 	return (
-		<Card className="databases-card">
-			{error && <Typography color="error">{error}</Typography>}
-			<CardContent>
-				<Typography variant="h5">Databases</Typography>
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={handleListDatabases}
+		<Grid container spacing={2}>
+			<Grid item xs={12} md={6}>
+				<Card
+					sx={{
+						minWidth: 275,
+						backgroundColor: 'lightblue',
+						border: '1px solid black',
+						boxShadow: '5px 5px 0px 0px black',
+						borderRadius: '15px',
+					}}
 				>
-					{isShown ? 'Hide Databases' : 'List Databases'}
-				</Button>
-				{isShown && databases.length > 0 && (
-					<List>
-						{databases.map((database) => (
-							<ListItem key={database.name}>
-								<ListItemText primary={database.name} />
-								<ListItemSecondaryAction>
-									<IconButton
-										edge="end"
-										aria-label="delete"
-										onClick={() =>
-											handleDeleteDatabase(database.name)
-										}
-									>
-										<Delete />
-									</IconButton>
-								</ListItemSecondaryAction>
-							</ListItem>
-						))}
-					</List>
-				)}
-			</CardContent>
-		</Card>
+					{error && <Typography color="error">{error}</Typography>}
+					<CardContent>
+						<Typography variant="h5">Databases</Typography>
+						<Button variant="contained" color="primary" onClick={handleListDatabases}>
+							{isShown ? 'Hide Databases' : 'List Databases'}
+						</Button>
+						{isShown && databases.length > 0 && (
+							<List>
+								{databases.map((database) => (
+									<ListItem key={database.name}>
+										<ListItemText primary={database.name} />
+										<ListItemSecondaryAction>
+											<IconButton
+												edge="end"
+												aria-label="delete"
+												onClick={() => handleDeleteDatabase(database.name)}
+											>
+												<Delete />
+											</IconButton>
+										</ListItemSecondaryAction>
+									</ListItem>
+								))}
+							</List>
+						)}
+					</CardContent>
+				</Card>
+			</Grid>
+			<Grid item xs={12} md={6}>
+				<Card
+					sx={{
+						minWidth: 275,
+						backgroundColor: 'lightblue',
+						border: '1px solid black',
+						boxShadow: '2px 2px 0px 0px black',
+						borderRadius: '15px',
+					}}
+				>
+					<CardContent>
+						<Typography variant="h5">Database Stats</Typography>
+						{/* ... stats code ... */}
+					</CardContent>
+				</Card>
+			</Grid>
+			<Grid item xs={12}>
+				<Card
+					sx={{
+						minWidth: 275,
+						backgroundColor: 'lightblue',
+						border: '1px solid black',
+						boxShadow: '2px 2px 0px 0px black',
+						borderRadius: '15px',
+					}}
+				>
+					<CardContent>
+						<Skeleton variant="rectangular" height={200} />
+					</CardContent>
+				</Card>
+			</Grid>
+		</Grid>
 	);
 }
 

@@ -1,15 +1,16 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import { Typography, Toolbar } from '@mui/material';
+import ResponsiveAppBar from './appBar';
 
 function Header() {
     return (
-        <AppBar position="static">
+        <ResponsiveAppBar position="static">
             <Toolbar>
                 <Typography variant="h6">
                     Restaurant Team Management
                 </Typography>
             </Toolbar>
-        </AppBar>
+        </ResponsiveAppBar>
     );
 };
 

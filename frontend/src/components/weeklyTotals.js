@@ -67,7 +67,7 @@ function WeeklyTotals() {
 					<TableRow>
 						<TableCell>Sales / Tips</TableCell>
 						{daysOfWeek.map((day, index) => (
-							<TableCell key={index}>{day}</TableCell>
+							<TableCell key={day + index}>{day}</TableCell>
 						))}
 						<TableCell>Total</TableCell>
 					</TableRow>
@@ -79,7 +79,7 @@ function WeeklyTotals() {
 								<ListItemCell index={i}>{title}</ListItemCell>
 							</TableCell>
 							{weeklyTotals.map((total, index) => (
-								<TableCell>
+								<TableCell key={total[titleToPropName[title]] + index}>
 									<Box display="flex" flexDirection="column" alignItems="stretch" p={0}>
 										<List>
 											<ListItem style={{ backgroundColor: i % 2 === 0 ? '#f0f0f0' : '#ffffff' }}>
@@ -124,7 +124,7 @@ function TipsCard({ team }) {
             };
 
             Object.keys(titleToPropName).forEach((key) => {
-                memberTips[key] = member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]], 0);
+                memberTips[key] = member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]] || 0, 0);
             });
             return memberTips;
         });
@@ -141,7 +141,7 @@ function TipsCard({ team }) {
                             <TableCell>Name</TableCell>
                             <TableCell>Position</TableCell>
                             {Object.keys(titleToPropName).map((title, index) => (
-                                <TableCell key={index}>{title}</TableCell>
+                                <TableCell key={title + index}>{title}</TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -151,7 +151,7 @@ function TipsCard({ team }) {
                                 <TableCell>{tip.name}</TableCell>
                                 <TableCell>{tip.position}</TableCell>
                                 {Object.keys(titleToPropName).map((title, index) => (
-                                    <TableCell key={index}>{tip[title]}</TableCell>
+                                    <TableCell key={'title' + index}>{tip[title]}</TableCell>
                                 ))}
                             </TableRow>
                         ))}

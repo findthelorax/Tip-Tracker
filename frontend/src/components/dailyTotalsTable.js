@@ -1,28 +1,11 @@
-import React, { memo, useContext, useEffect } from 'react';
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Paper,
-	Button,
-	Divider,
-} from '@mui/material';
+import React, { useContext, useEffect } from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import { Button, Paper } from '@mui/material';
 import { FormattedDate } from './utils/dateUtils';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 
-const CurrencyColumn = memo(({ className, value }) => (
-    <TableCell className={className}>
-        {Number(value || 0).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        })}
-    </TableCell>
-));
-
 const columnNames = {
+	date: 'Date',
 	foodSales: 'Food Sales',
 	barSales: 'Bar Sales',
 	nonCashTips: 'Non-Cash Tips',
@@ -41,74 +24,55 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 	useEffect(() => {
 	}, [refreshDailyTotals]);
 
+	const rows = team.flatMap((teamMember) =>
+		teamMember.dailyTotals.map((dailyTotal, index) => ({
+			id: `${dailyTotal.date}-${index}`,
+			date: dailyTotal.date,
+			teamMemberName: teamMember.teamMemberName,
+			teamMemberPosition: teamMember.position,
+			...dailyTotal,
+		}))
+	);
+
+	const columns = [
+		{ field: 'teamMemberName', headerName: 'Team Member Name', width: 150 },
+		{ field: 'teamMemberPosition', headerName: 'Position', width: 150 },
+		...Object.entries(columnNames).map(([key, name]) => ({
+			field: key,
+			headerName: name,
+			width: 150,
+			valueFormatter: ({ value }) =>
+				key !== 'date'
+					? Number(value || 0).toLocaleString('en-US', {
+						style: 'currency',
+						currency: 'USD',
+					})
+					: FormattedDate(value),
+		})),
+	];
+	
+	columns.push({
+		field: 'delete',
+		headerName: 'Action',
+		sortable: false,
+		width: 100,
+		renderCell: (params) => (
+			<Button
+				variant="contained"
+				sx={{ bgcolor: 'error.main', color: 'white' }}
+				onClick={() => deleteDailyTotal(params.row.teamMember, params.row.date)}
+			>
+				Delete
+			</Button>
+		),
+	});
+
 	return (
-		<TableContainer component={Paper}>
-			<Table className="sales-table" aria-label="simple table">
-				<TableHead>
-					<TableRow className="header-row">
-						<TableCell>Date</TableCell>
-						{Object.entries(columnNames).map(([key, name]) => (
-							<TableCell key={key} align="right">
-								{name}
-							</TableCell>
-						))}
-						<TableCell align="right">Action</TableCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
-					{team.map((teamMember) =>
-						teamMember.dailyTotals.map((dailyTotal, index) => (
-							<React.Fragment key={`${dailyTotal.date}-${index}`}>
-								{index === 0 && (
-									<>
-										<TableRow>
-											<TableCell colSpan={12}>
-												{`${teamMember.teamMemberName} - ${teamMember.position}`}
-											</TableCell>
-										</TableRow>
-										<TableRow>
-											<TableCell colSpan={12}>
-												<Divider />
-											</TableCell>
-										</TableRow>
-									</>
-								)}
-                                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-									<TableCell component="th" scope="row">
-										{dailyTotal.date
-											? FormattedDate(dailyTotal.date)
-											: dailyTotal.date}
-									</TableCell>
-									{Object.entries(columnNames).map(
-										([key, name]) => (
-											<CurrencyColumn
-												key={`${dailyTotal.date}-${key}`}
-												className={`${key}-column`}
-												value={dailyTotal[key]}
-											/>
-										)
-									)}
-									<TableCell align="right">
-										<Button
-											variant="contained"
-                                            sx={{ bgcolor: 'error.main', color: 'white' }}
-											onClick={() =>
-												deleteDailyTotal(
-													teamMember,
-													dailyTotal.date
-												)
-											}
-										>
-											Delete
-										</Button>
-									</TableCell>
-								</TableRow>
-							</React.Fragment>
-						))
-					)}
-				</TableBody>
-			</Table>
-		</TableContainer>
+		<div style={{ height: 400, width: '100%' }}>
+			<Paper elevation={3}>
+				<DataGrid rows={rows} columns={columns} pageSize={5} />
+			</Paper>
+		</div>
 	);
 }
 

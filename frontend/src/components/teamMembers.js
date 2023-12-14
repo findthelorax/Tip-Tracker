@@ -1,24 +1,29 @@
-import React, {
-	useState,
-	useEffect,
-	useContext,
-	useMemo,
-	useCallback,
-} from 'react';
+import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
 import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
-import { Card, CardContent, Typography, Button } from '@mui/material';
+import {
+	Card,
+	CardContent,
+	Box,
+	Grid,
+	ListItem,
+	ListItemAvatar,
+	Avatar,
+	ListItemText,
+	IconButton,
+	Typography,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FolderIcon from '@mui/icons-material/Folder';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
-const capitalizeFirstLetter = (string) =>
-	string.charAt(0).toUpperCase() + string.slice(1);
+const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 function TeamOperations() {
 	const { team, setTeam } = useContext(TeamContext);
 	const [teamMemberName, setTeamMemberName] = useState('');
-
 	const [position, setPosition] = useState('bartender');
 
 	const clearInputs = () => {
@@ -93,9 +98,7 @@ function TeamOperations() {
 
 			try {
 				await deleteTeamMember(id);
-				setTeam((prevTeam) =>
-					prevTeam.filter((member) => member._id !== id)
-				);
+				setTeam((prevTeam) => prevTeam.filter((member) => member._id !== id));
 			} catch (error) {
 				console.error('Error deleting team member:', error);
 				alert('Failed to delete team member');
@@ -104,49 +107,79 @@ function TeamOperations() {
 		[setTeam]
 	);
 
-	const handleDelete = useCallback((member) => {
-		deleteTeamMemberFromTeam(member._id, member.teamMemberName, member.position);
-	}, [deleteTeamMemberFromTeam]);
-
 	return (
-		<Card className="team-card">
-			<CardContent>
-				<TeamMemberForm
-					teamMemberName={teamMemberName}
-					setTeamMemberName={setTeamMemberName}
-					position={position}
-					setPosition={setPosition}
-					addTeamMember={addTeamMemberToTeam}
-				/>
-				{POSITIONS.map((position) => (
-					<div key={position}>
-						<Typography variant="h5">
-							{capitalizeFirstLetter(position)}s
-						</Typography>
-						{teamByPosition[position].map((member) => (
-							<div key={member._id} className="member-card">
-								<Typography variant="body1">
-									{member.teamMemberName
-										? capitalizeFirstLetter(
-												member.teamMemberName
-										  )
-										: 'Unknown'}
-								</Typography>{' '}
-								- {member.position}
-								<Button
-									variant="contained"
-									color="secondary"
-									onClick={() => handleDelete(member)}
-								>
-									Delete
-								</Button>
-							</div>
-						))}
-					</div>
-				))}
-			</CardContent>
-		</Card>
+		<Box sx={{ flexGrow: 1, maxWidth: 752 }}>
+			<Grid container spacing={2}>
+				<Grid item xs={12} md={6}>
+					<TeamMemberForm
+						teamMemberName={teamMemberName}
+						setTeamMemberName={setTeamMemberName}
+						position={position}
+						setPosition={setPosition}
+						addTeamMember={addTeamMemberToTeam}
+					/>
+					<Card
+						sx={{
+							minWidth: 275,
+							marginBottom: 2,
+							backgroundColor: 'lightblue',
+							border: '1px solid black',
+							boxShadow: '2px 2px 0px 0px black',
+							borderRadius: '15px',
+						}}
+					>
+						<CardContent>
+							{POSITIONS.map((position) => (
+								<Box key={position} sx={{ marginBottom: 2 }}>
+									<Card
+										sx={{
+											backgroundColor: 'white',
+											border: '1px solid black',
+											boxShadow: '2px 2px 0px 0px black',
+											borderRadius: '15px',
+										}}
+									>
+										<CardContent>
+											<Typography variant="h6" component="div">
+												{capitalizeFirstLetter(position)}
+											</Typography>
+											{teamByPosition[position].map((member) => (
+												<ListItem
+													key={member._id}
+													secondaryAction={
+														<IconButton
+															edge="end"
+															aria-label="delete"
+															onClick={() => deleteTeamMemberFromTeam(member._id)}
+														>
+															<DeleteIcon />
+														</IconButton>
+													}
+												>
+													<ListItemAvatar>
+														<Avatar>
+															<FolderIcon />
+														</Avatar>
+													</ListItemAvatar>
+													<ListItemText
+														primary={
+															member.teamMemberName
+																? capitalizeFirstLetter(member.teamMemberName)
+																: 'Unknown'
+														}
+														secondary={member.position}
+													/>
+												</ListItem>
+											))}
+										</CardContent>
+									</Card>
+								</Box>
+							))}
+						</CardContent>
+					</Card>
+				</Grid>
+			</Grid>
+		</Box>
 	);
 }
-
 export default TeamOperations;
