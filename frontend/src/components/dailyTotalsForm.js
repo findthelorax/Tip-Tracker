@@ -4,6 +4,7 @@ import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typograph
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { makeStyles } from '@material-ui/core/styles';
 import { FormInputDate } from './utils/dateUtils';
+import { NumericFormat } from 'react-number-format';
 
 const useStyles = makeStyles((theme) => ({
 	form: {
@@ -20,25 +21,44 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function InputField({ id, value, onChange, label, type = 'number', parseValue = parseFloat }) {
-	const classes = useStyles();
-	return (
-		<TextField
-			type={type}
-			id={id}
-			label={label}
-			value={value}
-			onChange={(e) => onChange(id, parseValue(e.target.value))}
-			fullWidth
-			margin="normal"
-			className={classes.input}
-			inputProps={{
-				inputMode: 'numeric',
-				pattern: '[0-9]*',
-				onFocus: (event) => event.target.select(), // Auto select all the data inside when it's clicked
-			}} // This will bring up the numeric keypad on mobile devices
-			placeholder="0" // Use 0 as a placeholder
-		/>
-	);
+    const classes = useStyles();
+
+    if (type === 'date') {
+        return (
+            <TextField
+                id={id}
+                label={label}
+                type={type}
+                value={value}
+                onChange={(event) => onChange(id, event.target.value)}
+                fullWidth
+                margin="normal"
+                className={classes.input}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+            />
+        );
+    }
+
+    return (
+        <NumericFormat
+            id={id}
+            label={label}
+            value={value}
+            onValueChange={(values) => onChange(id, parseValue(values.value))}
+            fullWidth
+            margin="normal"
+            className={classes.input}
+            customInput={TextField}
+            thousandSeparator={true}
+            prefix="$"
+            inputProps={{
+                onFocus: (event) => event.target.select(),
+            }}
+            placeholder="0"
+        />
+    );
 }
 
 function TeamMemberSelect({ team, value = '', onChange }) {
