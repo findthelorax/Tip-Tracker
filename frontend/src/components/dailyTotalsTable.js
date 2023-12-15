@@ -19,20 +19,21 @@ const columnNames = {
 };
 
 function DailyTotalsTable({ team, deleteDailyTotal }) {
-	const { refreshDailyTotals } = useContext(DailyTotalsContext);
+	console.log('🚀 ~ file: dailyTotalsTable.js:22 ~ DailyTotalsTable ~ team:', team);
+	const { refreshDailyTotals, dailyTotalsAll } = useContext(DailyTotalsContext);
 
-	useEffect(() => {
-	}, [refreshDailyTotals]);
+	useEffect(() => {}, [refreshDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal, index) => ({
-			id: `${dailyTotal.date}-${index}`,
+			id: `${teamMember._id}-${dailyTotal.date}`,
 			date: dailyTotal.date,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,
 		}))
 	);
+	const allRowsHaveId = rows.every((row) => 'id' in row);
 
 	const columns = [
 		{ field: 'teamMemberName', headerName: 'Team Member Name', width: 150 },
@@ -44,13 +45,13 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 			valueFormatter: ({ value }) =>
 				key !== 'date'
 					? Number(value || 0).toLocaleString('en-US', {
-						style: 'currency',
-						currency: 'USD',
-					})
+							style: 'currency',
+							currency: 'USD',
+					  })
 					: FormattedDate(value),
 		})),
 	];
-	
+
 	columns.push({
 		field: 'delete',
 		headerName: 'Action',
@@ -60,7 +61,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 			<Button
 				variant="contained"
 				sx={{ bgcolor: 'error.main', color: 'white' }}
-				onClick={() => deleteDailyTotal(params.row.teamMember, params.row.date)}
+				onClick={() => deleteDailyTotal(params.row.id, params.row.date)}
 			>
 				Delete
 			</Button>
@@ -69,9 +70,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 
 	return (
 		<div style={{ height: 400, width: '100%' }}>
-			<Paper elevation={3}>
-				<DataGrid rows={rows} columns={columns} pageSize={5} />
-			</Paper>
+			<DataGrid rows={rows} columns={columns} pageSize={5} />
 		</div>
 	);
 }

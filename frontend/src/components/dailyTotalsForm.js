@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography } from '@mui/material';
 // import { ErrorContext } from './contexts/ErrorContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { FormInputDate } from './utils/dateUtils';
+import { FormInputDate, FormattedDate } from './utils/dateUtils';
 import { NumericFormat } from 'react-number-format';
 import { Box } from '@mui/system';
 
@@ -92,10 +92,12 @@ function DailyTotalsForm({
 		}));
 	};
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		await submitDailyTotals(dailyTotals, selectedTeamMember);
-	};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const { date, ...otherFields } = dailyTotals;
+        await submitDailyTotals({ date: date, ...otherFields }, selectedTeamMember);
+        setSelectedTeamMember('');
+    };
 
     return (
         <Box
@@ -113,10 +115,10 @@ function DailyTotalsForm({
             <Typography variant="h5" gutterBottom>
                 Daily Totals
             </Typography>
-            <TeamMemberSelect team={team} value={selectedTeamMember._id} onChange={handleDailyTotalsChange} />
+            <TeamMemberSelect team={team} value={selectedTeamMember._id || ''} onChange={handleDailyTotalsChange} />
             <InputField
                 id="date"
-                value={dailyTotals.date || FormInputDate()}
+                value={dailyTotals.date}
                 onChange={handleDailyTotalsChange}
                 label="Date"
                 type="date"

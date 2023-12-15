@@ -6,7 +6,7 @@ import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { ErrorContext } from './contexts/ErrorContext';
 import { fetchDailyTotalsAll, deleteDailyTotalFromServer, submitDailyTotalToServer } from './utils/api';
-import { FormattedDate } from './utils/dateUtils';
+import { FormattedDate, CalculateTipOuts } from './utils/utils';
 
 const today = new Date();
 const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
@@ -32,17 +32,8 @@ function DailyTotals() {
 	const { setError } = useContext(ErrorContext);
 	const [dailyTotals, setDailyTotals] = useState(initialDailyTotals);
 
-	const calculateTipOuts = useMemo(() => {
-		let tipOuts = 0;
-		if (selectedTeamMember.position === 'bartender') {
-			tipOuts = Number(dailyTotals.barSales) * 0.05;
-		} else if (selectedTeamMember.position === 'host') {
-			tipOuts = Number(dailyTotals.foodSales) * 0.015;
-		} else if (selectedTeamMember.position === 'runner') {
-			tipOuts = Number(dailyTotals.foodSales) * 0.04;
-		}
-		return tipOuts;
-	}, [dailyTotals, selectedTeamMember]);
+	const tipOuts = useMemo(() => CalculateTipOuts(dailyTotals, selectedTeamMember), [dailyTotals, selectedTeamMember]);
+
 
 	const handleSubmissionError = useCallback(
 		(error, dailyTotals) => {
@@ -100,11 +91,11 @@ function DailyTotals() {
 	
 					if (workedSameDate) {
 						if (member.position === 'bartender') {
-							dailyTotals.barTipOuts += calculateTipOuts(dailyTotals, 'bartender');
+							dailyTotals.barTipOuts += tipOuts(dailyTotals, 'bartender');
 						} else if (member.position === 'host') {
-							dailyTotals.hostTipOuts += calculateTipOuts(dailyTotals, 'host');
+							dailyTotals.hostTipOuts += tipOuts(dailyTotals, 'host');
 						} else if (member.position === 'runner') {
-							dailyTotals.runnerTipOuts += calculateTipOuts(dailyTotals, 'runner');
+							dailyTotals.runnerTipOuts += tipOuts(dailyTotals, 'runner');
 						}
 					}
 				}
@@ -118,8 +109,6 @@ function DailyTotals() {
 
 			try {
 				await submitDailyTotalToServer(selectedTeamMember._id, newDailyTotals);
-				console.log("🚀 ~ file: dailyTotals.js:119 ~ selectedTeamMember._id:", selectedTeamMember._id)
-				console.log("🚀 ~ file: dailyTotals.js:119 ~ newDailyTotals:", newDailyTotals)
 				setRefreshDailyTotals(prevState => !prevState);
 				// setRefreshDailyTotals(newDailyTotals);
 
@@ -129,7 +118,7 @@ function DailyTotals() {
 				handleSubmissionError(error, dailyTotals);
 			}
 		},
-		[team, fetchDailyTotals, handleSubmissionError, calculateTipOuts, setRefreshDailyTotals]
+		[team, fetchDailyTotals, handleSubmissionError, tipOuts, setRefreshDailyTotals]
 	);
 
 	const prepareDailyTotals = (dailyTotals) => {
@@ -151,6 +140,7 @@ function DailyTotals() {
 
 	const deleteDailyTotal = useCallback(
 		async (teamMember, date) => {
+			console.log("🚀 ~ file: dailyTotals.js:143 ~ teamMember:", teamMember)
 			const confirmation = window.confirm(
 				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${teamMember.teamMemberName.toUpperCase()}		ON:		${FormattedDate(date).toUpperCase()}?`
 			);

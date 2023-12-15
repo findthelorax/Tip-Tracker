@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import TeamMemberForm from './teamMemberForm';
 import { TeamContext } from './contexts/TeamContext';
-import { getTeamMembers, addTeamMember, deleteTeamMember } from './utils/api';
+import { getTeamMembers } from './utils/api';
 import {
 	Card,
 	CardContent,
@@ -16,6 +16,8 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
+import { DailyTotalsContext } from './contexts/DailyTotalsContext';
+import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from './utils/functions';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
@@ -25,11 +27,13 @@ function TeamOperations() {
 	const { team, setTeam } = useContext(TeamContext);
 	const [teamMemberName, setTeamMemberName] = useState('');
 	const [position, setPosition] = useState('bartender');
-
+	const { refreshDailyTotals } = useContext(DailyTotalsContext);
 	const clearInputs = () => {
 		setTeamMemberName('');
 		setPosition('server');
 	};
+	const addMember = addTeamMemberToTeam(teamMemberName, position, setTeam, clearInputs);
+	const deleteMember = deleteTeamMemberFromTeam(setTeam);
 
 	useEffect(() => {
 		const fetchTeamMembers = async () => {
@@ -42,7 +46,7 @@ function TeamOperations() {
 		};
 
 		fetchTeamMembers();
-	}, [setTeam]);
+	}, [setTeam, refreshDailyTotals]);
 
 	const teamByPosition = useMemo(() => {
 		const teamByPosition = POSITIONS.reduce((acc, position) => {
@@ -70,43 +74,6 @@ function TeamOperations() {
 		);
 	}, [team]);
 
-	const addTeamMemberToTeam = useCallback(async () => {
-		if (teamMemberName && position) {
-			try {
-				const newMember = await addTeamMember(teamMemberName, position);
-				setTeam((prevTeam) => [...prevTeam, newMember]);
-				clearInputs();
-			} catch (error) {
-				console.error('Error adding team member:', error);
-				alert('Failed to add team member');
-			}
-		} else {
-			alert('Please enter both name and position');
-		}
-	}, [teamMemberName, position, setTeam]);
-
-	const deleteTeamMemberFromTeam = useCallback(
-		async (id, teamMemberName, position) => {
-			const confirmation = window.confirm(
-				`ARE YOU SURE YOU WANT TO DELETE:\n\n${
-					teamMemberName ? teamMemberName.toUpperCase() : 'Unknown'
-				} - ${position}?`
-			);
-			if (!confirmation) {
-				return;
-			}
-
-			try {
-				await deleteTeamMember(id);
-				setTeam((prevTeam) => prevTeam.filter((member) => member._id !== id));
-			} catch (error) {
-				console.error('Error deleting team member:', error);
-				alert('Failed to delete team member');
-			}
-		},
-		[setTeam]
-	);
-
 	return (
 		<Box sx={{ flexGrow: 1, maxWidth: 752 }}>
 			<Grid container spacing={2}>
@@ -116,7 +83,7 @@ function TeamOperations() {
 						setTeamMemberName={setTeamMemberName}
 						position={position}
 						setPosition={setPosition}
-						addTeamMember={addTeamMemberToTeam}
+						addTeamMember={addMember}
 					/>
 					<Card
 						sx={{
@@ -150,7 +117,7 @@ function TeamOperations() {
 														<IconButton
 															edge="end"
 															aria-label="delete"
-															onClick={() => deleteTeamMemberFromTeam(member._id)}
+															onClick={() => deleteMember(member._id, member.teamMemberName, member.position)}
 														>
 															<DeleteIcon />
 														</IconButton>

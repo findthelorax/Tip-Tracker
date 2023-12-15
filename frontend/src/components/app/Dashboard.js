@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import Header from './header';
 import TeamOperations from '../teamMembers';
+import TeamMembersPage from './TeamMembersPage';
 import DatabaseOperations from '../databaseOps';
 import { WeeklyTotals, TipsCard } from '../weeklyTotals';
 import DailyTotals from '../dailyTotals';
@@ -11,6 +12,7 @@ import Settings from '@mui/icons-material/Settings';
 import Storage from '@mui/icons-material/Storage';
 import BarChart from '@mui/icons-material/BarChart';
 import { TeamContext } from '../contexts/TeamContext';
+import SettingsPage from './Settings';
 
 function Dashboard({ refresh, error }) {
     const { team } = React.useContext(TeamContext);
@@ -20,17 +22,27 @@ function Dashboard({ refresh, error }) {
         switch(selectedMenu) {
             case 'Dashboard':
                 return (
-                    <>
-                        <TeamOperations />
-                        <DailyTotals refresh={refresh} />
-                        <WeeklyTotals team={team} refresh={refresh} />
-                        <TipsCard team={team} refresh={refresh}/>
-                    </>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} style={{ marginBottom: '20px' }}>
+                            <TeamOperations />
+                        </Grid>
+                        <Grid item xs={12} style={{ marginBottom: '20px' }}>
+                            <DailyTotals refresh={refresh} />
+                        </Grid>
+                        <Grid item xs={12} style={{ marginBottom: '20px' }}>
+                            <WeeklyTotals team={team} refresh={refresh} />
+                        </Grid>
+                        <Grid item xs={12} style={{ marginBottom: '20px' }}>
+                            <TipsCard team={team} refresh={refresh}/>
+                        </Grid>
+                    </Grid>
                 );
             case 'Team Members':
-                return <TeamOperations />;
+                return <TeamMembersPage />;
             case 'Database':
                 return <DatabaseOperations />;
+            case 'Settings':
+                return <SettingsPage />;
             // Add other cases for other menu items
             default:
                 return null;

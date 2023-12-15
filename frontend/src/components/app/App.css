@@ -1,10 +1,9 @@
 .App {
-  max-width: 600px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  text-align: center;  /* Center text inside the container */
+  text-align: center;
 }
 
 .App-logo {
@@ -40,4 +39,27 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.MuiDataGrid-root {
+  border: 10px solid #000;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.MuiDataGrid-row:nth-child(odd) {
+  background-color: #d2cfcf;
+}
+
+.MuiDataGrid-pagination {
+  justify-content: center;
+}
+.MuiDataGrid-paginationContainer {
+  justify-content: center;
+}
+.MuiDataGrid-toolbarContainer {
+  justify-content: center;
 }

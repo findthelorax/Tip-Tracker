@@ -16,16 +16,6 @@ function TeamMemberForm({
     };
 
     return (
-        <Card
-            sx={{
-                minWidth: 275,
-                backgroundColor: 'lightblue',
-                border: '1px solid black',
-                boxShadow: '2px 2px 0px 0px black',
-                borderRadius: '15px',
-            }}
-        >
-            <CardContent>
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
@@ -50,8 +40,8 @@ function TeamMemberForm({
                         margin="normal"
                         sx={{ margin: 1 }}
                     />
-                    <FormControl fullWidth margin="normal" sx={{ margin: 1 }}>
-                        <InputLabel id="position">Position</InputLabel>
+                    <FormControl fullWidth margin="normal" sx={{ margin: 1 }} variant="outlined">
+                        <InputLabel id="position"></InputLabel>
                         <Select
                             labelId="position"
                             id="position"
@@ -74,8 +64,6 @@ function TeamMemberForm({
                         </Button>
                     </Box>
                 </Box>
-            </CardContent>
-        </Card>
     );
 }
 

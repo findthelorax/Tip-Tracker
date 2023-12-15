@@ -76,6 +76,11 @@
     - add in logic for calculating tipOuts
     - replace alerts with a modal
 
+## Fix
+    - daily totals showing names incorrectly
+    - not refreshing when a team member is deleted
+
+
 
 ## Notes
 
