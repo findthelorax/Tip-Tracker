@@ -1,3 +1,8 @@
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
+
 export function FormattedDate(dateString) {
     const date = new Date(dateString);
     const year = date.getUTCFullYear();
@@ -43,4 +48,31 @@ export const CalculateTipOuts = (dailyTotals, selectedTeamMember, team) => {
     }
 
     return tipOuts;
+};
+
+export const ExportToCsvButton = ({ data }) => {
+    const handleExport = () => {
+        const csv = Papa.unparse(data);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const href = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = href;
+        link.setAttribute('download', 'export.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    return <Button onClick={handleExport}>Export to CSV</Button>;
+};
+
+export const ExportToExcelButton = ({ data }) => {
+    const handleExport = () => {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, "data.xlsx");
+    };
+
+    return <Button onClick={handleExport}>Export to Excel</Button>;
 };

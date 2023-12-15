@@ -76,6 +76,23 @@
     - add in logic for calculating tipOuts
     - replace alerts with a modal
 
+
+### EXPORT:
+
+First, install papaparse and xlsx:
+
+npm install papaparse
+
+npm install xlsx
+
+In this code, data is the array of objects you want to export. You can use this component in your DataGrid like this:
+
+<ExportButton data={myData} />
+
+<ExportToExcelButton data={myData} />
+
+Replace myData with the actual data you're displaying in your DataGrid.
+
 ## Fix
     - daily totals showing names incorrectly
     - not refreshing when a team member is deleted

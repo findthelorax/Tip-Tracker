@@ -4,6 +4,7 @@ import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { DataGrid } from '@mui/x-data-grid';
 import './app/App.css';
+import { FormattedDate, CalculateTipOuts, ExportToCsvButton, ExportToExcelButton } from './utils/utils';
 
 const titleToPropName = {
 	'Bar Sales': 'barSales',
@@ -76,6 +77,10 @@ function WeeklyTotals() {
 			<Typography variant="h5" component="h2">
 				Weekly Totals
 			</Typography>
+			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+				<ExportButton data={rows} />
+				<ExportToExcelButton data={rows} />
+			</div>
 			<DataGrid rows={rows} columns={columns} pageSize={5} />
 		</div>
 	);
@@ -122,6 +127,10 @@ function TipsCard({ team }) {
 			<Typography variant="h5" component="h2">
 				Weekly Tips
 			</Typography>
+			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+				<ExportButton data={rows} />
+				<ExportToExcelButton data={rows} />
+			</div>
 			<DataGrid rows={rows} columns={columns} pageSize={5} />
 		</div>
 	);
