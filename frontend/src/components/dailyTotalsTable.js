@@ -19,21 +19,20 @@ const columnNames = {
 };
 
 function DailyTotalsTable({ team, deleteDailyTotal }) {
-	console.log('🚀 ~ file: dailyTotalsTable.js:22 ~ DailyTotalsTable ~ team:', team);
 	const { refreshDailyTotals, dailyTotalsAll } = useContext(DailyTotalsContext);
 
 	useEffect(() => {}, [refreshDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal, index) => ({
-			id: `${teamMember._id}-${dailyTotal.date}`,
-			date: dailyTotal.date,
+			_id: teamMember._id,
+			date: FormattedDate(dailyTotal.date),
+			key: `${teamMember._id}-${FormattedDate(dailyTotal.date)}`,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,
 		}))
 	);
-	const allRowsHaveId = rows.every((row) => 'id' in row);
 
 	const columns = [
 		{ field: 'teamMemberName', headerName: 'Team Member Name', width: 150 },
@@ -61,7 +60,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 			<Button
 				variant="contained"
 				sx={{ bgcolor: 'error.main', color: 'white' }}
-				onClick={() => deleteDailyTotal(params.row.id, params.row.date)}
+				onClick={() => deleteDailyTotal(params.row, params.row.date)}
 			>
 				Delete
 			</Button>
@@ -70,7 +69,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 
 	return (
 		<div style={{ height: 400, width: '100%' }}>
-			<DataGrid rows={rows} columns={columns} pageSize={5} />
+			<DataGrid rows={rows} columns={columns} pageSize={5} getRowId={(row) => row.key}/>
 		</div>
 	);
 }

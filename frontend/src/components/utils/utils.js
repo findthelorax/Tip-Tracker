@@ -12,14 +12,35 @@ export const FormInputDate = () => {
     return formInputDate;
 };
 
-export const CalculateTipOuts = (dailyTotals, selectedTeamMember) => {
-    let tipOuts = 0;
-    if (selectedTeamMember.position === 'bartender') {
-        tipOuts = Number(dailyTotals.barSales) * 0.05;
-    } else if (selectedTeamMember.position === 'host') {
-        tipOuts = Number(dailyTotals.foodSales) * 0.015;
-    } else if (selectedTeamMember.position === 'runner') {
-        tipOuts = Number(dailyTotals.foodSales) * 0.04;
+export const CalculateTipOuts = (dailyTotals, selectedTeamMember, team) => {
+    let tipOuts = {
+        bartender: 0,
+        host: 0,
+        runner: 0,
+        server: 0
+    };
+
+    if (selectedTeamMember.position === 'server') {
+        // Calculate server tip outs
+        tipOuts.bartender = Number(dailyTotals.barSales) * 0.05;
+        tipOuts.runner = Number(dailyTotals.foodSales) * 0.04;
+        tipOuts.host = Number(dailyTotals.foodSales) * 0.015;
+
+        // Distribute tip outs to bartenders, runners, and hosts who worked the same day
+        for (const member of team) {
+            const workedSameDate = member.dailyTotals.some((total) => total.date === dailyTotals.date);
+
+            if (workedSameDate) {
+                if (member.position === 'bartender') {
+                    member.dailyTotals.find((total) => total.date === dailyTotals.date).barTipOuts += tipOuts.bartender;
+                } else if (member.position === 'runner') {
+                    member.dailyTotals.find((total) => total.date === dailyTotals.date).runnerTipOuts += tipOuts.runner;
+                } else if (member.position === 'host') {
+                    member.dailyTotals.find((total) => total.date === dailyTotals.date).hostTipOuts += tipOuts.host;
+                }
+            }
+        }
     }
+
     return tipOuts;
 };

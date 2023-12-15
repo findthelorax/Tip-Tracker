@@ -14,26 +14,26 @@ const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(
 
 const initialDailyTotals = {
 	date: localDate,
-    foodSales: '',
-    barSales: '',
-    nonCashTips: '',
-    cashTips: '',
-    barTipOuts: 0,
-    runnerTipOuts: 0,
-    hostTipOuts: 0,
-    totalTipOut: 0,
-    tipsReceived: 0,
-    totalPayrollTips: 0,
+	foodSales: '',
+	barSales: '',
+	nonCashTips: '',
+	cashTips: '',
+	barTipOuts: 0,
+	runnerTipOuts: 0,
+	hostTipOuts: 0,
+	totalTipOut: 0,
+	tipsReceived: 0,
+	totalPayrollTips: 0,
 };
 
 function DailyTotals() {
 	const { team, setTeam } = useContext(TeamContext);
-	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll, refreshDailyTotals, setRefreshDailyTotals } = useContext(DailyTotalsContext);
+	const { selectedTeamMember, setSelectedTeamMember, setDailyTotalsAll, refreshDailyTotals, setRefreshDailyTotals } =
+		useContext(DailyTotalsContext);
 	const { setError } = useContext(ErrorContext);
 	const [dailyTotals, setDailyTotals] = useState(initialDailyTotals);
 
-	const tipOuts = useMemo(() => CalculateTipOuts(dailyTotals, selectedTeamMember), [dailyTotals, selectedTeamMember]);
-
+	const tipOuts = useMemo(() => CalculateTipOuts(dailyTotals, selectedTeamMember, team), [dailyTotals, selectedTeamMember, team]);
 
 	const handleSubmissionError = useCallback(
 		(error, dailyTotals) => {
@@ -63,6 +63,21 @@ function DailyTotals() {
 		fetchDailyTotals();
 	}, [fetchDailyTotals, refreshDailyTotals]);
 
+	const updateTeamMemberTipOuts = useCallback(async (date, position, tipOut) => {
+		for (const member of team) {
+			const workedSameDate = member.dailyTotals.some((total) => total.date === date);
+
+			if (workedSameDate && member.position === position) {
+				// Update the member's daily total with the tip out
+				const dailyTotalIndex = member.dailyTotals.findIndex((total) => total.date === date);
+				member.dailyTotals[dailyTotalIndex].tipsReceived += tipOut;
+
+				// Update the member on the server
+				await submitDailyTotalToServer(member._id, member.dailyTotals[dailyTotalIndex]);
+			}
+		}
+	}, [team]);
+
 	// submitDailyTotals function breakdown
 	const submitDailyTotals = useCallback(
 		async (dailyTotals, selectedTeamMember) => {
@@ -74,31 +89,33 @@ function DailyTotals() {
 			}
 
 			if (existingTeamMember._id !== selectedTeamMember._id) {
-				alert('Selected team member does not match the existing team member.');
+				alert('Selected team member does not match an existing team member.');
 				return;
 			}
-
 			if (selectedTeamMember.position === 'server') {
-				dailyTotals.barTipOuts = 0;
-				dailyTotals.runnerTipOuts = 0;
-				dailyTotals.hostTipOuts = 0;
-	
-				for (const member of team) {
-					// Check if the team member worked on the same date
-					const workedSameDate = member.dailyTotals.some(
-						(total) => total.date === dailyTotals.date
-					);
-	
-					if (workedSameDate) {
-						if (member.position === 'bartender') {
-							dailyTotals.barTipOuts += tipOuts(dailyTotals, 'bartender');
-						} else if (member.position === 'host') {
-							dailyTotals.hostTipOuts += tipOuts(dailyTotals, 'host');
-						} else if (member.position === 'runner') {
-							dailyTotals.runnerTipOuts += tipOuts(dailyTotals, 'runner');
-						}
-					}
-				}
+				dailyTotals.barTipOuts = tipOuts.bartender;
+				dailyTotals.runnerTipOuts = tipOuts.runner;
+				dailyTotals.hostTipOuts = tipOuts.host;
+
+				console.log('🚀 ~ file: dailyTotals.js:97 ~ selectedTeamMember:', selectedTeamMember);
+				console.log('Before update:', dailyTotals);
+				console.log('Tip outs:', tipOuts);
+
+            for (const member of team) {
+                // Check if the team member worked on the same date
+                const workedSameDate = member.dailyTotals.some((total) => total.date === dailyTotals.date);
+
+                if (workedSameDate) {
+                    if (member.position === 'bartender') {
+                        await updateTeamMemberTipOuts(dailyTotals.date, 'bartender', tipOuts.bartender);
+                    } else if (member.position === 'host') {
+                        await updateTeamMemberTipOuts(dailyTotals.date, 'host', tipOuts.host);
+                    } else if (member.position === 'runner') {
+                        await updateTeamMemberTipOuts(dailyTotals.date, 'runner', tipOuts.runner);
+                    }
+                }
+            }
+				console.log('After update:', dailyTotals);
 			} else {
 				dailyTotals.barTipOuts = 0;
 				dailyTotals.runnerTipOuts = 0;
@@ -106,26 +123,30 @@ function DailyTotals() {
 			}
 
 			const newDailyTotals = prepareDailyTotals(dailyTotals);
+			console.log('🚀 ~ file: dailyTotals.js:109 ~ newDailyTotals:', newDailyTotals);
 
 			try {
 				await submitDailyTotalToServer(selectedTeamMember._id, newDailyTotals);
-				setRefreshDailyTotals(prevState => !prevState);
-				// setRefreshDailyTotals(newDailyTotals);
-
+				setRefreshDailyTotals((prevState) => !prevState);
 				clearFormFields();
 				fetchDailyTotals();
 			} catch (error) {
 				handleSubmissionError(error, dailyTotals);
 			}
 		},
-		[team, fetchDailyTotals, handleSubmissionError, tipOuts, setRefreshDailyTotals]
+		[team, fetchDailyTotals, handleSubmissionError, tipOuts, setRefreshDailyTotals, updateTeamMemberTipOuts]
 	);
 
 	const prepareDailyTotals = (dailyTotals) => {
-		const totalTipOut = Number(dailyTotals.barTipOuts) + Number(dailyTotals.runnerTipOuts) + Number(dailyTotals.hostTipOuts);
+		console.log("🚀 ~ file: dailyTotals.js:148 ~ prepareDailyTotals ~ dailyTotals:", dailyTotals)
+		const totalTipOut =
+			Number(dailyTotals.barTipOuts) + Number(dailyTotals.runnerTipOuts) + Number(dailyTotals.hostTipOuts);
+		console.log('🚀 ~ file: dailyTotals.js:125 ~ prepareDailyTotals ~ totalTipOut:', totalTipOut);
 		const tipsReceived = Number(dailyTotals.nonCashTips) + Number(dailyTotals.cashTips);
+		console.log('🚀 ~ file: dailyTotals.js:127 ~ prepareDailyTotals ~ tipsReceived:', tipsReceived);
 		const totalPayrollTips = tipsReceived - totalTipOut;
-				
+		console.log('🚀 ~ file: dailyTotals.js:129 ~ prepareDailyTotals ~ totalPayrollTips:', totalPayrollTips);
+
 		return {
 			...dailyTotals,
 			totalTipOut,
@@ -140,9 +161,10 @@ function DailyTotals() {
 
 	const deleteDailyTotal = useCallback(
 		async (teamMember, date) => {
-			console.log("🚀 ~ file: dailyTotals.js:143 ~ teamMember:", teamMember)
 			const confirmation = window.confirm(
-				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${teamMember.teamMemberName.toUpperCase()}		ON:		${FormattedDate(date).toUpperCase()}?`
+				`ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${teamMember.teamMemberName.toUpperCase()}		ON:		${FormattedDate(
+					date
+				).toUpperCase()}?`
 			);
 			if (!confirmation) {
 				return;
@@ -158,6 +180,7 @@ function DailyTotals() {
 				try {
 					const response = await deleteDailyTotalFromServer(teamMember._id, date);
 					console.log(response);
+					setRefreshDailyTotals((prevState) => !prevState); // add this line
 					fetchDailyTotals();
 				} catch (error) {
 					setError(`Error deleting daily total: ${error.message}`);
@@ -168,7 +191,7 @@ function DailyTotals() {
 				alert(`Failed to delete daily totals: ${error.message}`);
 			}
 		},
-		[setError, fetchDailyTotals]
+		[setError, fetchDailyTotals, setRefreshDailyTotals]
 	);
 
 	return (
