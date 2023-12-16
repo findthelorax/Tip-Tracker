@@ -11,10 +11,13 @@ function Signup() {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-
+		console.log(`Username: ${username}`);
+		console.log(`Password: ${password}`);
 		try {
 			const data = await signup(username, password);
 			if (data.message === 'Signup successful!') {
+				setUsername('');
+				setPassword('');
 				navigate('/login');
 			} else {
 				setErrorMessage(data.error);

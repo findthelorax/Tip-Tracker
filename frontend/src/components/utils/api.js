@@ -1,5 +1,19 @@
 import axios from "axios";
 
+// Admin registration
+export const registerAdmin = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${process.env.REACT_APP_SERVER_URL}/admin/register`,
+            { username, password },
+            { withCredentials: true }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const login = async (username, password) => {
     try {
         const response = await axios.post(
@@ -13,11 +27,11 @@ export const login = async (username, password) => {
     }
 };
 
-export const signup = async (username, password) => {
+export const signup = async (username, password, role) => {
     try {
         const response = await axios.post(
             `${process.env.REACT_APP_SERVER_URL}/signup`,
-            { username, password },
+            { username, password, role },
             { withCredentials: true }
         );
         return response.data;
