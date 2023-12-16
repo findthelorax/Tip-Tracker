@@ -6,9 +6,15 @@ import { ErrorProvider } from '../contexts/ErrorContext';
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Signup from './Signup';
+<<<<<<< HEAD
 import Profile from './Profile';
 import { fetchProfile } from '../utils/api';
 // import logo from '../../logo.svg';
+=======
+import AdminRegister from './Admin';
+import Main from './Main';
+import { AuthProvider } from '../contexts/AuthContext'; // Adjust the path as necessary
+>>>>>>> f778f4d40f8444826172833b6d9727e3c5c258c2
 
 const initialState = {
 	team: [],
@@ -35,6 +41,7 @@ function reducer(state, action) {
 function updateError(value) {
 	return { type: 'updateError', payload: value };
 }
+
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const [loggedIn, setLoggedIn] = useState(false);
@@ -66,6 +73,7 @@ function App() {
 	}, []);
 
 	return (
+<<<<<<< HEAD
 		<Router>
 			<ErrorProvider value={errorContextValue}>
 				<TeamProvider>
@@ -95,6 +103,30 @@ function App() {
 				</TeamProvider>
 			</ErrorProvider>
 		</Router>
+=======
+		<AuthProvider>
+			<Router>
+				<ErrorProvider value={errorContextValue}>
+					<TeamProvider>
+						<DailyTotalsProvider>
+							<div className="App">
+								<Routes>
+									<Route
+										path="/dashboard"
+										element={<Dashboard refresh={state.refresh} error={state.error} />}
+									/>
+									<Route path="/login" element={<Login />} />
+									<Route path="/signup" element={<Signup />} />
+									<Route path="/admin/register" element={<AdminRegister />} />
+									<Route path="/" element={<Main />} />
+								</Routes>
+							</div>
+						</DailyTotalsProvider>
+					</TeamProvider>
+				</ErrorProvider>
+			</Router>
+		</AuthProvider>
+>>>>>>> f778f4d40f8444826172833b6d9727e3c5c258c2
 	);
 }
 

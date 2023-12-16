@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { updateTipOutPercentages } from '../utils/utils';
 
-function SettingsPage({ user }) {
+function SettingsPage({ currentUser }) {
 	const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 	const [currency, setCurrency] = useState('USD');
 	const [bartenderTipOut, setBartenderTipOut] = useState(0.05);
@@ -108,7 +108,7 @@ function SettingsPage({ user }) {
 					{/* Map over the currencies here and create a MenuItem for each one */}
 				</Select>
 			</FormControl>
-			{user.role === 'manager' || user.role === 'root' ? (
+			{currentUser && (currentUser.role === 'manager' || currentUser.role === 'root') ? (
 				<>
 					<FormControl>
 						<TextField

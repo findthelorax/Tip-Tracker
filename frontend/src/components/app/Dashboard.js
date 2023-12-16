@@ -13,10 +13,12 @@ import Storage from '@mui/icons-material/Storage';
 import BarChart from '@mui/icons-material/BarChart';
 import { TeamContext } from '../contexts/TeamContext';
 import SettingsPage from './Settings';
+import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard({ refresh, error }) {
     const { team } = React.useContext(TeamContext);
     const [selectedMenu, setSelectedMenu] = useState('Dashboard'); // default selected menu
+    const { currentUser } = useAuth();
 
     const renderSelectedComponent = () => {
         switch(selectedMenu) {
@@ -38,11 +40,11 @@ function Dashboard({ refresh, error }) {
                     </Grid>
                 );
             case 'Team Members':
-                return <TeamMembersPage />;
+                return <TeamMembersPage currentUser={currentUser} />;
             case 'Database':
-                return <DatabaseOperations />;
+                return <DatabaseOperations currentUser={currentUser} />;
             case 'Settings':
-                return <SettingsPage user={currentUser} />;
+                return <SettingsPage currentUser={currentUser} />;
             // Add other cases for other menu items
             default:
                 return null;

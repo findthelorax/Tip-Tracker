@@ -11,7 +11,7 @@ function validateDailyTotal(dailyTotal) {
 
 router.get('/', async (req, res) => {
 	try {
-		const teamMembers = await Team.find();
+		const teamMembers = await Team.find().lean();
 		res.json(teamMembers);
 	} catch (err) {
 		console.error(err);
@@ -19,11 +19,16 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
-	const newMember = new Team({
-		name: req.body.name,
-		role: req.body.role,
-	});
+router.post("/", async (req, res) => {
+	const { teamMemberName, position } = req.body;
+
+	if (!teamMemberName || !position) {
+		return res
+			.status(400)
+			.json({ error: "Both name and position are required" });
+	}
+
+	const newMember = new Team({ teamMemberName, position });
 
 	try {
 		const savedMember = await newMember.save();
@@ -33,21 +38,6 @@ router.post('/', async (req, res) => {
 	}
 });
 
-// router.post("/", async (req, res) => {
-//     const { teamMemberName, position } = req.body;
-
-//     if (!teamMemberName || !position) {
-//         return res
-//             .status(400)
-//             .json({ error: "Both name and position are required" });
-//     }
-
-//     const teamMember = new TeamMember({ teamMemberName, position });
-//     await teamMember.save();
-
-//     res.json(teamMember);
-// });
-
 router.get('/:id', async (req, res) => {
 	const memberId = req.params.id;
 	if (!memberId) {
@@ -56,7 +46,7 @@ router.get('/:id', async (req, res) => {
 			message: 'Member ID is required',
 		});
 	}
-	await TeamMember.findById(memberId, (err, teamMember) => {
+	await Team.findById(memberId, (err, teamMember) => {
 		if (err) {
 			return res.status(400).json({
 				success: false,
@@ -96,7 +86,7 @@ router.delete('/:id', async (req, res) => {
 router.get('/:id/dailyTotals', async (req, res) => {
 	try {
 		const { id } = req.params;
-		const teamMember = await TeamMember.findById(id);
+		const teamMember = await Team.findById(id);
 
 		if (!teamMember) {
 			return res.status(404).json({ error: 'Team member not found' });
@@ -123,7 +113,7 @@ router.post(`/:id/dailyTotals`, async (req, res) => {
 		}
 
 		// Check if a daily total for the same date and teamMember already exists
-		const existingEntry = await TeamMember.findOne({
+		const existingEntry = await Team.findOne({
 			_id: memberId,
 			dailyTotals: { $elemMatch: { date: dailyTotal.date } },
 		});
@@ -136,7 +126,7 @@ router.post(`/:id/dailyTotals`, async (req, res) => {
 		}
 
 		// Update the team member's daily totals
-		await TeamMember.updateOne({ _id: memberId }, { $push: { dailyTotals: dailyTotal } });
+		await Team.updateOne({ _id: memberId }, { $push: { dailyTotals: dailyTotal } });
 
 		res.status(200).json({
 			success: true,
@@ -155,7 +145,7 @@ router.post(`/:id/dailyTotals`, async (req, res) => {
 router.delete('/:id/dailyTotals/:date', async (req, res) => {
 	try {
 		const { id: teamMemberId, date } = req.params;
-		const teamMember = await TeamMember.findById(teamMemberId);
+		const teamMember = await Team.findById(teamMemberId);
 
 		if (!teamMember) {
 			return res.status(404).json({ message: 'Team member not found' });
@@ -190,7 +180,7 @@ router.delete('/:id/dailyTotals/:date', async (req, res) => {
 router.get('/:id/weeklyTotals', async (req, res) => {
 	try {
 		const { id } = req.params;
-		const teamMember = await TeamMember.findById(id).select('weeklyTotals').lean();
+		const teamMember = await Team.findById(id).select('weeklyTotals').lean();
 
 		if (!teamMember) {
 			return res.status(404).json({ error: 'Team member not found' });
@@ -207,9 +197,9 @@ router.post('/:id/weeklyTotals', async (req, res) => {
 		const memberId = req.params.id;
 		const weeklyTotalsData = req.body;
 
-		await TeamMember.updateOne({ _id: memberId }, { $push: { weeklyTotals: weeklyTotalsData } });
+		await Team.updateOne({ _id: memberId }, { $push: { weeklyTotals: weeklyTotalsData } });
 
-		const teamMember = await TeamMember.findById(memberId);
+		const teamMember = await Team.findById(memberId);
 		res.json(teamMember.weeklyTotals);
 	} catch (error) {
 		console.error('Error adding weekly totals:', error);
@@ -221,7 +211,7 @@ router.post('/:id/weeklyTotals', async (req, res) => {
 router.delete('/:id/weeklyTotals', async (req, res) => {
 	try {
 		const memberId = req.params.id;
-		const teamMember = await TeamMember.findById(memberId);
+		const teamMember = await Team.findById(memberId);
 		teamMember.weeklyTotals = [];
 		await teamMember.save();
 		res.json({
@@ -236,7 +226,7 @@ router.delete('/:id/weeklyTotals', async (req, res) => {
 router.get('/weeklyTotalsAll', async (req, res) => {
 	try {
 		// Fetch all team members
-		const teamMembers = await TeamMember.find().lean();
+		const teamMembers = await Team.find().lean();
 
 		// Create an array to store results for all team members
 		const allWeeklyTotals = [];

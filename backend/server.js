@@ -5,7 +5,12 @@ const session = require('express-session');
 const teamMembersRoutes = require('./routes/teamMembers');
 const databaseRoutes = require('./routes/database');
 const loginRoutes = require('./routes/login');
-const userRoutes = require('./routes/users.js');
+const signupRoutes = require('./routes/signup');
+const userRoutes = require('./routes/users');
+const adminRoutes = require('./routes/admin');
+const session = require('express-session');
+const passport = require('passport');
+
 require('dotenv').config();
 
 const app = express();
@@ -17,6 +22,10 @@ mongoose
 	.connect(process.env.MONGODB_URL)
 	.then(() => console.log('MongoDB connected'))
 	.catch((err) => console.error(err));
+
+app.use(session({ secret: 'lucifer', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(
 	cors({
@@ -35,8 +44,10 @@ app.use(
 );
 app.use('/teamMembers', teamMembersRoutes);
 app.use('/api', databaseRoutes);
-app.use('/', loginRoutes);
+app.use('/login', loginRoutes);
+app.use('/signup', signupRoutes);
 app.use('/users', userRoutes);
+app.use('/admin', adminRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);

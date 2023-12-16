@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const TeamMember = require('./teamMember');
-const User = require('./user');
+const User = require('./users');
 require('dotenv').config();
 
 const db = mongoose.createConnection(process.env.MONGODB_URL);

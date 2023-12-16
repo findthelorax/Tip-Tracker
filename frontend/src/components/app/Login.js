@@ -8,18 +8,23 @@ function Login() {
 	const [password, setPassword] = useState('');
 	const [errorMessage, setErrorMessage] = useState('');
 	const navigate = useNavigate();
-	
+
 	const handleSignup = () => {
 		navigate('/signup');
 	};
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		
+
 		try {
 			const data = await login(username, password);
 			if (data.message === 'Login successful') {
-				navigate('/dashboard');
+				// Navigate to a different page based on the user's role
+				if (data.role === 'worker') {
+					navigate('/worker-dashboard');
+				} else {
+					navigate('/dashboard');
+				}
 			}
 		} catch (error) {
 			console.error('Error logging in:', error);
