@@ -4,6 +4,26 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const router = express.Router();
 
+function authCheck(req, res, next) {
+	if (!req.session.userId) {
+		return res.status(401).json({ error: 'Not authenticated' });
+	}
+	next();
+}
+
+router.get('/profile', authCheck, async (req, res) => {
+	try {
+		const user = await User.findById(req.session.userId).select('-password');
+		if (!user) {
+			return res.status(404).json({ error: 'User not found' });
+		}
+		res.json(user);
+	} catch (err) {
+		console.error('Error getting user profile', err);
+		res.status(500).json({ error: err.message });
+	}
+});
+
 router.post('/login', async (req, res) => {
 	const { username, password } = req.body;
 
@@ -24,9 +44,7 @@ router.post('/login', async (req, res) => {
 			return res.status(400).json({ error: 'Invalid username or password' });
 		}
 
-		const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-		res.cookie('token', token, { httpOnly: true });
+		req.session.userId = user._id;
 		res.json({ username: user.username, message: 'Login successful' });
 	} catch (err) {
 		console.error(`Error logging in user: ${username}`, err);
@@ -46,7 +64,7 @@ router.post('/signup', async (req, res) => {
 			username,
 			password: hashedPassword,
 		});
-		console.log("🚀 ~ file: login.js:49 ~ router.post ~ user:", user)
+		console.log('🚀 ~ file: login.js:49 ~ router.post ~ user:', user);
 		console.log(`Password: ${password}`);
 		console.log(`Hashed Password: ${hashedPassword}`);
 

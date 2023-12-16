@@ -1,4 +1,4 @@
-import React, { useReducer, useMemo } from 'react';
+import React, { useReducer, useMemo, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { TeamProvider } from '../contexts/TeamContext';
 import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
@@ -6,6 +6,8 @@ import { ErrorProvider } from '../contexts/ErrorContext';
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Signup from './Signup';
+import Profile from './Profile';
+import { fetchProfile } from '../utils/api';
 // import logo from '../../logo.svg';
 
 const initialState = {
@@ -35,6 +37,7 @@ function updateError(value) {
 }
 function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
+	const [loggedIn, setLoggedIn] = useState(false);
 
 	// Memoized context values
 	const errorContextValue = useMemo(
@@ -45,6 +48,23 @@ function App() {
 		[state.error]
 	);
 
+	useEffect(() => {
+		fetchProfile()
+			.then((response) => {
+				if (response.status === 200) {
+					setLoggedIn(true);
+				} else if (response.status === 401) {
+					setLoggedIn(false);
+				} else {
+					throw new Error('Unexpected status code');
+				}
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+				setLoggedIn(false);
+			});
+	}, []);
+
 	return (
 		<Router>
 			<ErrorProvider value={errorContextValue}>
@@ -53,11 +73,22 @@ function App() {
 						<div className="App">
 							<Routes>
 								<Route
+									path="/"
+									element={
+										loggedIn ? (
+											<Dashboard refresh={state.refresh} error={state.error} />
+										) : (
+											<Signup />
+										)
+									}
+								/>
+								<Route
 									path="/dashboard"
 									element={<Dashboard refresh={state.refresh} error={state.error} />}
 								/>
 								<Route path="/login" element={<Login />} />
 								<Route path="/signup" element={<Signup />} />
+								<Route path="/profile" element={<Profile />} />
 							</Routes>
 						</div>
 					</DailyTotalsProvider>
