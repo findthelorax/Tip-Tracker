@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import { Button } from '@mui/material';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
@@ -17,6 +17,16 @@ export const FormInputDate = () => {
     return formInputDate;
 };
 
+export let tipOutPercentages = {
+    bartender: 0.05,
+    runner: 0.04,
+    host: 0.015
+};
+
+export const updateTipOutPercentages = (newPercentages) => {
+    tipOutPercentages = { ...newPercentages };
+};
+
 export const CalculateTipOuts = (dailyTotals, selectedTeamMember, team) => {
     let tipOuts = {
         bartender: 0,
@@ -27,9 +37,9 @@ export const CalculateTipOuts = (dailyTotals, selectedTeamMember, team) => {
 
     if (selectedTeamMember.position === 'server') {
         // Calculate server tip outs
-        tipOuts.bartender = Number(dailyTotals.barSales) * 0.05;
-        tipOuts.runner = Number(dailyTotals.foodSales) * 0.04;
-        tipOuts.host = Number(dailyTotals.foodSales) * 0.015;
+        tipOuts.bartender = Number(dailyTotals.barSales) * tipOutPercentages.bartender;
+        tipOuts.runner = Number(dailyTotals.foodSales) * tipOutPercentages.runner;
+        tipOuts.host = Number(dailyTotals.foodSales) * tipOutPercentages.host;
 
         // Distribute tip outs to bartenders, runners, and hosts who worked the same day
         for (const member of team) {

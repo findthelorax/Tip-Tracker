@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { Typography, Paper } from '@mui/material';
+import { Typography } from '@mui/material';
 import { TeamContext } from './contexts/TeamContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
 import { DataGrid } from '@mui/x-data-grid';
@@ -78,7 +78,7 @@ function WeeklyTotals() {
 				Weekly Totals
 			</Typography>
 			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-				<ExportButton data={rows} />
+				<ExportToCsvButton data={rows} />
 				<ExportToExcelButton data={rows} />
 			</div>
 			<DataGrid rows={rows} columns={columns} pageSize={5} />
@@ -128,7 +128,7 @@ function TipsCard({ team }) {
 				Weekly Tips
 			</Typography>
 			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-				<ExportButton data={rows} />
+				<ExportToCsvButton data={rows} />
 				<ExportToExcelButton data={rows} />
 			</div>
 			<DataGrid rows={rows} columns={columns} pageSize={5} />

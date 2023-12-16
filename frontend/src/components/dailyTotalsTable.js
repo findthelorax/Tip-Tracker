@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, Paper } from '@mui/material';
+import { Button } from '@mui/material';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { FormattedDate, ExportButton, ExportToExcelButton } from './utils';
+import { FormattedDate, ExportToCsvButton, ExportToExcelButton } from './utils/utils';
 
 const columnNames = {
 	date: 'Date',
@@ -70,7 +70,7 @@ function DailyTotalsTable({ team, deleteDailyTotal }) {
 	return (
 		<div style={{ height: 400, width: '100%' }}>
 			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-				<ExportButton data={rows} />
+				<ExportToCsvButton data={rows} />
 				<ExportToExcelButton data={rows} />
 			</div>
 			<DataGrid rows={rows} columns={columns} pageSize={5} getRowId={(row) => row.key} />

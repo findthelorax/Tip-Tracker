@@ -77,21 +77,18 @@
     - replace alerts with a modal
 
 
-### EXPORT:
+### Check Password
 
-First, install papaparse and xlsx:
+const User = require('./models/User');
 
-npm install papaparse
+const user = await User.findOne({ username: 'example' });
+const isMatch = await user.verifyPassword('examplePassword');
 
-npm install xlsx
-
-In this code, data is the array of objects you want to export. You can use this component in your DataGrid like this:
-
-<ExportButton data={myData} />
-
-<ExportToExcelButton data={myData} />
-
-Replace myData with the actual data you're displaying in your DataGrid.
+if (isMatch) {
+  // The passwords match
+} else {
+  // The passwords don't match
+}
 
 ## Fix
     - daily totals showing names incorrectly

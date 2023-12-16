@@ -54,9 +54,17 @@ function TeamOperations() {
 			return acc;
 		}, {});
 
+		teamByPosition['other'] = [];
+
 		team.forEach((member) => {
-			teamByPosition[member.position].push(member);
+			if (member.position && teamByPosition.hasOwnProperty(member.position)) {
+				teamByPosition[member.position].push(member);
+			} else {
+				teamByPosition['other'].push(member);
+			}
 		});
+		console.log('🚀 ~ file: teamMembers.js:61 ~ team.forEach ~ team:', team);
+		console.log('🚀 ~ file: teamMembers.js:61 ~ team.forEach ~ teamByPosition:', teamByPosition);
 
 		return Object.fromEntries(
 			Object.entries(teamByPosition).map(([position, members]) => [
@@ -117,7 +125,13 @@ function TeamOperations() {
 														<IconButton
 															edge="end"
 															aria-label="delete"
-															onClick={() => deleteMember(member._id, member.teamMemberName, member.position)}
+															onClick={() =>
+																deleteMember(
+																	member._id,
+																	member.teamMemberName,
+																	member.position
+																)
+															}
 														>
 															<DeleteIcon />
 														</IconButton>

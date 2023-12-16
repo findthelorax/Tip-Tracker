@@ -6,17 +6,23 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: {
         type: String,
-        enum: ['manager', 'worker'],
+        enum: ['admin', 'manager', 'worker'],
         default: 'worker'
     }
 });
 
 UserSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
+        console.log('Password before hashing:', this.password);
         this.password = await bcrypt.hash(this.password, 10);
     }
     next();
 });
 
+UserSchema.methods.verifyPassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema, 'users');
+
+module.exports = User;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box, Card, CardContent } from '@mui/material';
+import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Box } from '@mui/material';
 
 const POSITIONS = ['Bartender', 'Runner', 'Server', 'Host'];
 

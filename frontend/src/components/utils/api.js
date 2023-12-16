@@ -1,5 +1,31 @@
 import axios from "axios";
 
+export const login = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${process.env.REACT_APP_SERVER_URL}/login`,
+            { username, password },
+            { withCredentials: true }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const signup = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${process.env.REACT_APP_SERVER_URL}/signup`,
+            { username, password },
+            { withCredentials: true }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const addDatabase = async (databaseName) => {
     try {
         const response = await axios.post(
@@ -29,7 +55,7 @@ export const deleteDatabase = async (databaseName) => {
 export const getTeamMembers = async () => {
     try {
         const response = await axios.get(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers`
         );
         return response.data;
     } catch (error) {
@@ -41,7 +67,7 @@ export const getTeamMembers = async () => {
 export const addTeamMember = async (teamMemberName, position) => {
     try {
         const response = await axios.post(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers`,
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers`,
             { teamMemberName, position }
         );
         return response.data;
@@ -54,7 +80,7 @@ export const addTeamMember = async (teamMemberName, position) => {
 export const deleteTeamMember = async (id) => {
     try {
         await axios.delete(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${id}`
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers/${id}`
         );
     } catch (error) {
         console.error(`Error deleting team member: ${error.message}`, error);
@@ -65,7 +91,7 @@ export const deleteTeamMember = async (id) => {
 export const fetchDailyTotalsAll = async () => {
     try {
         const response = await axios.get(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers`
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers`
         );
         return response.data;
     } catch (error) {
@@ -77,7 +103,7 @@ export const fetchDailyTotalsAll = async () => {
 export const submitDailyTotalToServer = async (teamMemberId, dailyTotals) => {
     try {
         const response = await axios.post(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${teamMemberId}/dailyTotals`,
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/dailyTotals`,
             dailyTotals
         );
         return response.data;
@@ -90,11 +116,58 @@ export const submitDailyTotalToServer = async (teamMemberId, dailyTotals) => {
 export const deleteDailyTotalFromServer = async (teamMemberId, date) => {
     try {
         const response = await axios.delete(
-            `${process.env.REACT_APP_SERVER_URL}/api/teamMembers/${teamMemberId}/dailyTotals/${date}`
+            `${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/dailyTotals/${date}`
         );
         return response.data;
     } catch (error) {
         console.error(`Error deleting daily total: ${error.message}`);
+        throw error;
+    }
+};
+
+// Fetch all users
+export const fetchUsers = async () => {
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/users`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Add a user
+export const addUser = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${process.env.REACT_APP_SERVER_URL}/users`,
+            { username, password },
+            { withCredentials: true }
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Fetch a user
+export const fetchUser = async (userId) => {
+    try {
+        const response = await axios.get(
+            `${process.env.REACT_APP_SERVER_URL}/users/${userId}`
+        );
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Delete a user
+export const deleteUser = async (userId) => {
+    try {
+        await axios.delete(
+            `${process.env.REACT_APP_SERVER_URL}/users/${userId}`
+        );
+    } catch (error) {
         throw error;
     }
 };

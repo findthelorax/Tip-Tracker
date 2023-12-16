@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography } from '@mui/material';
 // import { ErrorContext } from './contexts/ErrorContext';
 import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { FormInputDate, FormattedDate } from './utils/dateUtils';
 import { NumericFormat } from 'react-number-format';
 import { Box } from '@mui/system';
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const dailyTotalSchema = new mongoose.Schema({
+const DailyTotalSchema = new mongoose.Schema({
     date: Date,
     foodSales: Number,
     barSales: Number,
@@ -14,7 +14,7 @@ const dailyTotalSchema = new mongoose.Schema({
     totalPayrollTips: Number,
 }, { _id: false }); // Prevent creation of id for subdocument
 
-const weeklyTotalSchema = new mongoose.Schema({
+const WeeklyTotalSchema = new mongoose.Schema({
     date: Date,
     foodSales: Number,
     barSales: Number,
@@ -28,21 +28,21 @@ const weeklyTotalSchema = new mongoose.Schema({
     totalPayrollTips: Number,
 }, { _id: false }); // Prevent creation of id for subdocument
 
-const teamMemberSchema = new mongoose.Schema({
+const TeamMemberSchema = new mongoose.Schema({
     teamMemberName: String,
     position: String,
-    dailyTotals: [dailyTotalSchema],
-    weeklyTotals: [weeklyTotalSchema],
+    dailyTotals: [DailyTotalSchema],
+    weeklyTotals: [WeeklyTotalSchema],
 });
 
 // Add pre save middleware to capitalize name
-teamMemberSchema.pre('save', function (next) {
+TeamMemberSchema.pre('save', function (next) {
     if (this.teamMemberName && this.isModified('teamMemberName')) {
         this.teamMemberName = this.teamMemberName.charAt(0).toUpperCase() + this.teamMemberName.slice(1);
     }
     next();
 });
 
-const TeamMember = mongoose.model('TeamMember', teamMemberSchema);
+const TeamMember = mongoose.model('TeamMember', TeamMemberSchema, 'team');
 
 module.exports = TeamMember;

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 router.get('/getDatabases', async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Grid, Drawer, Typography, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import Header from './header';
+import Header from './Header';
 import TeamOperations from '../teamMembers';
 import TeamMembersPage from './TeamMembersPage';
 import DatabaseOperations from '../databaseOps';
@@ -42,7 +42,7 @@ function Dashboard({ refresh, error }) {
             case 'Database':
                 return <DatabaseOperations />;
             case 'Settings':
-                return <SettingsPage />;
+                return <SettingsPage user={currentUser} />;
             // Add other cases for other menu items
             default:
                 return null;

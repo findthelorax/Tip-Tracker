@@ -4,7 +4,6 @@ import {
 	FormControl,
 	InputLabel,
 	Select,
-	MenuItem,
 	Grid,
 	Card,
 	CardContent,
@@ -12,10 +11,14 @@ import {
 	Skeleton,
 	Box,
 } from '@mui/material';
+import { updateTipOutPercentages } from '../utils/utils';
 
-function SettingsPage() {
+function SettingsPage({ user }) {
 	const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
 	const [currency, setCurrency] = useState('USD');
+	const [bartenderTipOut, setBartenderTipOut] = useState(0.05);
+	const [runnerTipOut, setRunnerTipOut] = useState(0.04);
+	const [hostTipOut, setHostTipOut] = useState(0.015);
 
 	const handleTimezoneChange = (event) => {
 		setTimezone(event.target.value);
@@ -25,6 +28,19 @@ function SettingsPage() {
 	const handleCurrencyChange = (event) => {
 		setCurrency(event.target.value);
 		// Save the currency to context or local storage here
+	};
+
+	const handleTipOutChange = (event) => {
+		const { name, value } = event.target;
+		if (name === 'bartender') setBartenderTipOut(value);
+		else if (name === 'runner') setRunnerTipOut(value);
+		else if (name === 'host') setHostTipOut(value);
+
+		updateTipOutPercentages({
+			bartender: bartenderTipOut,
+			runner: runnerTipOut,
+			host: hostTipOut,
+		});
 	};
 
 	return (
@@ -92,6 +108,34 @@ function SettingsPage() {
 					{/* Map over the currencies here and create a MenuItem for each one */}
 				</Select>
 			</FormControl>
+			{user.role === 'manager' || user.role === 'root' ? (
+				<>
+					<FormControl>
+						<TextField
+							label="Bartender Tip Out Percentage"
+							name="bartender"
+							value={bartenderTipOut}
+							onChange={handleTipOutChange}
+						/>
+					</FormControl>
+					<FormControl>
+						<TextField
+							label="Runner Tip Out Percentage"
+							name="runner"
+							value={runnerTipOut}
+							onChange={handleTipOutChange}
+						/>
+					</FormControl>
+					<FormControl>
+						<TextField
+							label="Host Tip Out Percentage"
+							name="host"
+							value={hostTipOut}
+							onChange={handleTipOutChange}
+						/>
+					</FormControl>
+				</>
+			) : null}
 		</Box>
 	);
 }
