@@ -1,30 +1,40 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const User = require('../models/User');
-const config = require('../config');
+const { User } = require('../models/database');
 
-exports.login = async (req, res) => {
-	const { username, password } = req.body;
+exports.addUser = async (req, res) => {
+    const { username, password, role } = req.body;
+    const user = new User({ username, password, role });
 
-	try {
-		const user = await User.findOne({ username });
+    try {
+        const savedUser = await user.save();
+        res.json(savedUser);
+    } catch (err) {
+        res.json({ message: err });
+    }
+};
 
-		if (!user) {
-			return res.status(401).json({ error: 'Invalid username or password' });
-		}
+exports.getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId);
+        res.json(user);
+    } catch (err) {
+        res.json({ message: err });
+    }
+};
 
-		const passwordMatch = await bcrypt.compare(password, user.password);
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (err) {
+        res.json({ message: err });
+    }
+};
 
-		if (!passwordMatch) {
-			return res.status(401).json({ error: 'Invalid username or password' });
-		}
-
-		const token = jwt.sign({ id: user._id }, config.JWT_SECRET, { expiresIn: '1h' });
-
-		res.cookie('token', token, { httpOnly: true });
-		res.status(200).json({ username: user.username, role: user.role, message: 'Login successful' });
-	} catch (err) {
-		console.error(`Error logging in user: ${username}`, err);
-		res.status(500).json({ error: 'Server error' });
-	}
+exports.deleteUser = async (req, res) => {
+    try {
+        const removedUser = await User.deleteOne({ _id: req.params.userId });
+        res.json(removedUser);
+    } catch (err) {
+        res.json({ message: err });
+    }
 };

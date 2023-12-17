@@ -43,6 +43,6 @@ TeamMemberSchema.pre('save', function (next) {
     next();
 });
 
-const TeamMember = mongoose.model('TeamMember', TeamMemberSchema, 'team');
+const TeamMember = mongoose.model('TeamMember', TeamMemberSchema, 'teamMembers');
 
 module.exports = TeamMember;

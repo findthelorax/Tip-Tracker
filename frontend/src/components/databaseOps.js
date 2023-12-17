@@ -16,6 +16,7 @@ import {
 	Grid,
 	Skeleton,
 } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import Delete from '@mui/icons-material/Delete';
 
 function DatabaseOperations() {
@@ -112,7 +113,13 @@ function DatabaseOperations() {
 				>
 					<CardContent>
 						<Typography variant="h5">Database Stats</Typography>
-						{/* ... stats code ... */}
+						<BarChart width={500} height={300} data={databases}>
+							<XAxis dataKey="name" />
+							<YAxis />
+							<Tooltip />
+							<CartesianGrid stroke="#f5f5f5" />
+							<Bar dataKey="sizeOnDisk" fill="#ff7300" />
+						</BarChart>
 					</CardContent>
 				</Card>
 			</Grid>
