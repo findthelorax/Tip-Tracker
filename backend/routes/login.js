@@ -102,9 +102,7 @@ router.post('/login', async (req, res) => {
 			console.log(`User not found: ${username}`);
 			return res.status(400).json({ error: 'Invalid username or password' });
 		}
-
 		const passwordMatch = await bcrypt.compare(password, user.password);
-
 		if (!passwordMatch) {
 			console.log(`Password does not match for user: ${username}`);
 			return res.status(400).json({ error: 'Invalid username or password' });
@@ -118,7 +116,6 @@ router.post('/login', async (req, res) => {
 	}
 });
 
-<<<<<<< HEAD
 router.post('/signup', async (req, res) => {
 	const { username, password } = req.body;
 
@@ -147,6 +144,3 @@ router.post('/signup', async (req, res) => {
 });
 
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> f778f4d40f8444826172833b6d9727e3c5c258c2
