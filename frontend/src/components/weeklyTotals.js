@@ -1,10 +1,9 @@
-import React, { useContext, useMemo } from 'react';
-import { Typography } from '@mui/material';
-import { TeamContext } from './contexts/TeamContext';
-import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { DataGrid } from '@mui/x-data-grid';
-import './app/App.css';
-import { FormattedDate, CalculateTipOuts, ExportToCsvButton, ExportToExcelButton } from './utils/utils';
+import React, { useContext, useMemo, useState } from 'react';
+import { TeamContext } from '../contexts/TeamContext';
+import '../app/App.css';
+import moment from 'moment';
+import WeeklyTotalsRender from '../sections/weeklyTotals/weeklyTotalsRender';
+import WeeklyTipsRender from '../sections/weeklyTotals/weeklyTipsRender';
 
 const titleToPropName = {
 	'Bar Sales': 'barSales',
@@ -29,8 +28,10 @@ const formatUSD = (value) => {
 };
 
 function WeeklyTotals() {
-	const { refreshDailyTotals, dailyTotalsAll } = useContext(DailyTotalsContext);
 	const { team } = useContext(TeamContext);
+	const [selectedDate, setSelectedDate] = useState(moment());
+
+	const date = moment(selectedDate.toISOString());
 
 	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -47,15 +48,25 @@ function WeeklyTotals() {
 
 		team.forEach((member) => {
 			member.dailyTotals.forEach((total) => {
-				const dayOfWeek = new Date(total.date).getDay();
-				Object.keys(titleToPropName).forEach((key) => {
-					totals[dayOfWeek][titleToPropName[key]] += total[titleToPropName[key]] || 0;
-				});
+				const totalDate = moment(total.date);
+				const selectedWeekStart = moment(selectedDate).startOf('week');
+				const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+
+				if (totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd)) {
+					const dayOfWeek = totalDate.day();
+					Object.keys(titleToPropName).forEach((key) => {
+						totals[dayOfWeek][titleToPropName[key]] += total[titleToPropName[key]] || 0;
+					});
+				}
 			});
 		});
 
 		return totals;
-	}, [team]);
+	}, [team, selectedDate]);
+
+	const handleDateChange = (date) => {
+		setSelectedDate(date);
+	};
 
 	const columns = [
 		{ field: 'salesTips', headerName: 'Sales / Tips', width: 150 },
@@ -72,47 +83,52 @@ function WeeklyTotals() {
 		return row;
 	});
 
-	return (
-		<div style={{ height: 400, width: '100%' }}>
-			<Typography variant="h5" component="h2">
-				Weekly Totals
-			</Typography>
-			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-				<ExportToCsvButton data={rows} />
-				<ExportToExcelButton data={rows} />
-			</div>
-			<DataGrid rows={rows} columns={columns} pageSize={5} />
-		</div>
-	);
+	return <WeeklyTotalsRender date={date} handleDateChange={handleDateChange} rows={rows} columns={columns} />;
 }
 
 function TipsCard({ team }) {
-	const { refreshDailyTotals, dailyTotalsAll } = useContext(DailyTotalsContext);
-	let tips = [...team]
-		.sort((a, b) => {
-			const positions = ['bartender', 'host', 'runner', 'server'];
-			const positionA = positions.indexOf(a.position);
-			const positionB = positions.indexOf(b.position);
+	const [selectedDate, setSelectedDate] = useState(moment());
 
-			if (positionA !== positionB) {
-				return positionA - positionB;
-			}
+	const date = moment(selectedDate.toISOString());
 
-			return a.teamMemberName.localeCompare(b.teamMemberName);
-		})
-		.map((member) => {
-			let memberTips = {
-				name: member.teamMemberName,
-				position: member.position,
-			};
+	const handleDateChange = (date) => {
+		setSelectedDate(date);
+	};
 
-			Object.keys(titleToPropName).forEach((key) => {
-				memberTips[key] = formatUSD(
-					member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]] || 0, 0)
-				);
+	let tips = useMemo(() => {
+		return team
+			.filter((member) => {
+				const memberDate = moment(member.date);
+				const selectedWeekStart = moment(selectedDate).startOf('week');
+				const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+
+				return memberDate.isSameOrAfter(selectedWeekStart) && memberDate.isSameOrBefore(selectedWeekEnd);
+			})
+			.sort((a, b) => {
+				const positions = ['bartender', 'host', 'runner', 'server'];
+				const positionA = positions.indexOf(a.position);
+				const positionB = positions.indexOf(b.position);
+
+				if (positionA !== positionB) {
+					return positionA - positionB;
+				}
+
+				return a.teamMemberName.localeCompare(b.teamMemberName);
+			})
+			.map((member) => {
+				let memberTips = {
+					name: member.teamMemberName,
+					position: member.position,
+				};
+
+				Object.keys(titleToPropName).forEach((key) => {
+					memberTips[key] = formatUSD(
+						member.dailyTotals.reduce((sum, total) => sum + total[titleToPropName[key]] || 0, 0)
+					);
+				});
+				return memberTips;
 			});
-			return memberTips;
-		});
+	}, [team, selectedDate]);
 
 	const columns = [
 		{ field: 'name', headerName: 'Name', width: 150 },
@@ -122,18 +138,7 @@ function TipsCard({ team }) {
 
 	const rows = tips.map((tip, index) => ({ id: index, ...tip }));
 
-	return (
-		<div style={{ height: 400, width: '100%' }}>
-			<Typography variant="h5" component="h2">
-				Weekly Tips
-			</Typography>
-			<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-				<ExportToCsvButton data={rows} />
-				<ExportToExcelButton data={rows} />
-			</div>
-			<DataGrid rows={rows} columns={columns} pageSize={5} />
-		</div>
-	);
+	return <WeeklyTipsRender date={date} handleDateChange={handleDateChange} rows={rows} columns={columns} />;
 }
 
 export { WeeklyTotals, TipsCard };

@@ -13,10 +13,4 @@ router.get('/:id/dailyTotals', TeamMembersController.getDailyTotals);
 router.post('/:id/dailyTotals', TeamMembersController.createDailyTotal);
 router.delete('/:id/dailyTotals/:date', TeamMembersController.deleteDailyTotal);
 
-router.get('/:id/weeklyTotals', TeamMembersController.getWeeklyTotals);
-router.post('/:id/weeklyTotals', TeamMembersController.createWeeklyTotals);
-router.delete('/:id/weeklyTotals', TeamMembersController.deleteWeeklyTotals);
-
-router.get('/weeklyTotalsAll', TeamMembersController.getWeeklyTotalsAll);
-
 module.exports = router;

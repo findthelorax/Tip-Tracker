@@ -14,25 +14,10 @@ const DailyTotalSchema = new mongoose.Schema({
     totalPayrollTips: Number,
 }, { _id: false }); // Prevent creation of id for subdocument
 
-const WeeklyTotalSchema = new mongoose.Schema({
-    date: Date,
-    foodSales: Number,
-    barSales: Number,
-    nonCashTips: Number,
-    cashTips: Number,
-    barTipOuts: Number,
-    runnerTipOuts: Number,
-    hostTipOuts: Number,
-    totalTipOut: Number,
-    tipsReceived: Number,
-    totalPayrollTips: Number,
-}, { _id: false }); // Prevent creation of id for subdocument
-
 const TeamMemberSchema = new mongoose.Schema({
     teamMemberName: String,
     position: String,
     dailyTotals: [DailyTotalSchema],
-    weeklyTotals: [WeeklyTotalSchema],
 });
 
 // Add pre save middleware to capitalize name

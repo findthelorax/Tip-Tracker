@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { registerAdmin } from '../utils/api'; // Assuming api.js is in the same directory
+import { registerAdmin } from '../utils/api';
 
 function AdminRegister() {
     const [username, setUsername] = useState('');

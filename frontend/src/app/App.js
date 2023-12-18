@@ -12,6 +12,8 @@ import { fetchProfile } from '../utils/api';
 import AdminRegister from './Admin';
 import Main from './Main';
 import { AuthProvider } from '../contexts/AuthContext'; // Adjust the path as necessary
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 const initialState = {
 	team: [],
@@ -70,6 +72,8 @@ function App() {
 	}, []);
 
 	return (
+		<LocalizationProvider dateAdapter={AdapterMoment}>
+
 		<AuthProvider>
 
 		<Router>
@@ -104,6 +108,7 @@ function App() {
 			</ErrorProvider>
 		</Router>
 		</AuthProvider>
+		</LocalizationProvider>
 	);
 }
 

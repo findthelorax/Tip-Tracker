@@ -2,19 +2,17 @@ import React from 'react';
 import { Button } from '@mui/material';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import axios from 'axios';
+import moment from 'moment';
 
 export function FormattedDate(dateString) {
-    const date = new Date(dateString);
-    const year = date.getUTCFullYear();
-    const month = date.getUTCMonth();
-    const day = date.getUTCDate();
-    const formattedDate = new Date(year, month, day);
-    return `${formattedDate.toLocaleString('default', { month: 'short' })} ${formattedDate.getDate()}, ${formattedDate.getFullYear()}`;
+    const date = moment(dateString);
+    return date.format('MMM D, YYYY');
 }
+
 export const FormInputDate = () => {
-    const currentDate = new Date();
-    const formInputDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-    return formInputDate;
+    const currentDate = moment();
+    return currentDate.format('YYYY-MM-DD');
 };
 
 export let tipOutPercentages = {
@@ -85,4 +83,14 @@ export const ExportToExcelButton = ({ data }) => {
     };
 
     return <Button onClick={handleExport}>Export to Excel</Button>;
+};
+
+export const setAuthToken = token => {
+    if (token) {
+        // Apply to every request
+        axios.defaults.headers.common['Authorization'] = token;
+    } else {
+        // Delete auth header
+        delete axios.defaults.headers.common['Authorization'];
+    }
 };

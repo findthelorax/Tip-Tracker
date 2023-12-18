@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext, useCallback, useMemo } from 're
 import { Typography } from '@mui/material';
 import DailyTotalsForm from './dailyTotalsForm';
 import DailyTotalsTable from './dailyTotalsTable';
-import { TeamContext } from './contexts/TeamContext';
-import { DailyTotalsContext } from './contexts/DailyTotalsContext';
-import { ErrorContext } from './contexts/ErrorContext';
-import { fetchDailyTotalsAll, deleteDailyTotalFromServer, submitDailyTotalToServer } from './utils/api';
-import { FormattedDate, CalculateTipOuts } from './utils/utils';
+import { TeamContext } from '../contexts/TeamContext';
+import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
+import { ErrorContext } from '../contexts/ErrorContext';
+import { fetchDailyTotalsAll, deleteDailyTotalFromServer, submitDailyTotalToServer } from '../utils/api';
+import { FormattedDate, CalculateTipOuts } from '../utils/utils';
+import moment from 'moment';
 
 const today = new Date();
 const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
@@ -65,8 +66,7 @@ function DailyTotals() {
 
 	const updateTeamMemberTipOuts = useCallback(async (date, position, tipOut) => {
 		for (const member of team) {
-			const workedSameDate = member.dailyTotals.some((total) => total.date === date);
-
+			const workedSameDate = member.dailyTotals.some((total) => moment(total.date).format('YYYY-MM-DD') === moment(dailyTotals.date).format('YYYY-MM-DD'));
 			if (workedSameDate && member.position === position) {
 				// Update the member's daily total with the tip out
 				const dailyTotalIndex = member.dailyTotals.findIndex((total) => total.date === date);
@@ -97,10 +97,6 @@ function DailyTotals() {
 				dailyTotals.runnerTipOuts = tipOuts.runner;
 				dailyTotals.hostTipOuts = tipOuts.host;
 
-				console.log('🚀 ~ file: dailyTotals.js:97 ~ selectedTeamMember:', selectedTeamMember);
-				console.log('Before update:', dailyTotals);
-				console.log('Tip outs:', tipOuts);
-
             for (const member of team) {
                 // Check if the team member worked on the same date
                 const workedSameDate = member.dailyTotals.some((total) => total.date === dailyTotals.date);
@@ -123,7 +119,6 @@ function DailyTotals() {
 			}
 
 			const newDailyTotals = prepareDailyTotals(dailyTotals);
-			console.log('🚀 ~ file: dailyTotals.js:109 ~ newDailyTotals:', newDailyTotals);
 
 			try {
 				await submitDailyTotalToServer(selectedTeamMember._id, newDailyTotals);
@@ -138,14 +133,10 @@ function DailyTotals() {
 	);
 
 	const prepareDailyTotals = (dailyTotals) => {
-		console.log("🚀 ~ file: dailyTotals.js:148 ~ prepareDailyTotals ~ dailyTotals:", dailyTotals)
 		const totalTipOut =
 			Number(dailyTotals.barTipOuts) + Number(dailyTotals.runnerTipOuts) + Number(dailyTotals.hostTipOuts);
-		console.log('🚀 ~ file: dailyTotals.js:125 ~ prepareDailyTotals ~ totalTipOut:', totalTipOut);
 		const tipsReceived = Number(dailyTotals.nonCashTips) + Number(dailyTotals.cashTips);
-		console.log('🚀 ~ file: dailyTotals.js:127 ~ prepareDailyTotals ~ tipsReceived:', tipsReceived);
 		const totalPayrollTips = tipsReceived - totalTipOut;
-		console.log('🚀 ~ file: dailyTotals.js:129 ~ prepareDailyTotals ~ totalPayrollTips:', totalPayrollTips);
 
 		return {
 			...dailyTotals,
@@ -205,10 +196,6 @@ function DailyTotals() {
 				selectedTeamMember={selectedTeamMember}
 				setSelectedTeamMember={setSelectedTeamMember}
 			/>
-
-			<Typography variant="h1" component="h2" gutterBottom sx={{ marginBottom: '0.35em' }}>
-				DAILY TOTALS
-			</Typography>
 			<DailyTotalsTable team={team} deleteDailyTotal={deleteDailyTotal} />
 		</React.Fragment>
 	);
