@@ -48,7 +48,6 @@ export function TeamMemberSelect({ team, value = '', onChange }) {
 		onChange('teamMemberID', selectedMember ? selectedMember._id : '');
 	};
 	return (
-		<Card>
 			<FormControl fullWidth margin="normal">
 				<InputLabel id="teamMemberSelectName">Team Member</InputLabel>
 				<Select
@@ -67,7 +66,6 @@ export function TeamMemberSelect({ team, value = '', onChange }) {
 					))}
 				</Select>
 			</FormControl>
-		</Card>
 	);
 }
 

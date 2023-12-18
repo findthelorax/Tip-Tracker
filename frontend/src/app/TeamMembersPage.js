@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState, useMemo } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
-import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
+// import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import { getTeamMembers } from '../utils/api';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,7 +13,7 @@ function TeamMembersPage() {
 	const { team, setTeam } = useContext(TeamContext);
 	const [teamMemberName, setTeamMemberName] = useState('');
 	const [position, setPosition] = useState('bartender');
-	const { refreshDailyTotals } = useContext(DailyTotalsContext);
+	// const { refreshDailyTotals } = useContext(DailyTotalsContext);
 	const clearInputs = () => {
 		setTeamMemberName('');
 		setPosition('server');

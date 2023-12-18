@@ -17,20 +17,7 @@ function TeamMemberForm({
 
     return (
         <Card>
-            <Box
-                component="form"
-                onSubmit={handleSubmit}
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: 2,
-                    backgroundColor: '#f5f5f5',
-                    border: '1px solid black',
-                    boxShadow: '2px 2px 0px 0px black',
-                    borderRadius: '15px',
-                }}
-            >
+           
                 <TextField
                     id="teamMemberName"
                     label="Name"
@@ -64,7 +51,7 @@ function TeamMemberForm({
                         Add to Team
                     </Button>
                 </Box>
-            </Box>
+
         </Card>
     );
 }

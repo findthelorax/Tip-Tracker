@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
-import TeamMemberForm from './teamMembersForm';
+import TeamMemberForm from './teamMembersFormRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 

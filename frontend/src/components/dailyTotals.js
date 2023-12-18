@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import { Typography } from '@mui/material';
 import DailyTotalsForm from './dailyTotalsForm';
 import DailyTotalsTable from './dailyTotalsTable';
 import { TeamContext } from '../contexts/TeamContext';

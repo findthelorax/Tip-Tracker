@@ -1,5 +1,5 @@
 import React from 'react';
-import { DailyTotalsForm } from '../sections/dailyTotals/dailyTotalsForm';
+import { DailyTotalsForm } from '../sections/dailyTotals/dailyTotalsFormRender';
 
 export default function DailyTotalsFormContainer({
 	team,

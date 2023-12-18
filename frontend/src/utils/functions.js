@@ -1,4 +1,4 @@
-import { addTeamMember, deleteTeamMember, submitDailyTotalToServer, deleteDailyTotalFromServer, fetchDailyTotalsAll } from './api';
+import { addTeamMember, deleteTeamMember } from './api';
 
 export const addTeamMemberToTeam = (teamMemberName, position, setTeam, clearInputs) => {
 	return async () => {

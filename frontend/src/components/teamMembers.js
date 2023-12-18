@@ -4,7 +4,7 @@ import { getTeamMembers } from '../utils/api';
 import { Box, Grid } from '@mui/material';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../utils/functions';
-import TeamMemberFormRender from '../sections/teamMembers/teamMembersForm';
+import TeamMemberFormRender from '../sections/teamMembers/teamMembersFormRender';
 import TeamMembersRender from '../sections/teamMembers/teamMembersListRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
@@ -77,6 +77,8 @@ function TeamOperations() {
 						setPosition={setPosition}
 						addMember={addMember}
 					/>
+				</Grid>
+				<Grid item xs={12} md={6}>
 					<TeamMembersRender teamByPosition={teamByPosition} deleteMember={deleteMember} />
 				</Grid>
 			</Grid>
