@@ -13,4 +13,13 @@ router.get('/:id/dailyTotals', TeamMembersController.getDailyTotals);
 router.post('/:id/dailyTotals', TeamMembersController.createDailyTotal);
 router.delete('/:id/dailyTotals/:date', TeamMembersController.deleteDailyTotal);
 
+router.get('/:id/weeklyTotals/', TeamMembersController.getAllWeeklyTotals);
+
+router.post('/:id/weeklyTotals/:week', TeamMembersController.createWeeklyTotals);
+router.get('/:id/weeklyTotals/:week', TeamMembersController.getWeeklyTotals);
+router.delete('/:id/weeklyTotals/:week', TeamMembersController.deleteWeeklyTotals);
+router.patch('/:id/weeklyTotals/:week', TeamMembersController.updateWeeklyTotals);
+
+router.put('/:id/updateWeeklyTotals', TeamMembersController.updateWeeklyTotals);
+
 module.exports = router;

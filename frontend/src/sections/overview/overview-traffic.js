@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
-import ComputerDesktopIcon from '@heroicons/react/24/solid/ComputerDesktopIcon';
-import DeviceTabletIcon from '@heroicons/react/24/solid/DeviceTabletIcon';
-import PhoneIcon from '@heroicons/react/24/solid/PhoneIcon';
+import { FaComputer } from "react-icons/fa6";
+import { IoTabletPortrait } from "react-icons/io5";
+import { MdPhoneAndroid } from "react-icons/md";
 import {
   Box,
   Card,
@@ -65,17 +65,17 @@ const useChartOptions = (labels) => {
 const iconMap = {
   Desktop: (
     <SvgIcon>
-      <ComputerDesktopIcon />
+      <FaComputer />
     </SvgIcon>
   ),
   Tablet: (
     <SvgIcon>
-      <DeviceTabletIcon />
+      <IoTabletPortrait />
     </SvgIcon>
   ),
   Phone: (
     <SvgIcon>
-      <PhoneIcon />
+      <MdPhoneAndroid />
     </SvgIcon>
   )
 };

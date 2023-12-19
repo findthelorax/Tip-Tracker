@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
-import { addTeamMemberToTeam } from '../utils/functions';
+import { addTeamMemberToTeam } from '../logic/teamMembersLogic';
 import TeamMemberFormRender from '../sections/teamMembers/teamMembersFormRender';
 
 function TeamMemberForm() {

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { Button } from '@mui/material';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { FormattedDate } from '../utils/utils';
+import { FormattedDate } from '../logic/utils';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
 import { TeamContext } from '../contexts/TeamContext';
 

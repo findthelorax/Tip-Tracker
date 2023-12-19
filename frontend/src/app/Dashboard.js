@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -19,7 +19,12 @@ import TeamMembersList from '../components/teamMembersList';
 import TeamMemberForm from '../components/teamMemberForm';
 import TeamMembersPage from './TeamMembersPage';
 import DatabaseOperations from '../components/databaseOps';
-import { WeeklyTotalsTable, WeeklyTipsTable, WeeklyBarSalesCard, WeeklyFoodSalesCard } from '../components/weeklyTotals';
+import {
+	WeeklyTotalsTable,
+	WeeklyTipsTable,
+	WeeklyBarSalesCard,
+	WeeklyFoodSalesCard,
+} from '../components/weeklyTotals';
 import DailyTotalsTable from '../components/dailyTotalsTable';
 import DailyTotalsForm from '../components/dailyTotalsForm';
 import { TeamContext } from '../contexts/TeamContext';
@@ -28,7 +33,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { MainListItems, SecondaryListItems } from './SideNav';
 import { OverviewTraffic } from '../sections/overview/overview-traffic';
 import { OverviewTotalProfit } from '../sections/overview/overview-total-profit';
-import { OverviewBudget } from '../sections/overview/overview-budget';
+// import { SalesCardStyling } from '../stylings/salesCardStyling';
+import { calculateSalesDifferences } from '../logic/weeklyTotalsLogic';
+
 import moment from 'moment';
 
 const drawerWidth = 240;
@@ -76,6 +83,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 }));
 
 function Dashboard({ refresh }) {
+	const [salesDifferences, setSalesDifferences] = useState({});
 	const { team } = React.useContext(TeamContext);
 	const [selectedMenu, setSelectedMenu] = useState('Dashboard');
 	const { currentUser } = useAuth();
@@ -84,6 +92,11 @@ function Dashboard({ refresh }) {
 	const toggleDrawer = () => {
 		setOpen(!open);
 	};
+	useEffect(() => {
+		const differences = calculateSalesDifferences(team);
+		setSalesDifferences(differences);
+	}, [team]);
+
 	const renderSelectedComponent = () => {
 		switch (selectedMenu) {
 			case 'Dashboard':
@@ -97,9 +110,6 @@ function Dashboard({ refresh }) {
 					>
 						<Container maxWidth="xl">
 							<Grid container spacing={3}>
-								<Grid item xs={12} sm={6} lg={3}>
-									<OverviewBudget difference={12} positive sx={{ height: '100%' }} value="$24k" />
-								</Grid>
 								<Grid item xs={12} md={8} lg={8}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 250 }}>
 										<TeamMembersList />
@@ -132,21 +142,39 @@ function Dashboard({ refresh }) {
 								</Grid>
 								<Grid item xs={12}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<WeeklyTotalsTable team={team} refresh={refresh} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+										<WeeklyTotalsTable
+											team={team}
+											refresh={refresh}
+											selectedDate={selectedDate}
+											setSelectedDate={setSelectedDate}
+										/>
 									</Paper>
 								</Grid>
-								<Grid item xs={4}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<WeeklyBarSalesCard  team={team} refresh={refresh} selectedDate={selectedDate}/>
-									</Paper>
+								<Grid item xs={6}>
+									<WeeklyBarSalesCard
+										sx={{ height: '100%' }}
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										salesDifferences={salesDifferences}
+									/>
 								</Grid>
-								<Grid item xs={4}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<WeeklyFoodSalesCard team={team} refresh={refresh} selectedDate={selectedDate}/>
-									</Paper>
+								<Grid item xs={6}>
+									<WeeklyFoodSalesCard
+										sx={{ height: '100%' }}
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										salesDifferences={salesDifferences}
+									/>
 								</Grid>
 								<Grid item xs={12}>
-									<WeeklyTipsTable team={team} refresh={refresh} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+									<WeeklyTipsTable
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										setSelectedDate={setSelectedDate}
+									/>
 								</Grid>
 							</Grid>
 						</Container>
@@ -164,72 +192,72 @@ function Dashboard({ refresh }) {
 	};
 
 	return (
-			<Box sx={{ display: 'flex' }}>
-				<CssBaseline />
-				<AppBar position="absolute" open={open}>
-					<Toolbar
-						sx={{
-							pr: '24px', // keep right padding when drawer closed
-						}}
-					>
-						<IconButton
-							edge="start"
-							color="inherit"
-							aria-label="open drawer"
-							onClick={toggleDrawer}
-							sx={{
-								...(open && {
-									display: 'none',
-								}),
-							}}
-						>
-							<MenuIcon />
-						</IconButton>
-						<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-							Dashboard
-						</Typography>
-						<IconButton color="inherit">
-							<Badge badgeContent={4} color="error">
-								<NotificationsIcon />
-							</Badge>
-						</IconButton>
-					</Toolbar>
-				</AppBar>
-				<Drawer variant="permanent" open={open}>
-					<Toolbar
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'flex-end',
-							px: [1],
-						}}
-					>
-						<IconButton onClick={toggleDrawer}>
-							<ChevronLeftIcon />
-						</IconButton>
-					</Toolbar>
-
-					<Divider />
-					<Box >
-						<MainListItems setSelectedMenu={setSelectedMenu} />
-					</Box>
-					<Divider />
-					<SecondaryListItems setSelectedMenu={setSelectedMenu} />
-				</Drawer>
-				<Box
-					component="main"
+		<Box sx={{ display: 'flex' }}>
+			<CssBaseline />
+			<AppBar position="absolute" open={open}>
+				<Toolbar
 					sx={{
-						flexGrow: 1,
-						height: '100vh',
-						overflow: 'auto',
+						pr: '24px', // keep right padding when drawer closed
 					}}
 				>
-					<Toolbar />
-					<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-						{renderSelectedComponent()}
-					</Container>
+					<IconButton
+						edge="start"
+						color="inherit"
+						aria-label="open drawer"
+						onClick={toggleDrawer}
+						sx={{
+							...(open && {
+								display: 'none',
+							}),
+						}}
+					>
+						<MenuIcon />
+					</IconButton>
+					<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+						Dashboard
+					</Typography>
+					<IconButton color="inherit">
+						<Badge badgeContent={4} color="error">
+							<NotificationsIcon />
+						</Badge>
+					</IconButton>
+				</Toolbar>
+			</AppBar>
+			<Drawer variant="permanent" open={open}>
+				<Toolbar
+					sx={{
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'flex-end',
+						px: [1],
+					}}
+				>
+					<IconButton onClick={toggleDrawer}>
+						<ChevronLeftIcon />
+					</IconButton>
+				</Toolbar>
+
+				<Divider />
+				<Box>
+					<MainListItems setSelectedMenu={setSelectedMenu} />
 				</Box>
+				<Divider />
+				<SecondaryListItems setSelectedMenu={setSelectedMenu} />
+			</Drawer>
+			<Box
+				component="main"
+				sx={{
+					flexGrow: 1,
+					height: '100vh',
+					overflow: 'auto',
+				}}
+			>
+				<Toolbar />
+				<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+					{renderSelectedComponent()}
+				</Container>
 			</Box>
+		</Box>
 	);
 }
 

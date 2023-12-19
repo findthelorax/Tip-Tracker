@@ -11,7 +11,7 @@ import {
 	Skeleton,
 	Box,
 } from '@mui/material';
-import { updateTipOutPercentages } from '../utils/utils';
+import { updateTipOutPercentages } from '../logic/utils';
 
 function SettingsPage({ currentUser }) {
 	const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);

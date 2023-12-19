@@ -104,6 +104,8 @@ export const fetchDailyTotalsAll = async () => {
 };
 
 export const submitDailyTotalToServer = async (teamMemberId, dailyTotals) => {
+	console.log("🚀 ~ file: api.js:107 ~ submitDailyTotalToServer ~ dailyTotals:", dailyTotals)
+	console.log("🚀 ~ file: api.js:107 ~ submitDailyTotalToServer ~ teamMemberId:", teamMemberId)
 	try {
 		const response = await axios.post(
 			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/dailyTotals`,
@@ -124,6 +126,57 @@ export const deleteDailyTotalFromServer = async (teamMemberId, date) => {
 		return response.data;
 	} catch (error) {
 		console.error(`Error deleting daily total: ${error.message}`);
+		throw error;
+	}
+};
+
+// Weekly Totals
+export const createWeeklyTotal = async (teamMemberId, weeklyTotal) => {
+	try {
+		const response = await axios.post(
+			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/weeklyTotals`,
+			weeklyTotal
+		);
+		return response.data;
+	} catch (error) {
+		console.error(`Error creating weekly total: ${error.message}`);
+		throw error;
+	}
+};
+
+export const deleteWeeklyTotal = async (teamMemberId, week) => {
+	try {
+		const response = await axios.delete(
+			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/weeklyTotals/${week}`
+		);
+		return response.data;
+	} catch (error) {
+		console.error(`Error deleting weekly total: ${error.message}`);
+		throw error;
+	}
+};
+
+export const updateWeeklyTotal = async (teamMemberId, week, updatedWeeklyTotal) => {
+	try {
+		const response = await axios.patch(
+			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/weeklyTotals/${week}`,
+			updatedWeeklyTotal
+		);
+		return response.data;
+	} catch (error) {
+		console.error(`Error updating weekly total: ${error.message}`);
+		throw error;
+	}
+};
+
+export const getWeeklyTotal = async (teamMemberId, week) => {
+	try {
+		const response = await axios.get(
+			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/weeklyTotals/${week}`
+		);
+		return response.data;
+	} catch (error) {
+		console.error(`Error getting weekly total: ${error.message}`);
 		throw error;
 	}
 };
@@ -187,4 +240,16 @@ export const fetchProfile = async () => {
 		console.error('Error:', error);
 		throw error;
 	}
+};
+
+export const updateWeeklyTotalsAndSaveTeamMemberOnServer = async (teamMemberId) => {
+	const response = await fetch(`/api/teamMembers/${teamMemberId}/updateWeeklyTotals`, {
+		method: 'PUT',
+	});
+
+	if (!response.ok) {
+		throw new Error(`HTTP error! status: ${response.status}`);
+	}
+
+	return response.json();
 };

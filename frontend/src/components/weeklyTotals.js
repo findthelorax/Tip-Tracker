@@ -5,28 +5,7 @@ import moment from 'moment';
 import WeeklyTotalsRender from '../sections/weeklyTotals/weeklyTotalsRender';
 import WeeklyTipsRender from '../sections/weeklyTotals/weeklyTipsRender';
 import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from '../sections/weeklyTotals/weeklyTotalsCardsRender';
-
-const titleToPropName = {
-	'Bar Sales': 'barSales',
-	'Food Sales': 'foodSales',
-	'Non-Cash Tips': 'nonCashTips',
-	'Cash Tips': 'cashTips',
-	'Bar Tip Outs': 'barTipOuts',
-	'Runner Tip Outs': 'runnerTipOuts',
-	'Host Tip Outs': 'hostTipOuts',
-	'Total Tip Out': 'totalTipOut',
-	'Tips Received': 'tipsReceived',
-	'Total Payroll Tips': 'totalPayrollTips',
-};
-const titles = Object.keys(titleToPropName);
-
-const formatUSD = (value) => {
-	const formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD',
-	});
-	return formatter.format(value);
-};
+import { titleToPropName, titles, formatUSD, calculateSalesDifferences } from '../logic/weeklyTotalsLogic';
 
 function WeeklyTotalsTable({selectedDate, setSelectedDate}) {
 	const { team } = useContext(TeamContext);
@@ -155,8 +134,16 @@ function WeeklyFoodSalesCard({ team, selectedDate }) {
 		});
 	}, [team, selectedDate]);
 
+	const salesDifferences = calculateSalesDifferences(teamMembers);
+
     return (
-        <WeeklyFoodSalesCardRender teamMembers={teamMembers} selectedDate={selectedDate}/>
+        <WeeklyFoodSalesCardRender
+            teamMembers={teamMembers}
+            difference={salesDifferences.foodSales?.difference}
+            positive={salesDifferences.foodSales?.positive}
+            selectedDate={selectedDate}
+            sx={salesDifferences.foodSales?.sx}
+        />
     );
 }
 function WeeklyBarSalesCard({ team, selectedDate }) {
@@ -173,8 +160,16 @@ function WeeklyBarSalesCard({ team, selectedDate }) {
 		});
 	}, [team, selectedDate]);
 
+	const salesDifferences = calculateSalesDifferences(teamMembers);
+
     return (
-        <WeeklyBarSalesCardRender teamMembers={teamMembers} selectedDate={selectedDate}/>
+        <WeeklyBarSalesCardRender
+            teamMembers={teamMembers}
+            difference={salesDifferences.barSales?.difference}
+            positive={salesDifferences.barSales?.positive}
+            selectedDate={selectedDate}
+            sx={salesDifferences.barSales?.sx}
+        />
     );
 }
 

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 // import jwt_decode from 'jwt-decode';
-import { setAuthToken } from '../utils/utils'; // This is a utility function to set the token in the axios headers
+import { setAuthToken } from '../logic/utils'; // This is a utility function to set the token in the axios headers
 
 // Create the context
 const AuthContext = createContext();

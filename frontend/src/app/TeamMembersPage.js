@@ -4,7 +4,7 @@ import { TeamContext } from '../contexts/TeamContext';
 import { getTeamMembers } from '../utils/api';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../utils/functions';
+import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../logic/teamMembersLogic';
 import TeamMembersPageRender from '../sections/teamMembers/teamMembersPageRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];

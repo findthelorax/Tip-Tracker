@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Box, Card, CardContent, CardHeader } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { ExportToCsvButton, ExportToExcelButton } from '../../utils/utils';
+import { ExportToCsvButton, ExportToExcelButton } from '../../logic/utils';
 
 export default function WeeklyTipsRender({ date, handleDateChange, rows, columns }) {
     return (

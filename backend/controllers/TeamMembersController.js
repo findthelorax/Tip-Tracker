@@ -1,5 +1,4 @@
-const TeamMember = require('../models/teamMember');
-const { User, Team } = require('../models/database');
+const { Team } = require('../models/database');
 
 function validateDailyTotal(dailyTotal) {
 	return (
@@ -8,101 +7,98 @@ function validateDailyTotal(dailyTotal) {
 }
 
 exports.getTeamMembers = async (req, res) => {
-    try {
-        const teamMembers = await Team.find().lean();
-        res.json(teamMembers);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
-    }
+	try {
+		const teamMembers = await Team.find();
+		res.json(teamMembers);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: 'Server error' });
+	}
 };
 
 exports.createTeamMember = async (req, res) => {
-    const { teamMemberName, position } = req.body;
+	const { teamMemberName, position } = req.body;
 
-    if (!teamMemberName || !position) {
-        return res
-            .status(400)
-            .json({ error: "Both name and position are required" });
-    }
+	if (!teamMemberName || !position) {
+		return res.status(400).json({ error: 'Both name and position are required' });
+	}
 
-    const newMember = new Team({ teamMemberName, position });
+	const newMember = new Team({ teamMemberName, position });
 
-    try {
-        const savedMember = await newMember.save();
-        res.status(201).json(savedMember);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
+	try {
+		const savedMember = await newMember.save();
+		res.status(201).json(savedMember);
+	} catch (err) {
+		res.status(400).json({ message: err.message });
+	}
 };
 
 exports.getTeamMember = async (req, res) => {
-    const memberId = req.params.id;
-    if (!memberId) {
-        return res.status(400).json({
-            success: false,
-            message: 'Member ID is required',
-        });
-    }
-    try {
-        const teamMember = await Team.findById(memberId);
-        if (!teamMember) {
-            return res.status(404).json({
-                success: false,
-                message: 'Team member not found',
-            });
-        }
-        return res.status(200).json({
-            success: true,
-            data: teamMember,
-        });
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json({
-            success: false,
-            error: err,
-        });
-    }
+	const memberId = req.params.id;
+	if (!memberId) {
+		return res.status(400).json({
+			success: false,
+			message: 'Member ID is required',
+		});
+	}
+	try {
+		const teamMember = await Team.findById(memberId);
+		if (!teamMember) {
+			return res.status(404).json({
+				success: false,
+				message: 'Team member not found',
+			});
+		}
+		return res.status(200).json({
+			success: true,
+			data: teamMember,
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(400).json({
+			success: false,
+			error: err,
+		});
+	}
 };
 
 exports.updateTeamMember = async (req, res) => {
-    const { teamMemberName, position } = req.body;
+	const { teamMemberName, position } = req.body;
 
-    if (!teamMemberName || !position) {
-        return res.status(400).json({ error: "Both name and position are required" });
-    }
+	if (!teamMemberName || !position) {
+		return res.status(400).json({ error: 'Both name and position are required' });
+	}
 
-    try {
-        const updatedMember = await TeamMember.findByIdAndUpdate(
-            req.params.id,
-            { teamMemberName, position },
-            { new: true } // This option returns the updated document
-        );
+	try {
+		const updatedMember = await Team.findByIdAndUpdate(req.params.id, { teamMemberName, position }, { new: true });
 
-        if (!updatedMember) {
-            return res.status(404).json({ error: "Team member not found" });
-        }
+		if (!updatedMember) {
+			return res.status(404).json({ error: 'Team member not found' });
+		}
 
-        res.json(updatedMember);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+		res.json(updatedMember);
+	} catch (err) {
+		res.status(500).json({ message: err.message });
+	}
 };
 
 exports.deleteTeamMember = async (req, res) => {
 	const memberId = req.params.id;
-	const teamMember = await Team.findById(memberId); // Check if the team member exists
+	const teamMember = await Team.findById(memberId);
 	if (!teamMember) {
 		return res.status(404).json({
 			success: false,
 			message: 'Team member not found',
 		});
 	}
-	await Team.findOneAndDelete({ _id: memberId });
-	res.json({
-		success: true,
-		message: 'Team member deleted successfully',
-	});
+	try {
+		const deleted = await Team.findByIdAndDelete(memberId);
+		if (!deleted) throw new Error('Deletion failed');
+		res.json({ message: `Team member ${memberId} deleted` });
+	} catch (error) {
+		console.error(`Error deleting team member ${memberId}:`, error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
 };
 
 // Route to get daily totals for a specific team member
@@ -200,10 +196,10 @@ exports.deleteDailyTotal = async (req, res) => {
 };
 
 // Route to get weekly totals for a specific team member
-exports.getWeeklyTotals = async (req, res) => {
+exports.getAllWeeklyTotals = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const teamMember = await Team.findById(id).select('weeklyTotals').lean();
+		const teamMember = await Team.findById(id).select('weeklyTotals');
 
 		if (!teamMember) {
 			return res.status(404).json({ error: 'Team member not found' });
@@ -218,7 +214,8 @@ exports.getWeeklyTotals = async (req, res) => {
 exports.createWeeklyTotals = async (req, res) => {
 	try {
 		const memberId = req.params.id;
-		const weeklyTotalsData = req.body;
+		const week = req.params.week;
+		const weeklyTotalsData = { ...req.body, week };
 
 		await Team.updateOne({ _id: memberId }, { $push: { weeklyTotals: weeklyTotalsData } });
 
@@ -230,15 +227,33 @@ exports.createWeeklyTotals = async (req, res) => {
 	}
 };
 
+exports.getWeeklyTotals = async (req, res) => {
+	try {
+		const memberId = req.params.id;
+		const teamMember = await Team.findById(memberId);
+		if (!teamMember) {
+			return res.status(404).json({ error: 'Team member not found' });
+		}
+		res.json(teamMember.weeklyTotals);
+	} catch (error) {
+		console.error('Error getting weekly totals:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+};
+
 // Delete a specific team member's weekly totals
 exports.deleteWeeklyTotals = async (req, res) => {
 	try {
 		const memberId = req.params.id;
+		const week = req.params.week;
 		const teamMember = await Team.findById(memberId);
-		teamMember.weeklyTotals = [];
+
+		// Filter out the week to be deleted
+		// teamMember.weeklyTotals = teamMember.weeklyTotals.filter(total => total.week !== week);
+		teamMember.weeklyTotals = teamMember.weeklyTotals.filter((total) => total.week !== week.toString());
 		await teamMember.save();
 		res.json({
-			message: `Weekly totals for team member ${memberId} deleted`,
+			message: `Weekly totals for the week ${week} for team member ${memberId} deleted`,
 		});
 	} catch (error) {
 		console.error(`Error deleting weekly totals for team member ${memberId}:`, error);
@@ -246,63 +261,56 @@ exports.deleteWeeklyTotals = async (req, res) => {
 	}
 };
 
-exports.getWeeklyTotalsAll = async (req, res) => {
+exports.updateWeeklyTotalsAndSaveTeamMemberOnServer = async (req, res) => {
+	const teamMember = await TeamMember.findById(req.params.id);
+
+	if (!teamMember) {
+		return res.status(404).send('Team member not found');
+	}
+
+	teamMember.updateWeeklyTotals();
+	await teamMember.save();
+
+	res.send(teamMember);
+};
+
+exports.updateWeeklyTotals = async (req, res) => {
 	try {
-		// Fetch all team members
-		const teamMembers = await Team.find().lean();
+		const memberId = req.params.id;
+		const week = req.params.week;
+		const teamMember = await Team.findById(memberId);
 
-		// Create an array to store results for all team members
-		const allWeeklyTotals = [];
-
-		// Get the start and end dates of the current week
-		const currentDate = new Date();
-		const firstDayOfWeek = currentDate.getDate() - currentDate.getDay(); // Sunday
-		const lastDayOfWeek = firstDayOfWeek + 6; // Saturday
-
-		const startOfWeek = new Date(currentDate.setDate(firstDayOfWeek));
-		startOfWeek.setHours(0, 0, 0, 0); // set time to 00:00:00.000
-
-		const endOfWeek = new Date(currentDate.setDate(lastDayOfWeek));
-		endOfWeek.setHours(23, 59, 59, 999); // set time to 23:59:59.999
-
-		// Iterate through each team member
-		for (const teamMember of teamMembers) {
-			// Fetch weekly totals for the current team member
-			const weeklyTotals = teamMember.dailyTotals.filter((total) => {
-				const date = new Date(total.date);
-				return date >= startOfWeek && date <= endOfWeek;
-			});
-
-			// Calculate the weekly total
-			const weeklyTotal = weeklyTotals.reduce((total, dailyTotal) => {
-				return {
-					date: endOfWeek, // set the date to the end of the week
-					foodSales: (total.foodSales || 0) + dailyTotal.foodSales,
-					barSales: (total.barSales || 0) + dailyTotal.barSales,
-					nonCashTips: (total.nonCashTips || 0) + dailyTotal.nonCashTips,
-					cashTips: (total.cashTips || 0) + dailyTotal.cashTips,
-					barTipOuts: (total.barTipOuts || 0) + dailyTotal.barTipOuts,
-					runnerTipOuts: (total.runnerTipOuts || 0) + dailyTotal.runnerTipOuts,
-					hostTipOuts: (total.hostTipOuts || 0) + dailyTotal.hostTipOuts,
-					totalTipOut: (total.totalTipOut || 0) + dailyTotal.totalTipOut,
-					tipsReceived: (total.tipsReceived || 0) + dailyTotal.tipsReceived,
-					totalPayrollTips: (total.totalPayrollTips || 0) + dailyTotal.totalPayrollTips,
-				};
-			}, {});
-
-			// Create an object with team member details and their weekly total
-			const teamMemberData = {
-				teamMemberName: teamMember.teamMemberName,
-				weeklyTotal: weeklyTotal,
-			};
-			// Push the team member data to the array
-			allWeeklyTotals.push(teamMemberData);
+		if (!teamMember) {
+			return res.status(404).json({ error: 'Team member not found' });
 		}
 
-		// Send the array of daily totals for all team members in the response
-		res.json(allWeeklyTotals);
+		// Fetch weekly totals for the specified week
+		const weeklyTotals = teamMember.dailyTotals.filter((total) => total.week === week);
+
+		// Calculate the weekly total
+		const weeklyTotal = weeklyTotals.reduce((total, dailyTotal) => {
+			return {
+				week: total.week, // set the date to the end of the week
+				foodSales: (total.foodSales || 0) + dailyTotal.foodSales,
+				barSales: (total.barSales || 0) + dailyTotal.barSales,
+				nonCashTips: (total.nonCashTips || 0) + dailyTotal.nonCashTips,
+				cashTips: (total.cashTips || 0) + dailyTotal.cashTips,
+				barTipOuts: (total.barTipOuts || 0) + dailyTotal.barTipOuts,
+				runnerTipOuts: (total.runnerTipOuts || 0) + dailyTotal.runnerTipOuts,
+				hostTipOuts: (total.hostTipOuts || 0) + dailyTotal.hostTipOuts,
+				totalTipOut: (total.totalTipOut || 0) + dailyTotal.totalTipOut,
+				tipsReceived: (total.tipsReceived || 0) + dailyTotal.tipsReceived,
+				totalPayrollTips: (total.totalPayrollTips || 0) + dailyTotal.totalPayrollTips,
+			};
+		}, {});
+
+		// Update the team member's weekly totals
+		teamMember.weeklyTotals.push(weeklyTotal);
+		await teamMember.save();
+
+		res.json(teamMember.weeklyTotals);
 	} catch (error) {
-		console.error('Error fetching weekly totals for all team members:', error);
-		res.status(500).json({ success: false, message: 'Failed to fetch weekly totals for all team members' });
+		console.error('Error updating weekly totals:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
 	}
 };

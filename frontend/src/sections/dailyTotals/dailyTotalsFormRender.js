@@ -45,7 +45,7 @@ export function InputField({ id, value = '', onChange, label, type = 'number', p
 export function TeamMemberSelect({ team, value = '', onChange }) {
 	const handleTeamMemberSelect = (event) => {
 		const selectedMember = team.find((member) => member._id === event.target.value);
-		onChange('teamMemberID', selectedMember ? selectedMember._id : '');
+		onChange('teamMemberId', selectedMember ? selectedMember._id : '');
 	};
 	return (
 		<FormControl fullWidth margin="normal">
@@ -93,7 +93,11 @@ export function DailyTotalsFormRender({
 				<Typography variant="h5" gutterBottom>
 					Daily Totals
 				</Typography>
-				<TeamMemberSelect team={team} value={selectedTeamMember || ''} onChange={handleDailyTotalsChange} />
+				<TeamMemberSelect
+					team={team}
+					value={selectedTeamMember ? selectedTeamMember._id : ''}
+					onChange={handleDailyTotalsChange}
+				/>
 				<InputField
 					id="date"
 					value={dailyTotals.date}
