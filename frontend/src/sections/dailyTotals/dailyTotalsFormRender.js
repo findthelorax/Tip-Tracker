@@ -3,7 +3,7 @@ import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typograph
 import { NumericFormat } from 'react-number-format';
 import { Box } from '@mui/system';
 
-export function InputField({ id, value, onChange, label, type = 'number', parseValue = parseFloat }) {
+export function InputField({ id, value = '', onChange, label, type = 'number', parseValue = parseFloat }) {
 	if (type === 'date') {
 		return (
 			<TextField
@@ -48,28 +48,34 @@ export function TeamMemberSelect({ team, value = '', onChange }) {
 		onChange('teamMemberID', selectedMember ? selectedMember._id : '');
 	};
 	return (
-			<FormControl fullWidth margin="normal">
-				<InputLabel id="teamMemberSelectName">Team Member</InputLabel>
-				<Select
-					labelId="teamMemberSelectName"
-					id="teamMemberSelectName"
-					value={value}
-					onChange={handleTeamMemberSelect}
-				>
-					<MenuItem value="" disabled>
-						Select Team Member
+		<FormControl fullWidth margin="normal">
+			<InputLabel id="teamMemberSelectName">Team Member</InputLabel>
+			<Select
+				labelId="teamMemberSelectName"
+				id="teamMemberSelectName"
+				value={value}
+				onChange={handleTeamMemberSelect}
+			>
+				<MenuItem value="" disabled>
+					Select Team Member
+				</MenuItem>
+				{team.map((member) => (
+					<MenuItem key={member._id} value={member._id}>
+						{`${member.teamMemberName} - ${member.position}`}
 					</MenuItem>
-					{team.map((member) => (
-						<MenuItem key={member._id} value={member._id}>
-							{`${member.teamMemberName} - ${member.position}`}
-						</MenuItem>
-					))}
-				</Select>
-			</FormControl>
+				))}
+			</Select>
+		</FormControl>
 	);
 }
 
-export function DailyTotalsForm({ team, dailyTotals, handleDailyTotalsChange, handleSubmit, selectedTeamMember }) {
+export function DailyTotalsFormRender({
+	team,
+	dailyTotals,
+	handleDailyTotalsChange,
+	handleSubmit,
+	selectedTeamMember,
+}) {
 	return (
 		<Card>
 			<Box
@@ -87,7 +93,7 @@ export function DailyTotalsForm({ team, dailyTotals, handleDailyTotalsChange, ha
 				<Typography variant="h5" gutterBottom>
 					Daily Totals
 				</Typography>
-				<TeamMemberSelect team={team} value={selectedTeamMember._id || ''} onChange={handleDailyTotalsChange} />
+				<TeamMemberSelect team={team} value={selectedTeamMember || ''} onChange={handleDailyTotalsChange} />
 				<InputField
 					id="date"
 					value={dailyTotals.date}

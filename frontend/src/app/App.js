@@ -13,7 +13,9 @@ import AdminRegister from './Admin';
 import Main from './Main';
 import { AuthProvider } from '../contexts/AuthContext'; // Adjust the path as necessary
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '../theme/index';
 
 const initialState = {
 	team: [],
@@ -45,6 +47,7 @@ function App() {
 	const [state, dispatch] = useReducer(reducer, initialState);
 	const [loggedIn, setLoggedIn] = useState(false);
 
+	const theme = createTheme();
 	// Memoized context values
 	const errorContextValue = useMemo(
 		() => ({
@@ -72,43 +75,43 @@ function App() {
 	}, []);
 
 	return (
-		<LocalizationProvider dateAdapter={AdapterMoment}>
-
-		<AuthProvider>
-
-		<Router>
-			<ErrorProvider value={errorContextValue}>
-				<TeamProvider>
-					<DailyTotalsProvider>
-						<div className="App">
-							<Routes>
-								<Route
-									path="/"
-									element={
-										loggedIn ? (
-											<Dashboard refresh={state.refresh} error={state.error} />
-										) : (
-											<Signup />
-										)
-									}
-								/>
-								<Route
-									path="/dashboard"
-									element={<Dashboard refresh={state.refresh} error={state.error} />}
-								/>
-								<Route path="/login" element={<Login />} />
-								<Route path="/signup" element={<Signup />} />
-								<Route path="/profile" element={<Profile />} />
-								<Route path="/admin/register" element={<AdminRegister />} />
-									<Route path="/" element={<Main />} />
-							</Routes>
-						</div>
-					</DailyTotalsProvider>
-				</TeamProvider>
-			</ErrorProvider>
-		</Router>
-		</AuthProvider>
-		</LocalizationProvider>
+		<ThemeProvider theme={theme}>
+			<LocalizationProvider dateAdapter={AdapterMoment}>
+				<AuthProvider>
+					<Router>
+						<ErrorProvider value={errorContextValue}>
+							<TeamProvider>
+								<DailyTotalsProvider>
+									<div className="App">
+										<Routes>
+											<Route
+												path="/"
+												element={
+													loggedIn ? (
+														<Dashboard refresh={state.refresh} error={state.error} />
+													) : (
+														<Signup />
+													)
+												}
+											/>
+											<Route
+												path="/dashboard"
+												element={<Dashboard refresh={state.refresh} error={state.error} />}
+											/>
+											<Route path="/login" element={<Login />} />
+											<Route path="/signup" element={<Signup />} />
+											<Route path="/profile" element={<Profile />} />
+											<Route path="/admin/register" element={<AdminRegister />} />
+											<Route path="/" element={<Main />} />
+										</Routes>
+									</div>
+								</DailyTotalsProvider>
+							</TeamProvider>
+						</ErrorProvider>
+					</Router>
+				</AuthProvider>
+			</LocalizationProvider>
+		</ThemeProvider>
 	);
 }
 

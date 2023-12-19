@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -15,11 +15,13 @@ import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import TeamOperations from '../components/teamMembers';
+import TeamMembersList from '../components/teamMembersList';
+import TeamMemberForm from '../components/teamMemberForm';
 import TeamMembersPage from './TeamMembersPage';
 import DatabaseOperations from '../components/databaseOps';
-import { WeeklyTotals, TipsCard } from '../components/weeklyTotals';
-import DailyTotals from '../components/dailyTotals';
+import { WeeklyTotalsTable, WeeklyTipsTable, WeeklyBarSalesCard, WeeklyFoodSalesCard } from '../components/weeklyTotals';
+import DailyTotalsTable from '../components/dailyTotalsTable';
+import DailyTotalsForm from '../components/dailyTotalsForm';
 import { TeamContext } from '../contexts/TeamContext';
 import SettingsPage from './Settings';
 import { useAuth } from '../contexts/AuthContext';
@@ -27,6 +29,7 @@ import { MainListItems, SecondaryListItems } from './SideNav';
 import { OverviewTraffic } from '../sections/overview/overview-traffic';
 import { OverviewTotalProfit } from '../sections/overview/overview-total-profit';
 import { OverviewBudget } from '../sections/overview/overview-budget';
+import moment from 'moment';
 
 const drawerWidth = 240;
 
@@ -72,17 +75,15 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 	},
 }));
 
-const defaultTheme = createTheme();
-
-function Dashboard({ refresh, error }) {
+function Dashboard({ refresh }) {
 	const { team } = React.useContext(TeamContext);
 	const [selectedMenu, setSelectedMenu] = useState('Dashboard');
 	const { currentUser } = useAuth();
+	const [selectedDate, setSelectedDate] = useState(moment());
 	const [open, setOpen] = React.useState(true);
 	const toggleDrawer = () => {
 		setOpen(!open);
 	};
-
 	const renderSelectedComponent = () => {
 		switch (selectedMenu) {
 			case 'Dashboard':
@@ -101,15 +102,25 @@ function Dashboard({ refresh, error }) {
 								</Grid>
 								<Grid item xs={12} md={8} lg={8}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 250 }}>
-										<TeamOperations />
+										<TeamMembersList />
+									</Paper>
+								</Grid>
+								<Grid item xs={12} md={8} lg={8}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 250 }}>
+										<TeamMemberForm />
 									</Paper>
 								</Grid>
 								<Grid item xs={12} sm={6} lg={3}>
 									<OverviewTotalProfit sx={{ height: '100%' }} value="$15k" />
 								</Grid>
 								<Grid item xs={12}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column'}}>
-										<DailyTotals refresh={refresh} />
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+										<DailyTotalsForm refresh={refresh} />
+									</Paper>
+								</Grid>
+								<Grid item xs={12}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+										<DailyTotalsTable refresh={refresh} />
 									</Paper>
 								</Grid>
 								<Grid item xs={12} md={6} lg={4}>
@@ -121,11 +132,21 @@ function Dashboard({ refresh, error }) {
 								</Grid>
 								<Grid item xs={12}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<WeeklyTotals team={team} refresh={refresh} />
+										<WeeklyTotalsTable team={team} refresh={refresh} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+									</Paper>
+								</Grid>
+								<Grid item xs={4}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+										<WeeklyBarSalesCard  team={team} refresh={refresh} selectedDate={selectedDate}/>
+									</Paper>
+								</Grid>
+								<Grid item xs={4}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+										<WeeklyFoodSalesCard team={team} refresh={refresh} selectedDate={selectedDate}/>
 									</Paper>
 								</Grid>
 								<Grid item xs={12}>
-										<TipsCard team={team} refresh={refresh} />
+									<WeeklyTipsTable team={team} refresh={refresh} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 								</Grid>
 							</Grid>
 						</Container>
@@ -143,7 +164,6 @@ function Dashboard({ refresh, error }) {
 	};
 
 	return (
-		<ThemeProvider theme={defaultTheme}>
 			<Box sx={{ display: 'flex' }}>
 				<CssBaseline />
 				<AppBar position="absolute" open={open}>
@@ -188,16 +208,17 @@ function Dashboard({ refresh, error }) {
 							<ChevronLeftIcon />
 						</IconButton>
 					</Toolbar>
+
 					<Divider />
-					<MainListItems setSelectedMenu={setSelectedMenu} />
+					<Box >
+						<MainListItems setSelectedMenu={setSelectedMenu} />
+					</Box>
 					<Divider />
 					<SecondaryListItems setSelectedMenu={setSelectedMenu} />
 				</Drawer>
 				<Box
 					component="main"
 					sx={{
-						backgroundColor: (theme) =>
-							theme.palette.mode === 'dark' ? theme.palette.grey[100] : theme.palette.grey[900],
 						flexGrow: 1,
 						height: '100vh',
 						overflow: 'auto',
@@ -209,7 +230,6 @@ function Dashboard({ refresh, error }) {
 					</Container>
 				</Box>
 			</Box>
-		</ThemeProvider>
 	);
 }
 

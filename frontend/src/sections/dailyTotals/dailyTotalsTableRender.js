@@ -1,10 +1,9 @@
-// dailyTotalsTableRender.js
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Card, CardContent, CardHeader, Box, Typography } from '@mui/material';
 import { ExportToCsvButton, ExportToExcelButton } from '../../utils/utils';
 
-function DailyTotalsTableRender({ rows, columns, deleteDailyTotal }) {
+function DailyTotalsTableRender({ rows, columns }) {
     return (
         <Card style={{ height: '100%', width: '100%' }}>
             <CardHeader

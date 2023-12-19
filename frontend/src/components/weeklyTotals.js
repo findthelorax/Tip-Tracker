@@ -1,9 +1,10 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
 import '../app/App.css';
 import moment from 'moment';
 import WeeklyTotalsRender from '../sections/weeklyTotals/weeklyTotalsRender';
 import WeeklyTipsRender from '../sections/weeklyTotals/weeklyTipsRender';
+import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from '../sections/weeklyTotals/weeklyTotalsCardsRender';
 
 const titleToPropName = {
 	'Bar Sales': 'barSales',
@@ -27,10 +28,8 @@ const formatUSD = (value) => {
 	return formatter.format(value);
 };
 
-function WeeklyTotals() {
+function WeeklyTotalsTable({selectedDate, setSelectedDate}) {
 	const { team } = useContext(TeamContext);
-	const [selectedDate, setSelectedDate] = useState(moment());
-
 	const date = moment(selectedDate.toISOString());
 
 	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -70,7 +69,10 @@ function WeeklyTotals() {
 
 	const columns = [
 		{ field: 'salesTips', headerName: 'Sales / Tips', width: 150 },
-		...daysOfWeek.map((day) => ({ field: day, headerName: day, width: 150 })),
+		...daysOfWeek.map((day, index) => {
+			const date = moment(selectedDate).startOf('week').add(index, 'days').format('MM/DD');
+			return { field: day, headerName: `${day} (${date})`, width: 150 };
+		}),
 		{ field: 'total', headerName: 'Total', width: 150 },
 	];
 
@@ -86,9 +88,7 @@ function WeeklyTotals() {
 	return <WeeklyTotalsRender date={date} handleDateChange={handleDateChange} rows={rows} columns={columns} />;
 }
 
-function TipsCard({ team }) {
-	const [selectedDate, setSelectedDate] = useState(moment());
-
+function WeeklyTipsTable({ team, selectedDate, setSelectedDate}) {
 	const date = moment(selectedDate.toISOString());
 
 	const handleDateChange = (date) => {
@@ -141,4 +141,41 @@ function TipsCard({ team }) {
 	return <WeeklyTipsRender date={date} handleDateChange={handleDateChange} rows={rows} columns={columns} />;
 }
 
-export { WeeklyTotals, TipsCard };
+function WeeklyFoodSalesCard({ team, selectedDate }) {
+    const teamMembers = useMemo(() => {
+        const selectedWeekStart = moment(selectedDate).startOf('week');
+        const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+
+		return team.map(member => {
+			const weeklyTotals = member.dailyTotals.filter(total => {
+				const totalDate = moment(total.date);
+				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
+			});
+			return { ...member, weeklyTotals };
+		});
+	}, [team, selectedDate]);
+
+    return (
+        <WeeklyFoodSalesCardRender teamMembers={teamMembers} selectedDate={selectedDate}/>
+    );
+}
+function WeeklyBarSalesCard({ team, selectedDate }) {
+    const teamMembers = useMemo(() => {
+        const selectedWeekStart = moment(selectedDate).startOf('week');
+        const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+
+		return team.map(member => {
+			const weeklyTotals = member.dailyTotals.filter(total => {
+				const totalDate = moment(total.date);
+				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
+			});
+			return { ...member, weeklyTotals };
+		});
+	}, [team, selectedDate]);
+
+    return (
+        <WeeklyBarSalesCardRender teamMembers={teamMembers} selectedDate={selectedDate}/>
+    );
+}
+
+export { WeeklyTotalsTable, WeeklyTipsTable, WeeklyBarSalesCard, WeeklyFoodSalesCard };

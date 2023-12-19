@@ -3,6 +3,7 @@ import { Button } from '@mui/material';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import { FormattedDate } from '../utils/utils';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
+import { TeamContext } from '../contexts/TeamContext';
 
 const columnNames = {
 	date: 'Date',
@@ -18,13 +19,15 @@ const columnNames = {
 	totalPayrollTips: 'Total Payroll Tips',
 };
 
-function DailyTotalsTable({ team, deleteDailyTotal }) {
+function DailyTotalsTable() {
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
+    const { deleteDailyTotal } = useContext(DailyTotalsContext);
+	const { team } = useContext(TeamContext);
 
 	useEffect(() => {}, [refreshDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
-		teamMember.dailyTotals.map((dailyTotal, index) => ({
+		teamMember.dailyTotals.map((dailyTotal) => ({
 			_id: teamMember._id,
 			date: FormattedDate(dailyTotal.date),
 			key: `${teamMember._id}-${FormattedDate(dailyTotal.date)}`,

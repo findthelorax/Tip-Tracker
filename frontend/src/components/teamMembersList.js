@@ -1,24 +1,15 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useEffect, useContext, useMemo } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
 import { getTeamMembers } from '../utils/api';
-import { Box, Grid } from '@mui/material';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../utils/functions';
-import TeamMemberFormRender from '../sections/teamMembers/teamMembersFormRender';
+import { deleteTeamMemberFromTeam } from '../utils/functions';
 import TeamMembersRender from '../sections/teamMembers/teamMembersListRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
-function TeamOperations() {
+function TeamMembersList() {
 	const { team, setTeam } = useContext(TeamContext);
-	const [teamMemberName, setTeamMemberName] = useState('');
-	const [position, setPosition] = useState('bartender');
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
-	const clearInputs = () => {
-		setTeamMemberName('');
-		setPosition('server');
-	};
-	const addMember = addTeamMemberToTeam(teamMemberName, position, setTeam, clearInputs);
 	const deleteMember = deleteTeamMemberFromTeam(setTeam);
 
 	useEffect(() => {
@@ -66,24 +57,7 @@ function TeamOperations() {
 		);
 	}, [team]);
 
-	return (
-		<Box sx={{ flexGrow: 1, maxWidth: 752 }}>
-			<Grid container spacing={2}>
-				<Grid item xs={12} md={6}>
-					<TeamMemberFormRender
-						teamMemberName={teamMemberName}
-						setTeamMemberName={setTeamMemberName}
-						position={position}
-						setPosition={setPosition}
-						addMember={addMember}
-					/>
-				</Grid>
-				<Grid item xs={12} md={6}>
-					<TeamMembersRender teamByPosition={teamByPosition} deleteMember={deleteMember} />
-				</Grid>
-			</Grid>
-		</Box>
-	);
+	return <TeamMembersRender teamByPosition={teamByPosition} deleteMember={deleteMember} />;
 }
 
-export default TeamOperations;
+export default TeamMembersList;
