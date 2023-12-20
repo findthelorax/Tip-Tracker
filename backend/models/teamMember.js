@@ -49,13 +49,58 @@ TeamMemberSchema.pre('save', function (next) {
 	next();
 });
 
+// Add pre save middleware to update weekly totals
+TeamMemberSchema.pre('save', function (next) {
+    // `this` is the teamMember document about to be saved
+    const teamMember = this;
+
+    // Check if dailyTotals array has been modified
+    if (teamMember.isModified('dailyTotals')) {
+        // Update weekly totals
+        teamMember.updateWeeklyTotals();
+    }
+
+    next();
+});
+
+
+// // Method to remove a daily total and update weekly totals
+// TeamMemberSchema.methods.removeDailyTotal = function (dailyTotalId) {
+//     // Remove the daily total
+//     this.dailyTotals.id(dailyTotalId).remove();
+
+//     // Update weekly totals
+//     this.updateWeeklyTotals();
+// };
+
+// // Then, when you want to remove a daily total, you can do something like this:
+
+// const teamMember = await TeamMember.findById(req.params.id);
+// teamMember.removeDailyTotal(req.params.dailyTotalId);
+// await teamMember.save();
+
+
 // Method to update weekly totals
 TeamMemberSchema.methods.updateWeeklyTotals = function () {
 	const weekStart = new Date();
 	weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Sunday
 
+	weekStart.setHours(0, 0, 0, 0);
+
+	const existingWeeklyTotal = this.weeklyTotals.find((total) => total.week.getTime() === weekStart.getTime());
+    if (existingWeeklyTotal) {
+        throw new Error('A total for the current week already exists.');
+    }
+	function isSameDayOrAfter(date1, date2) {
+		return (
+			date1.getFullYear() >= date2.getFullYear() &&
+			date1.getMonth() >= date2.getMonth() &&
+			date1.getDate() >= date2.getDate()
+		);
+	}
+
 	const weeklyTotal = this.dailyTotals
-		.filter((total) => total.date >= weekStart)
+		.filter((total) => isSameDayOrAfter(total.date, weekStart))
 		.reduce(
 			(acc, curr) => ({
 				week: weekStart,
@@ -85,7 +130,24 @@ TeamMemberSchema.methods.updateWeeklyTotals = function () {
 			}
 		);
 
-	this.weeklyTotals.push(weeklyTotal);
+	const existingWeeklyTotalIndex = this.weeklyTotals.findIndex(
+		(total) => total.week.getTime() === weekStart.getTime()
+	);
+
+	if (existingWeeklyTotalIndex !== -1) {
+		this.weeklyTotals[existingWeeklyTotalIndex] = weeklyTotal;
+	} else {
+		this.weeklyTotals.push(weeklyTotal);
+	}
+};
+
+TeamMemberSchema.methods.getWeeklyTotals = function (weekStart) {
+	const weekEnd = new Date(weekStart);
+	weekEnd.setDate(weekEnd.getDate() + 6); // Saturday
+
+	const weeklyTotal = this.weeklyTotals.find((total) => total.week >= weekStart && total.week <= weekEnd);
+
+	return weeklyTotal;
 };
 
 const TeamMember = mongoose.model('TeamMember', TeamMemberSchema, 'teamMembers');

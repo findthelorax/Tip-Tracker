@@ -34,7 +34,7 @@ import { MainListItems, SecondaryListItems } from './SideNav';
 import { OverviewTraffic } from '../sections/overview/overview-traffic';
 import { OverviewTotalProfit } from '../sections/overview/overview-total-profit';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
-import { calculateSalesDifferences } from '../logic/weeklyTotalsLogic';
+import { calculateSalesDifferences } from '../hooks/weeklyTotalsLogic';
 
 import moment from 'moment';
 

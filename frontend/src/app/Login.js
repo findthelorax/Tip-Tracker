@@ -19,9 +19,17 @@ function Login() {
 		try {
 			const data = await login(username, password);
 			if (data.message === 'Login successful') {
+				
+				// Store the JWT token in local storage
+				localStorage.setItem('jwtToken', data.token);
+
 				// Navigate to a different page based on the user's role
-				if (data.role === 'worker') {
-					navigate('/worker-dashboard');
+				if (data.role === 'user') {
+					navigate('/user-dashboard');
+				} else if (data.role === 'admin') {
+					navigate('/admin-dashboard');
+				} else if (data.role === 'root') {
+					navigate('/root-dashboard');
 				} else {
 					navigate('/dashboard');
 				}

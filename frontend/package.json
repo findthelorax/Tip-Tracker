@@ -21,6 +21,7 @@
     "html-webpack-plugin": "^5.5.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.2",
     "next": "^14.0.4",

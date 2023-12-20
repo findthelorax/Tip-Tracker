@@ -1,5 +1,5 @@
 import { deleteDailyTotalFromServer, fetchDailyTotalsAll, submitDailyTotalToServer } from '../utils/api';
-import { CalculateTipOuts, FormattedDate } from '../logic/utils';
+import { CalculateTipOuts, FormattedDate } from '../hooks/utils';
 import moment from 'moment';
 
 export const handleSubmissionError = (error, dailyTotals, selectedTeamMember) => {

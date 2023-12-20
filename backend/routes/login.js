@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const LoginController = require('../controllers/LoginController');
+const { authenticate, requireRole } = require('../utils/auth');
 
-router.get('/profile', LoginController.profile);
-router.patch('/profile', LoginController.updateProfile);
-router.delete('/profile', LoginController.deleteProfile);
+router.get('/profile', authenticate, LoginController.profile);
+router.patch('/profile', authenticate, LoginController.updateProfile);
+router.delete('/profile', authenticate, LoginController.deleteProfile);
 
 router.post('/login', LoginController.login);
-router.post('/signup', LoginController.signup);
 router.get('/login', LoginController.getLogin);
+router.post('/signup', LoginController.signup);
+
+router.post('/logout', LoginController.logout);
 
 module.exports = router;

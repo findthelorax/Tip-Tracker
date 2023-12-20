@@ -5,7 +5,7 @@ import moment from 'moment';
 import WeeklyTotalsRender from '../sections/weeklyTotals/weeklyTotalsRender';
 import WeeklyTipsRender from '../sections/weeklyTotals/weeklyTipsRender';
 import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from '../sections/weeklyTotals/weeklyTotalsCardsRender';
-import { titleToPropName, titles, formatUSD, calculateSalesDifferences } from '../logic/weeklyTotalsLogic';
+import { titleToPropName, titles, formatUSD, calculateSalesDifferences } from '../hooks/weeklyTotalsLogic';
 
 function WeeklyTotalsTable({selectedDate, setSelectedDate}) {
 	const { team } = useContext(TeamContext);

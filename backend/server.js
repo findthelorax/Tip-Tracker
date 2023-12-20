@@ -35,11 +35,11 @@ app.use(
 		cookie: { secure: false }, // set to true if your using https
 	})
 );
-app.use('/teamMembers', teamMembersRoutes);
-app.use('/api', databaseRoutes);
 app.use('/', loginRoutes);
-app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/api', databaseRoutes);
+app.use('/users', userRoutes);
+app.use('/teamMembers', teamMembersRoutes);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);

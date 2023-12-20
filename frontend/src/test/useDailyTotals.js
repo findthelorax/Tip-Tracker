@@ -5,7 +5,7 @@ import { initialDailyTotals } from '../contexts/DailyTotalsContext';
 import { TeamContext } from '../contexts/TeamContext';
 import { ErrorContext } from '../contexts/ErrorContext';
 import { deleteDailyTotalFromServer, submitDailyTotalToServer, fetchDailyTotalsAll, updateWeeklyTotalsAndSaveTeamMemberOnServer } from '../utils/api';
-import { FormattedDate, CalculateTipOuts } from '../logic/utils';
+import { FormattedDate, CalculateTipOuts } from '../hooks/utils';
 
 const today = new Date();
 const localDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString().split('T')[0];
@@ -22,7 +22,6 @@ export const initialDailyTotals = {
     tipsReceived: 0,
     totalPayrollTips: 0,
 };
-export const DailyTotalsProvider = createContext();
 
 export function useDailyTotals() {
 	const [dailyTotalsAll, setDailyTotalsAll] = useState([]);

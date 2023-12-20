@@ -44,15 +44,11 @@ export function InputField({ id, value = '', onChange, label, type = 'number', p
 }
 
 export function TeamMemberSelect({ team, value = '', onChange }) {
-	console.log("🚀 ~ file: dailyTotalsFormRender.js:47 ~ TeamMemberSelect ~ team:", team)
-	console.log("🚀 ~ file: dailyTotalsFormRender.js:47 ~ TeamMemberSelect ~ value:", value)
 	const { setSelectedTeamMember } = useContext(DailyTotalsContext);
 	const handleTeamMemberSelect = (event) => {
 		const selectedMember = team.find((member) => member._id === event.target.value);
         onChange('teamMemberId', selectedMember._id);
 		setSelectedTeamMember(selectedMember);
-		console.log("🚀 ~ file: dailyTotalsFormRender.js:50 ~ handleTeamMemberSelect ~ selectedMember:", selectedMember)
-			console.log("🚀 ~ file: dailyTotalsFormRender.js:50 ~ handleTeamMemberSelect ~ selectedMember._id:", selectedMember._id)
 	};
 	return (
 		<FormControl fullWidth margin="normal">
@@ -83,9 +79,6 @@ export function DailyTotalsFormRender({
 	handleSubmit,
 	selectedTeamMember,
 }) {
-	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ selectedTeamMember:", selectedTeamMember)
-	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ team:", team)
-	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ dailyTotals:", dailyTotals)
 	return (
 		<Card>
 			<Box

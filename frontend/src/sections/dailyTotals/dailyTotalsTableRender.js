@@ -1,7 +1,7 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Card, CardContent, CardHeader, Box, Typography } from '@mui/material';
-import { ExportToCsvButton, ExportToExcelButton } from '../../logic/utils';
+import { ExportToCsvButton, ExportToExcelButton } from '../../hooks/utils';
 
 function DailyTotalsTableRender({ rows, columns }) {
     return (

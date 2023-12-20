@@ -1,37 +1,12 @@
 const { Team } = require('../models/database');
+const moment = require('moment-timezone');
+require('dotenv').config();
 
 function validateDailyTotal(dailyTotal) {
 	return (
 		dailyTotal.date && dailyTotal.foodSales && dailyTotal.barSales && dailyTotal.nonCashTips && dailyTotal.cashTips
 	);
 }
-
-exports.getTeamMembers = async (req, res) => {
-	try {
-		const teamMembers = await Team.find();
-		res.json(teamMembers);
-	} catch (err) {
-		console.error(err);
-		res.status(500).json({ message: 'Server error' });
-	}
-};
-
-exports.createTeamMember = async (req, res) => {
-	const { teamMemberName, position } = req.body;
-
-	if (!teamMemberName || !position) {
-		return res.status(400).json({ error: 'Both name and position are required' });
-	}
-
-	const newMember = new Team({ teamMemberName, position });
-
-	try {
-		const savedMember = await newMember.save();
-		res.status(201).json(savedMember);
-	} catch (err) {
-		res.status(400).json({ message: err.message });
-	}
-};
 
 exports.getTeamMember = async (req, res) => {
 	const memberId = req.params.id;
@@ -59,6 +34,23 @@ exports.getTeamMember = async (req, res) => {
 			success: false,
 			error: err,
 		});
+	}
+};
+
+exports.createTeamMember = async (req, res) => {
+	const { teamMemberName, position } = req.body;
+
+	if (!teamMemberName || !position) {
+		return res.status(400).json({ error: 'Both name and position are required' });
+	}
+
+	const newMember = new Team({ teamMemberName, position });
+
+	try {
+		const savedMember = await newMember.save();
+		res.status(201).json(savedMember);
+	} catch (err) {
+		res.status(400).json({ message: err.message });
 	}
 };
 
@@ -101,6 +93,17 @@ exports.deleteTeamMember = async (req, res) => {
 	}
 };
 
+// Get All Team Members
+exports.getTeamMembers = async (req, res) => {
+	try {
+		const teamMembers = await Team.find();
+		res.json(teamMembers);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: 'Server error' });
+	}
+};
+
 // Route to get daily totals for a specific team member
 exports.getDailyTotals = async (req, res) => {
 	try {
@@ -117,7 +120,7 @@ exports.getDailyTotals = async (req, res) => {
 	}
 };
 
-// Server route for handling daily totals submission for a specific team member
+// Creat daily totals for a specific team member
 exports.createDailyTotal = async (req, res) => {
 	try {
 		const memberId = req.params.id;
@@ -160,7 +163,7 @@ exports.createDailyTotal = async (req, res) => {
 	}
 };
 
-// Server route for handling daily totals deletion for a specific team member
+// Delete daily totals for a specific team member
 exports.deleteDailyTotal = async (req, res) => {
 	try {
 		const { id: teamMemberId, date } = req.params;
@@ -170,9 +173,11 @@ exports.deleteDailyTotal = async (req, res) => {
 			return res.status(404).json({ message: 'Team member not found' });
 		}
 
-		const dateString = new Date(date).toISOString();
+		// Parse the date string from the client using moment and the timezone from .env
+		const dateString = moment(date).local().format();
+
 		teamMember.dailyTotals = teamMember.dailyTotals.filter(
-			(dailyTotal) => new Date(dailyTotal.date).toISOString() !== dateString
+			(dailyTotal) => moment(dailyTotal.date).local().format() !== dateString
 		);
 
 		try {
@@ -195,8 +200,8 @@ exports.deleteDailyTotal = async (req, res) => {
 	}
 };
 
-// Route to get weekly totals for a specific team member
-exports.getAllWeeklyTotals = async (req, res) => {
+// Route to get all weekly totals for a specific team member
+exports.getOneTMWeeklyTotals = async (req, res) => {
 	try {
 		const { id } = req.params;
 		const teamMember = await Team.findById(id).select('weeklyTotals');
@@ -211,6 +216,31 @@ exports.getAllWeeklyTotals = async (req, res) => {
 	}
 };
 
+// Route to get a specific team member's weekly totals for a specific week
+exports.getOneWeeklyTotals = async (req, res) => {
+	try {
+		const teamMember = await Team.findById(req.params.id);
+
+		if (!teamMember) {
+			return res.status(404).json({ message: 'Team member not found' });
+		}
+
+		// Parse the week parameter into a Date object
+		const weekStart = moment(req.params.week);
+
+		const weeklyTotal = teamMember.getWeeklyTotals(weekStart);
+
+		if (!weeklyTotal) {
+			return res.status(404).json({ message: 'Weekly total not found' });
+		}
+
+		res.status(200).json(weeklyTotal);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+};
+
+// Route to create a specific team member's weekly totals for a specific week
 exports.createWeeklyTotals = async (req, res) => {
 	try {
 		const memberId = req.params.id;
@@ -227,21 +257,7 @@ exports.createWeeklyTotals = async (req, res) => {
 	}
 };
 
-exports.getWeeklyTotals = async (req, res) => {
-	try {
-		const memberId = req.params.id;
-		const teamMember = await Team.findById(memberId);
-		if (!teamMember) {
-			return res.status(404).json({ error: 'Team member not found' });
-		}
-		res.json(teamMember.weeklyTotals);
-	} catch (error) {
-		console.error('Error getting weekly totals:', error);
-		res.status(500).json({ error: 'Internal Server Error' });
-	}
-};
-
-// Delete a specific team member's weekly totals
+// Delete a specific team member's weekly totals for a specific week
 exports.deleteWeeklyTotals = async (req, res) => {
 	try {
 		const memberId = req.params.id;
@@ -261,56 +277,72 @@ exports.deleteWeeklyTotals = async (req, res) => {
 	}
 };
 
-exports.updateWeeklyTotalsAndSaveTeamMemberOnServer = async (req, res) => {
-	const teamMember = await TeamMember.findById(req.params.id);
+exports.updateWeeklyTotalsPut = async (req, res) => {
+    try {
+        const teamMember = await Team.findById(req.params.id);
 
-	if (!teamMember) {
-		return res.status(404).send('Team member not found');
-	}
+        if (!teamMember) {
+            return res.status(404).json({ message: 'Team member not found' });
+        }
 
-	teamMember.updateWeeklyTotals();
-	await teamMember.save();
+        // Create a new date using moment and set it to the start of the week
+		const weekStart = moment().local().startOf('week').toDate();
 
-	res.send(teamMember);
+		const existingWeeklyTotal = teamMember.weeklyTotals.find(
+			(total) => moment(total.week).local().isSame(weekStart, 'day')
+		);
+        if (existingWeeklyTotal) {
+            return res.status(400).json({ message: 'Weekly total for this week already exists' });
+        }
+
+        teamMember.updateWeeklyTotals();
+
+        await teamMember.save();
+
+        res.status(200).json(teamMember);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 
-exports.updateWeeklyTotals = async (req, res) => {
-	try {
-		const memberId = req.params.id;
-		const week = req.params.week;
-		const teamMember = await Team.findById(memberId);
+exports.updateWeeklyTotalsPatch = async (req, res) => {
+    try {
+        // Parse the date string from the client using moment
+		const weekStart = moment(req.params.week).local().startOf('day').toDate();
+		
+        // Check for existing weekly total for the same week
+        const existingWeeklyTotal = await Team.findOne({ _id: req.params.id, 'weeklyTotals.week': weekStart });
+        if (existingWeeklyTotal) {
+            return res.status(400).json({ message: 'Weekly total for this week already exists' });
+        }
 
-		if (!teamMember) {
-			return res.status(404).json({ error: 'Team member not found' });
-		}
+        const result = await Team.updateOne(
+            { _id: req.params.id, 'weeklyTotals.week': weekStart },
+            {
+                $set: {
+                    'weeklyTotals.$[elem].foodSales': req.body.foodSales,
+                    'weeklyTotals.$[elem].barSales': req.body.barSales,
+                    'weeklyTotals.$[elem].nonCashTips': req.body.nonCashTips,
+                    'weeklyTotals.$[elem].cashTips': req.body.cashTips,
+                    'weeklyTotals.$[elem].barTipOuts': req.body.barTipOuts,
+                    'weeklyTotals.$[elem].runnerTipOuts': req.body.runnerTipOuts,
+                    'weeklyTotals.$[elem].hostTipOuts': req.body.hostTipOuts,
+                    'weeklyTotals.$[elem].totalTipOut': req.body.totalTipOut,
+                    'weeklyTotals.$[elem].tipsReceived': req.body.tipsReceived,
+                    'weeklyTotals.$[elem].totalPayrollTips': req.body.totalPayrollTips,
+                },
+            },
+            {
+                arrayFilters: [{ 'elem.week': weekStart }],
+            }
+        );
 
-		// Fetch weekly totals for the specified week
-		const weeklyTotals = teamMember.dailyTotals.filter((total) => total.week === week);
+        if (result.nModified === 0) {
+            return res.status(404).json({ message: 'Weekly total not found' });
+        }
 
-		// Calculate the weekly total
-		const weeklyTotal = weeklyTotals.reduce((total, dailyTotal) => {
-			return {
-				week: total.week, // set the date to the end of the week
-				foodSales: (total.foodSales || 0) + dailyTotal.foodSales,
-				barSales: (total.barSales || 0) + dailyTotal.barSales,
-				nonCashTips: (total.nonCashTips || 0) + dailyTotal.nonCashTips,
-				cashTips: (total.cashTips || 0) + dailyTotal.cashTips,
-				barTipOuts: (total.barTipOuts || 0) + dailyTotal.barTipOuts,
-				runnerTipOuts: (total.runnerTipOuts || 0) + dailyTotal.runnerTipOuts,
-				hostTipOuts: (total.hostTipOuts || 0) + dailyTotal.hostTipOuts,
-				totalTipOut: (total.totalTipOut || 0) + dailyTotal.totalTipOut,
-				tipsReceived: (total.tipsReceived || 0) + dailyTotal.tipsReceived,
-				totalPayrollTips: (total.totalPayrollTips || 0) + dailyTotal.totalPayrollTips,
-			};
-		}, {});
-
-		// Update the team member's weekly totals
-		teamMember.weeklyTotals.push(weeklyTotal);
-		await teamMember.save();
-
-		res.json(teamMember.weeklyTotals);
-	} catch (error) {
-		console.error('Error updating weekly totals:', error);
-		res.status(500).json({ error: 'Internal Server Error' });
-	}
+        res.status(200).json({ message: 'Weekly total updated' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };

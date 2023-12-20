@@ -6,14 +6,19 @@ import axios from 'axios';
 import moment from 'moment';
 
 export function FormattedDate(dateString) {
-    const date = moment(dateString);
+    const date = moment(dateString).local();
     return date.format('MMM D, YYYY');
 }
 
 export const FormInputDate = () => {
-    const currentDate = moment();
+    const currentDate = moment().local();
     return currentDate.format('YYYY-MM-DD');
 };
+
+// export const FormInputDate = () => {
+//     const currentDate = moment();
+//     return currentDate.format('YYYY-MM-DDTHH:mm:ss');
+// };
 
 export let tipOutPercentages = {
     bartender: 0.05,
@@ -41,7 +46,7 @@ export const CalculateTipOuts = (dailyTotals, selectedTeamMember, team) => {
 
         // Distribute tip outs to bartenders, runners, and hosts who worked the same day
         for (const member of team) {
-            const workedSameDate = member.dailyTotals.some((total) => total.date === dailyTotals.date);
+            const workedSameDate = member.dailyTotals.some((total) => moment(total.date).isSame(moment(dailyTotals.date), 'day'));
 
             if (workedSameDate) {
                 if (member.position === 'bartender') {

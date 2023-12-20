@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { Button } from '@mui/material';
+import moment from 'moment';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { FormattedDate } from '../logic/utils';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
 import { TeamContext } from '../contexts/TeamContext';
 
@@ -21,16 +21,17 @@ const columnNames = {
 
 function DailyTotalsTable() {
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
-    const { deleteDailyTotal } = useContext(DailyTotalsContext);
+	const { deleteDailyTotal } = useContext(DailyTotalsContext);
 	const { team } = useContext(TeamContext);
+	console.log("🚀 ~ file: dailyTotalsTable.js:26 ~ DailyTotalsTable ~ team:", team)
 
 	useEffect(() => {}, [refreshDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal) => ({
 			_id: teamMember._id,
-			date: FormattedDate(dailyTotal.date),
-			key: `${teamMember._id}-${FormattedDate(dailyTotal.date)}`,
+			date: moment(dailyTotal.date).local().format('MMM D, YYYY'),
+			key: `${teamMember._id}-${moment(dailyTotal.date).local().format('MMM D, YYYY')}`,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,
@@ -50,7 +51,7 @@ function DailyTotalsTable() {
 							style: 'currency',
 							currency: 'USD',
 					  })
-					: FormattedDate(value),
+					: moment(value).local().format('MMM D, YYYY'),
 		})),
 	];
 
