@@ -22,7 +22,7 @@ export const initialDailyTotals = {
     tipsReceived: 0,
     totalPayrollTips: 0,
 };
-export const DailyTotalsContext = createContext();
+export const DailyTotalsProvider = createContext();
 
 export function useDailyTotals() {
 	const [dailyTotalsAll, setDailyTotalsAll] = useState([]);
@@ -36,6 +36,7 @@ export function useDailyTotals() {
 
 	const handleDailyTotalsChange = (field, value) => {
 		if (field === 'teamMemberId') {
+			
 			setSelectedTeamMember(value);
 		} else {
 			let updates = { [field]: value === '' ? 0 : value };

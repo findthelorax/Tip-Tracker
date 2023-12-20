@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { TextField, FormControl, InputLabel, Select, MenuItem, Button, Typography, Card } from '@mui/material';
 import { NumericFormat } from 'react-number-format';
 import { Box } from '@mui/system';
+import { DailyTotalsContext } from '../../contexts/DailyTotalsContext';
 
 export function InputField({ id, value = '', onChange, label, type = 'number', parseValue = parseFloat }) {
 	if (type === 'date') {
@@ -43,9 +44,15 @@ export function InputField({ id, value = '', onChange, label, type = 'number', p
 }
 
 export function TeamMemberSelect({ team, value = '', onChange }) {
+	console.log("🚀 ~ file: dailyTotalsFormRender.js:47 ~ TeamMemberSelect ~ team:", team)
+	console.log("🚀 ~ file: dailyTotalsFormRender.js:47 ~ TeamMemberSelect ~ value:", value)
+	const { setSelectedTeamMember } = useContext(DailyTotalsContext);
 	const handleTeamMemberSelect = (event) => {
 		const selectedMember = team.find((member) => member._id === event.target.value);
-		onChange('teamMemberId', selectedMember ? selectedMember._id : '');
+        onChange('teamMemberId', selectedMember._id);
+		setSelectedTeamMember(selectedMember);
+		console.log("🚀 ~ file: dailyTotalsFormRender.js:50 ~ handleTeamMemberSelect ~ selectedMember:", selectedMember)
+			console.log("🚀 ~ file: dailyTotalsFormRender.js:50 ~ handleTeamMemberSelect ~ selectedMember._id:", selectedMember._id)
 	};
 	return (
 		<FormControl fullWidth margin="normal">
@@ -53,7 +60,7 @@ export function TeamMemberSelect({ team, value = '', onChange }) {
 			<Select
 				labelId="teamMemberSelectName"
 				id="teamMemberSelectName"
-				value={value}
+                value={value ? value._id : ''}
 				onChange={handleTeamMemberSelect}
 			>
 				<MenuItem value="" disabled>
@@ -76,11 +83,15 @@ export function DailyTotalsFormRender({
 	handleSubmit,
 	selectedTeamMember,
 }) {
+	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ selectedTeamMember:", selectedTeamMember)
+	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ team:", team)
+	console.log("🚀 ~ file: dailyTotalsFormRender.js:79 ~ dailyTotals:", dailyTotals)
 	return (
 		<Card>
 			<Box
 				component="form"
 				onSubmit={handleSubmit}
+				autoComplete="off"
 				sx={{
 					display: 'flex',
 					flexDirection: 'column',
@@ -93,11 +104,7 @@ export function DailyTotalsFormRender({
 				<Typography variant="h5" gutterBottom>
 					Daily Totals
 				</Typography>
-				<TeamMemberSelect
-					team={team}
-					value={selectedTeamMember ? selectedTeamMember._id : ''}
-					onChange={handleDailyTotalsChange}
-				/>
+				<TeamMemberSelect team={team} value={selectedTeamMember || ''} onChange={handleDailyTotalsChange} />
 				<InputField
 					id="date"
 					value={dailyTotals.date}

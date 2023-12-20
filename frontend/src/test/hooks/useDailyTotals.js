@@ -1,10 +1,9 @@
-import useDailyTotals from '../hooks/useDailyTotals';
-import DailyTotalsFormRender from '../components/DailyTotalsFormRender';
+import useDailyTotals from './useDailyTotals';
+import DailyTotalsFormRender from '../../sections/dailyTotals/dailyTotalsFormRender';
 import { useContext } from 'react';
-import { TeamContext } from '../contexts/TeamContext';
+import { TeamContext } from '../../contexts/TeamContext';
 
-
-export default function DailyTotalsFormContainer() {
+export function DailyTotalsFormContainer() {
     const { team } = useContext(TeamContext);
     const { dailyTotals, selectedTeamMember, handleDailyTotalsChange, handleSubmit } = useDailyTotals();
 
