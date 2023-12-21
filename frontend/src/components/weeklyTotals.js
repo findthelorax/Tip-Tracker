@@ -9,7 +9,7 @@ import { titleToPropName, titles, formatUSD, calculateSalesDifferences } from '.
 
 function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	const { team } = useContext(TeamContext);
-	const date = moment(selectedDate);
+	const date = moment.parseZone(selectedDate);
 
 	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -26,9 +26,9 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 
 		team.forEach((member) => {
 			member.dailyTotals.forEach((total) => {
-				const totalDate = moment(total.date);
-				const selectedWeekStart = moment(selectedDate).startOf('week');
-				const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+				const totalDate = moment.parseZone(total.date);
+				const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
+				const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
 
 				if (totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd)) {
 					const dayOfWeek = totalDate.day();
@@ -49,7 +49,7 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	const columns = [
 		{ field: 'salesTips', headerName: 'Sales / Tips', width: 150 },
 		...daysOfWeek.map((day, index) => {
-			const date = moment(selectedDate).startOf('week').add(index, 'days').format('MM/DD');
+			const date = moment.parseZone(selectedDate).startOf('week').add(index, 'days').format('MM/DD');
 			return { field: day, headerName: `${day} (${date})`, width: 150 };
 		}),
 		{ field: 'total', headerName: 'Total', width: 150 },
@@ -76,7 +76,7 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 }
 
 function WeeklyTipsTable({ team, selectedDate, setSelectedDate }) {
-	const date = moment(selectedDate);
+	const date = moment.parseZone(selectedDate);
 
 	const handleDateChange = (date) => {
 		setSelectedDate(date);
@@ -85,9 +85,9 @@ function WeeklyTipsTable({ team, selectedDate, setSelectedDate }) {
 	let tips = useMemo(() => {
 		return team
 			.filter((member) => {
-				const memberDate = moment(member.date);
-				const selectedWeekStart = moment(selectedDate).startOf('week');
-				const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+				const memberDate = moment.parseZone(member.date);
+				const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
+				const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
 
 				return memberDate.isSameOrAfter(selectedWeekStart) && memberDate.isSameOrBefore(selectedWeekEnd);
 			})
@@ -138,12 +138,12 @@ function WeeklyTipsTable({ team, selectedDate, setSelectedDate }) {
 
 function WeeklyFoodSalesCard({ team, selectedDate }) {
 	const teamMembers = useMemo(() => {
-		const selectedWeekStart = moment(selectedDate).startOf('week');
-		const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+		const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
+		const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
 
 		return team.map((member) => {
 			const weeklyTotals = member.dailyTotals.filter((total) => {
-				const totalDate = moment(total.date);
+				const totalDate = moment.parseZone(total.date);
 				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
 			});
 			return { ...member, weeklyTotals };
@@ -165,12 +165,12 @@ function WeeklyFoodSalesCard({ team, selectedDate }) {
 }
 function WeeklyBarSalesCard({ team, selectedDate }) {
 	const teamMembers = useMemo(() => {
-		const selectedWeekStart = moment(selectedDate).startOf('week');
-		const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
+		const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
+		const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
 
 		return team.map((member) => {
 			const weeklyTotals = member.dailyTotals.filter((total) => {
-				const totalDate = moment(total.date);
+				const totalDate = moment.parseZone(total.date);
 				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
 			});
 			return { ...member, weeklyTotals };

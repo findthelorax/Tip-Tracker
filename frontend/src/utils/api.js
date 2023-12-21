@@ -295,10 +295,10 @@ export const submitDailyTotalToServer = async (teamMemberId, dailyTotals) => {
 	}
 };
 
-export const deleteDailyTotalFromServer = async (teamMemberId, date) => {
+export const deleteDailyTotalFromServer = async (teamMemberId, dateId) => {
 	try {
 		const response = await axios.delete(
-			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/dailyTotals/${date}`
+			`${process.env.REACT_APP_SERVER_URL}/teamMembers/${teamMemberId}/dailyTotals/${dateId}`
 		);
 		return response.data;
 	} catch (error) {

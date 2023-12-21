@@ -94,10 +94,6 @@ function WeeklyFoodSalesCardRender({ teamMembers, selectedDate, salesDifferences
 		return total + (weekTotal ? weekTotal.foodSales : 0);
 	}, 0);
 
-	// const totalWeeklyFoodSales = teamMembers.reduce((total, member) => {
-	// 	return total + member.weeklyTotals.reduce((sum, weekTotal) => sum + weekTotal.foodSales, 0);
-	// }, 0);
-
 	const formattedTotalWeeklyFoodSales = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
 		totalWeeklyFoodSales
 	);

@@ -12,13 +12,9 @@ export function FormattedDate(dateString) {
 
 export const FormInputDate = () => {
     const currentDate = moment().local();
+    console.log("🚀 ~ file: utils.js:17 ~ FormInputDate ~ currentDate:", currentDate)
     return currentDate.format('YYYY-MM-DD');
 };
-
-// export const FormInputDate = () => {
-//     const currentDate = moment();
-//     return currentDate.format('YYYY-MM-DDTHH:mm:ss');
-// };
 
 export let tipOutPercentages = {
     bartender: 0.05,

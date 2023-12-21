@@ -11,7 +11,7 @@ router.get('/', TeamMembersController.getTeamMembers);
 
 router.get('/:id/dailyTotals', TeamMembersController.getDailyTotals);
 router.post('/:id/dailyTotals', TeamMembersController.createDailyTotal);
-router.delete('/:id/dailyTotals/:date', TeamMembersController.deleteDailyTotal);
+router.delete('/:id/dailyTotals/:id', TeamMembersController.deleteDailyTotal);
 
 router.get('/:id/weeklyTotals/', TeamMembersController.getOneTMWeeklyTotals);
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const DailyTotalSchema = new mongoose.Schema(
 	{
@@ -14,12 +15,12 @@ const DailyTotalSchema = new mongoose.Schema(
 		tipsReceived: Number,
 		totalPayrollTips: Number,
 	},
-	{ _id: false }
-); // Prevent creation of id for subdocument
+);
 
 const WeeklyTotalSchema = new mongoose.Schema(
 	{
-		week: Date,
+		weekStart: Date,
+		weekEnd: Date,
 		foodSales: Number,
 		barSales: Number,
 		nonCashTips: Number,
@@ -31,17 +32,19 @@ const WeeklyTotalSchema = new mongoose.Schema(
 		tipsReceived: Number,
 		totalPayrollTips: Number,
 	},
-	{ _id: false }
 );
 
 const TeamMemberSchema = new mongoose.Schema({
 	teamMemberName: String,
 	position: String,
+	timeZone: {
+        type: String,
+        default: 'UTC',
+    },
 	dailyTotals: [DailyTotalSchema],
 	weeklyTotals: [WeeklyTotalSchema],
 });
 
-// Add pre save middleware to capitalize name
 TeamMemberSchema.pre('save', function (next) {
 	if (this.teamMemberName && this.isModified('teamMemberName')) {
 		this.teamMemberName = this.teamMemberName.charAt(0).toUpperCase() + this.teamMemberName.slice(1);
@@ -49,103 +52,144 @@ TeamMemberSchema.pre('save', function (next) {
 	next();
 });
 
-// Add pre save middleware to update weekly totals
 TeamMemberSchema.pre('save', function (next) {
-    // `this` is the teamMember document about to be saved
-    const teamMember = this;
+	const teamMember = this;
 
-    // Check if dailyTotals array has been modified
-    if (teamMember.isModified('dailyTotals')) {
-        // Update weekly totals
-        teamMember.updateWeeklyTotals();
-    }
-
-    next();
-});
-
-
-// // Method to remove a daily total and update weekly totals
-// TeamMemberSchema.methods.removeDailyTotal = function (dailyTotalId) {
-//     // Remove the daily total
-//     this.dailyTotals.id(dailyTotalId).remove();
-
-//     // Update weekly totals
-//     this.updateWeeklyTotals();
-// };
-
-// // Then, when you want to remove a daily total, you can do something like this:
-
-// const teamMember = await TeamMember.findById(req.params.id);
-// teamMember.removeDailyTotal(req.params.dailyTotalId);
-// await teamMember.save();
-
-
-// Method to update weekly totals
-TeamMemberSchema.methods.updateWeeklyTotals = function () {
-	const weekStart = new Date();
-	weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Sunday
-
-	weekStart.setHours(0, 0, 0, 0);
-
-	const existingWeeklyTotal = this.weeklyTotals.find((total) => total.week.getTime() === weekStart.getTime());
-    if (existingWeeklyTotal) {
-        throw new Error('A total for the current week already exists.');
-    }
-	function isSameDayOrAfter(date1, date2) {
-		return (
-			date1.getFullYear() >= date2.getFullYear() &&
-			date1.getMonth() >= date2.getMonth() &&
-			date1.getDate() >= date2.getDate()
-		);
+	if (teamMember.isModified('dailyTotals')) {
+		teamMember.updateWeeklyTotals();
 	}
 
-	const weeklyTotal = this.dailyTotals
-		.filter((total) => isSameDayOrAfter(total.date, weekStart))
-		.reduce(
-			(acc, curr) => ({
-				week: weekStart,
-				foodSales: acc.foodSales + curr.foodSales,
-				barSales: acc.barSales + curr.barSales,
-				nonCashTips: acc.nonCashTips + curr.nonCashTips,
-				cashTips: acc.cashTips + curr.cashTips,
-				barTipOuts: acc.barTipOuts + curr.barTipOuts,
-				runnerTipOuts: acc.runnerTipOuts + curr.runnerTipOuts,
-				hostTipOuts: acc.hostTipOuts + curr.hostTipOuts,
-				totalTipOut: acc.totalTipOut + curr.totalTipOut,
-				tipsReceived: acc.tipsReceived + curr.tipsReceived,
-				totalPayrollTips: acc.totalPayrollTips + curr.totalPayrollTips,
-			}),
-			{
-				week: weekStart,
-				foodSales: 0,
-				barSales: 0,
-				nonCashTips: 0,
-				cashTips: 0,
-				barTipOuts: 0,
-				runnerTipOuts: 0,
-				hostTipOuts: 0,
-				totalTipOut: 0,
-				tipsReceived: 0,
-				totalPayrollTips: 0,
-			}
-		);
+	next();
+});
 
-	const existingWeeklyTotalIndex = this.weeklyTotals.findIndex(
-		(total) => total.week.getTime() === weekStart.getTime()
-	);
+TeamMemberSchema.methods.addDailyTotal = function (dailyTotal) {
+	// Add the daily total
+	this.dailyTotals.push(dailyTotal);
 
-	if (existingWeeklyTotalIndex !== -1) {
-		this.weeklyTotals[existingWeeklyTotalIndex] = weeklyTotal;
+	// Get the start of the week for the daily total
+	const weekStart = moment(dailyTotal.date).startOf('week').format('YYYY-MM-DD');
+
+	// Find the index of the corresponding weekly total
+	const index = this.weeklyTotals.findIndex(total => total.weekStart === weekStart);
+
+	// If the weekly total doesn't exist, create it
+	if (index === -1) {
+		this.weeklyTotals.push({
+			weekStart: weekStart,
+			weekEnd: moment(dailyTotal.date).endOf('week').format('YYYY-MM-DD'),
+			foodSales: dailyTotal.foodSales,
+			barSales: dailyTotal.barSales,
+			nonCashTips: dailyTotal.nonCashTips,
+			cashTips: dailyTotal.cashTips,
+			barTipOuts: dailyTotal.barTipOuts,
+			runnerTipOuts: dailyTotal.runnerTipOuts,
+			hostTipOuts: dailyTotal.hostTipOuts,
+			totalTipOut: dailyTotal.totalTipOut,
+			tipsReceived: dailyTotal.tipsReceived,
+			totalPayrollTips: dailyTotal.totalPayrollTips,
+		});
 	} else {
-		this.weeklyTotals.push(weeklyTotal);
+		// If the weekly total exists, update it
+		this.weeklyTotals[index].foodSales += dailyTotal.foodSales;
+		this.weeklyTotals[index].barSales += dailyTotal.barSales;
+		this.weeklyTotals[index].nonCashTips += dailyTotal.nonCashTips;
+		this.weeklyTotals[index].cashTips += dailyTotal.cashTips;
+		this.weeklyTotals[index].barTipOuts += dailyTotal.barTipOuts;
+		this.weeklyTotals[index].runnerTipOuts += dailyTotal.runnerTipOuts;
+		this.weeklyTotals[index].hostTipOuts += dailyTotal.hostTipOuts;
+		this.weeklyTotals[index].totalTipOut += dailyTotal.totalTipOut;
+		this.weeklyTotals[index].tipsReceived += dailyTotal.tipsReceived;
+		this.weeklyTotals[index].totalPayrollTips += dailyTotal.totalPayrollTips;
 	}
 };
 
-TeamMemberSchema.methods.getWeeklyTotals = function (weekStart) {
-	const weekEnd = new Date(weekStart);
-	weekEnd.setDate(weekEnd.getDate() + 6); // Saturday
+TeamMemberSchema.methods.removeDailyTotal = function (dailyTotalId) {
+	// Find the daily total
+	const dailyTotal = this.dailyTotals.id(dailyTotalId);
 
-	const weeklyTotal = this.weeklyTotals.find((total) => total.week >= weekStart && total.week <= weekEnd);
+	// Get the start of the week for the daily total
+	const weekStart = moment(dailyTotal.date).startOf('week').format('YYYY-MM-DD');
+
+	// Find the index of the corresponding weekly total
+	const index = this.weeklyTotals.findIndex(total => total.weekStart === weekStart);
+
+	// If the weekly total exists, update it
+	if (index !== -1) {
+		this.weeklyTotals[index].foodSales -= dailyTotal.foodSales;
+		this.weeklyTotals[index].barSales -= dailyTotal.barSales;
+		this.weeklyTotals[index].nonCashTips -= dailyTotal.nonCashTips;
+		this.weeklyTotals[index].cashTips -= dailyTotal.cashTips;
+		this.weeklyTotals[index].barTipOuts -= dailyTotal.barTipOuts;
+		this.weeklyTotals[index].runnerTipOuts -= dailyTotal.runnerTipOuts;
+		this.weeklyTotals[index].hostTipOuts -= dailyTotal.hostTipOuts;
+		this.weeklyTotals[index].totalTipOut -= dailyTotal.totalTipOut;
+		this.weeklyTotals[index].tipsReceived -= dailyTotal.tipsReceived;
+		this.weeklyTotals[index].totalPayrollTips -= dailyTotal.totalPayrollTips;
+	}
+
+	// Remove the daily total
+	dailyTotal.remove();
+};
+
+TeamMemberSchema.methods.updateWeeklyTotals = function () {
+    const weekStart = moment().startOf('week').toDate();
+    const weekEnd = moment().endOf('week').toDate();
+
+    function isSameDayOrAfter(date1, date2) {
+        return moment(date1).isSameOrAfter(date2, 'day');
+    }
+
+    const weeklyTotal = this.dailyTotals
+        .filter((total) => isSameDayOrAfter(total.date, weekStart))
+        .reduce(
+            (acc, curr) => ({
+                weekStart: weekStart,
+                weekEnd: weekEnd,
+                foodSales: acc.foodSales + curr.foodSales,
+                barSales: acc.barSales + curr.barSales,
+                nonCashTips: acc.nonCashTips + curr.nonCashTips,
+                cashTips: acc.cashTips + curr.cashTips,
+                barTipOuts: acc.barTipOuts + curr.barTipOuts,
+                runnerTipOuts: acc.runnerTipOuts + curr.runnerTipOuts,
+                hostTipOuts: acc.hostTipOuts + curr.hostTipOuts,
+                totalTipOut: acc.totalTipOut + curr.totalTipOut,
+                tipsReceived: acc.tipsReceived + curr.tipsReceived,
+                totalPayrollTips: acc.totalPayrollTips + curr.totalPayrollTips,
+            }),
+            {
+                weekStart: weekStart,
+                weekEnd: weekEnd,
+                foodSales: 0,
+                barSales: 0,
+                nonCashTips: 0,
+                cashTips: 0,
+                barTipOuts: 0,
+                runnerTipOuts: 0,
+                hostTipOuts: 0,
+                totalTipOut: 0,
+                tipsReceived: 0,
+                totalPayrollTips: 0,
+            }
+        );
+
+    const existingWeeklyTotalIndex = this.weeklyTotals.findIndex((total) =>
+        moment(total.weekStart).isSame(weekStart, 'day')
+    );
+
+    if (existingWeeklyTotalIndex !== -1) {
+        this.weeklyTotals[existingWeeklyTotalIndex] = weeklyTotal;
+    } else {
+        this.weeklyTotals.push(weeklyTotal);
+    }
+};
+
+TeamMemberSchema.methods.getWeeklyTotals = function (weekStart) {
+	const weekEnd = moment(weekStart).endOf('week').toDate();
+
+	const weeklyTotal = this.weeklyTotals.find((total) => 
+		moment(total.weekStart).isSameOrAfter(weekStart, 'day') &&
+		moment(total.weekEnd).isSameOrBefore(weekEnd, 'day')
+	);
 
 	return weeklyTotal;
 };

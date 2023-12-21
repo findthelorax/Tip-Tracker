@@ -14,7 +14,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['root', 'admin', 'user'],
         default: 'user'
-    }
+    },
+    avatar: String,
+    city: String,
+    country: { type: String, default: 'USA' },
+    jobTitle: String,
+    name: String,
+    timezone: { type: String, default: 'UTC' },
 });
 
 UserSchema.pre('save', async function (next) {

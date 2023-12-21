@@ -45,6 +45,7 @@ function calculateThisWeekBarSales(dailyTotals) {
         if (totalDate.isSameOrAfter(thisWeekStart) && totalDate.isSameOrBefore(thisWeekEnd)) {
             return total + (Number(dailyTotal.barSales) || 0);
         }
+            console.log("🚀 ~ file: weeklyTotalsLogic.js:48 ~ returndailyTotals.reduce ~ total:", total)
         return total;
     }, 0);
 }

@@ -25,7 +25,10 @@ export const useSubmitDailyTotals = (
                 dailyTotals.hostTipOuts = tipOuts.host;
 
                 for (const member of team) {
+                    console.log("🚀 ~ file: submitDailyTotals.js:28 ~ team:", team)
+                    console.log("🚀 ~ file: submitDailyTotals.js:28 ~ member:", member)
                     const workedSameDate = member.dailyTotals.some((total) => total.date === dailyTotals.date);
+                    console.log("🚀 ~ file: submitDailyTotals.js:29 ~ workedSameDate:", workedSameDate)
 
                     if (workedSameDate) {
                         if (member.position === 'bartender') {

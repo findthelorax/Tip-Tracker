@@ -24,9 +24,7 @@ function DailyTotalsTable() {
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
 	const { deleteDailyTotal } = useContext(DailyTotalsContext);
 	const { team } = useContext(TeamContext);
-	console.log("🚀 ~ file: dailyTotalsTable.js:27 ~ DailyTotalsTable ~ team:", team)
 	const { fetchDailyTotals } = useFetchDailyTotals();
-
 
 	useEffect(() => {
 		fetchDailyTotals();
@@ -34,9 +32,10 @@ function DailyTotalsTable() {
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal) => ({
-			_id: teamMember._id,
-			date: moment(dailyTotal.date).format('MMM D, YYYY'),
-			key: `${teamMember._id}-${moment(dailyTotal.date).format('MMM D, YYYY')}`,
+			teamMemberId: teamMember._id,
+			_id: dailyTotal._id,
+			date: moment.parseZone(dailyTotal.date).format('MMM D, YYYY'),
+			key: dailyTotal._id,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,
@@ -65,20 +64,22 @@ function DailyTotalsTable() {
 		headerName: 'Action',
 		sortable: false,
 		width: 100,
-		renderCell: (params) => (
-			<Button
-				variant="contained"
-				sx={{ bgcolor: 'error.main', color: 'white' }}
-				onClick={() => deleteDailyTotal(params.row, params.row.date)}
-			>
-				Delete
-			</Button>
-		),
+		renderCell: (params) => {
+			const teamMember = team.find((member) => member._id === params.row.teamMemberId);
+			const dailyTotal = params.row;
+			return (
+				<Button
+					variant="contained"
+					sx={{ bgcolor: 'error.main', color: 'white' }}
+					onClick={() => deleteDailyTotal(teamMember, dailyTotal)}
+				>
+					Delete
+				</Button>
+			);
+		},
 	});
 
-	return (
-		<DailyTotalsTableRender rows={rows} columns={columns} deleteDailyTotal={deleteDailyTotal} />
-	);
+	return <DailyTotalsTableRender rows={rows} columns={columns} deleteDailyTotal={deleteDailyTotal} />;
 }
 
 export default DailyTotalsTable;

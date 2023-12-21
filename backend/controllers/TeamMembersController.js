@@ -147,8 +147,18 @@ exports.createDailyTotal = async (req, res) => {
 			});
 		}
 
+		// Find the team member
+		const teamMember = await Team.findById(memberId);
+
 		// Update the team member's daily totals
-		await Team.updateOne({ _id: memberId }, { $push: { dailyTotals: dailyTotal } });
+		teamMember.dailyTotals.push(dailyTotal);
+
+		// Mark the dailyTotals field as modified
+		teamMember.markModified('dailyTotals');
+
+		// Save the team member
+		await teamMember.save();
+
 
 		res.status(200).json({
 			success: true,
@@ -165,20 +175,72 @@ exports.createDailyTotal = async (req, res) => {
 
 // Delete daily totals for a specific team member
 exports.deleteDailyTotal = async (req, res) => {
+    try {
+        const { teamMemberId, dailyTotalId } = req.params;
+        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ dailyTotalId:", dailyTotalId)
+        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ teamMemberId:", teamMemberId)
+        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ req.params:", req.params)
+        const teamMember = await Team.findById(teamMemberId);
+        console.log("🚀 ~ file: TeamMembersController.js:184 ~ exports.deleteDailyTotal ~ teamMember:", teamMember)
+
+        if (!teamMember) {
+            return res.status(404).json({ message: 'Team member not found' });
+        }
+
+        // Use the _id of the daily total to remove it
+        teamMember.dailyTotals.id(dailyTotalId).remove();
+        teamMember.markModified('dailyTotals');
+
+        try {
+            await teamMember.save();
+        } catch (saveError) {
+            console.error('Error saving team member:', saveError);
+            throw saveError;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Daily total deleted successfully',
+        });
+    } catch (error) {
+        console.error('Error deleting daily total:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+        });
+    }
+};
+
+// Update daily totals for a specific team member
+exports.updateDailyTotal = async (req, res) => {
 	try {
-		const { id: teamMemberId, date } = req.params;
+		const { id: teamMemberId, dailyTotalId } = req.params;
+		const updatedDailyTotal = req.body;
+
+		// Validate updatedDailyTotal
+		if (!validateDailyTotal(updatedDailyTotal)) {
+			return res.status(400).json({
+				success: false,
+				message: 'updatedDailyTotal must have all required fields.',
+			});
+		}
+
 		const teamMember = await Team.findById(teamMemberId);
 
 		if (!teamMember) {
 			return res.status(404).json({ message: 'Team member not found' });
 		}
 
-		// Parse the date string from the client using moment and the timezone from .env
-		const dateString = moment(date).local().format();
+		// Find the daily total to update
+		const dailyTotal = teamMember.dailyTotals.id(dailyTotalId);
 
-		teamMember.dailyTotals = teamMember.dailyTotals.filter(
-			(dailyTotal) => moment(dailyTotal.date).local().format() !== dateString
-		);
+		if (!dailyTotal) {
+			return res.status(404).json({ message: 'Daily total not found' });
+		}
+
+		// Update the daily total
+		dailyTotal.set(updatedDailyTotal);
+		teamMember.markModified('dailyTotals');
 
 		try {
 			await teamMember.save();
@@ -189,10 +251,10 @@ exports.deleteDailyTotal = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: 'Daily total deleted successfully',
+			message: 'Daily total updated successfully',
 		});
 	} catch (error) {
-		console.error('Error deleting daily total:', error);
+		console.error('Error updating daily total:', error);
 		res.status(500).json({
 			success: false,
 			message: 'Internal Server Error',
@@ -278,71 +340,71 @@ exports.deleteWeeklyTotals = async (req, res) => {
 };
 
 exports.updateWeeklyTotalsPut = async (req, res) => {
-    try {
-        const teamMember = await Team.findById(req.params.id);
+	try {
+		const teamMember = await Team.findById(req.params.id);
 
-        if (!teamMember) {
-            return res.status(404).json({ message: 'Team member not found' });
-        }
+		if (!teamMember) {
+			return res.status(404).json({ message: 'Team member not found' });
+		}
 
-        // Create a new date using moment and set it to the start of the week
+		// Create a new date using moment and set it to the start of the week
 		const weekStart = moment().local().startOf('week').toDate();
 
-		const existingWeeklyTotal = teamMember.weeklyTotals.find(
-			(total) => moment(total.week).local().isSame(weekStart, 'day')
+		const existingWeeklyTotal = teamMember.weeklyTotals.find((total) =>
+			moment(total.week).local().isSame(weekStart, 'day')
 		);
-        if (existingWeeklyTotal) {
-            return res.status(400).json({ message: 'Weekly total for this week already exists' });
-        }
+		if (existingWeeklyTotal) {
+			return res.status(400).json({ message: 'Weekly total for this week already exists' });
+		}
 
-        teamMember.updateWeeklyTotals();
+		teamMember.updateWeeklyTotals();
 
-        await teamMember.save();
+		await teamMember.save();
 
-        res.status(200).json(teamMember);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+		res.status(200).json(teamMember);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
 };
 
 exports.updateWeeklyTotalsPatch = async (req, res) => {
-    try {
-        // Parse the date string from the client using moment
+	try {
+		// Parse the date string from the client using moment
 		const weekStart = moment(req.params.week).local().startOf('day').toDate();
-		
-        // Check for existing weekly total for the same week
-        const existingWeeklyTotal = await Team.findOne({ _id: req.params.id, 'weeklyTotals.week': weekStart });
-        if (existingWeeklyTotal) {
-            return res.status(400).json({ message: 'Weekly total for this week already exists' });
-        }
 
-        const result = await Team.updateOne(
-            { _id: req.params.id, 'weeklyTotals.week': weekStart },
-            {
-                $set: {
-                    'weeklyTotals.$[elem].foodSales': req.body.foodSales,
-                    'weeklyTotals.$[elem].barSales': req.body.barSales,
-                    'weeklyTotals.$[elem].nonCashTips': req.body.nonCashTips,
-                    'weeklyTotals.$[elem].cashTips': req.body.cashTips,
-                    'weeklyTotals.$[elem].barTipOuts': req.body.barTipOuts,
-                    'weeklyTotals.$[elem].runnerTipOuts': req.body.runnerTipOuts,
-                    'weeklyTotals.$[elem].hostTipOuts': req.body.hostTipOuts,
-                    'weeklyTotals.$[elem].totalTipOut': req.body.totalTipOut,
-                    'weeklyTotals.$[elem].tipsReceived': req.body.tipsReceived,
-                    'weeklyTotals.$[elem].totalPayrollTips': req.body.totalPayrollTips,
-                },
-            },
-            {
-                arrayFilters: [{ 'elem.week': weekStart }],
-            }
-        );
+		// Check for existing weekly total for the same week
+		const existingWeeklyTotal = await Team.findOne({ _id: req.params.id, 'weeklyTotals.week': weekStart });
+		if (existingWeeklyTotal) {
+			return res.status(400).json({ message: 'Weekly total for this week already exists' });
+		}
 
-        if (result.nModified === 0) {
-            return res.status(404).json({ message: 'Weekly total not found' });
-        }
+		const result = await Team.updateOne(
+			{ _id: req.params.id, 'weeklyTotals.week': weekStart },
+			{
+				$set: {
+					'weeklyTotals.$[elem].foodSales': req.body.foodSales,
+					'weeklyTotals.$[elem].barSales': req.body.barSales,
+					'weeklyTotals.$[elem].nonCashTips': req.body.nonCashTips,
+					'weeklyTotals.$[elem].cashTips': req.body.cashTips,
+					'weeklyTotals.$[elem].barTipOuts': req.body.barTipOuts,
+					'weeklyTotals.$[elem].runnerTipOuts': req.body.runnerTipOuts,
+					'weeklyTotals.$[elem].hostTipOuts': req.body.hostTipOuts,
+					'weeklyTotals.$[elem].totalTipOut': req.body.totalTipOut,
+					'weeklyTotals.$[elem].tipsReceived': req.body.tipsReceived,
+					'weeklyTotals.$[elem].totalPayrollTips': req.body.totalPayrollTips,
+				},
+			},
+			{
+				arrayFilters: [{ 'elem.week': weekStart }],
+			}
+		);
 
-        res.status(200).json({ message: 'Weekly total updated' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+		if (result.nModified === 0) {
+			return res.status(404).json({ message: 'Weekly total not found' });
+		}
+
+		res.status(200).json({ message: 'Weekly total updated' });
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
 };
