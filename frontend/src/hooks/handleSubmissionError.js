@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 export const useHandleSubmissionError = (selectedTeamMember) => {
-    const [submissionError, setSubmissionError] = useState(null);
+    const [setSubmissionError] = useState(null);
 
     return useCallback(
         (error, dailyTotals) => {

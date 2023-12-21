@@ -4,7 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { ExportToCsvButton, ExportToExcelButton } from '../../hooks/utils';
 
-export default function WeeklyTotalsRender({ date, handleDateChange, rows, columns }) {
+export default function WeeklyTotalsTableRender({ date, handleDateChange, rows, columns }) {
     return (
         <Card style={{ height: '100%', width: '100%' }}>
             <CardContent>

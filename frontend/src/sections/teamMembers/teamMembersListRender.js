@@ -1,91 +1,64 @@
-// TeamMembersRender.js
-import React from 'react';
-import {
-    Card,
-    CardContent,
-    Box,
-    ListItem,
-    ListItemAvatar,
-    Avatar,
-    ListItemText,
-    IconButton,
-    Typography,
-} from '@mui/material';
+import * as React from 'react';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import { IconButton, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FolderIcon from '@mui/icons-material/Folder';
-
-const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
+// function CustomToolbar() {
+//     return (
+//         <GridToolbarContainer>
+//             <GridToolbarExport />
+//         </GridToolbarContainer>
+//     );
+// }
+
 function TeamMembersRender({ teamByPosition, deleteMember }) {
-    return (
-        <Card
-            sx={{
-                minWidth: 275,
-                marginBottom: 2,
-                backgroundColor: 'lightblue',
-                border: '1px solid black',
-                boxShadow: '2px 2px 0px 0px black',
-                borderRadius: '15px',
-            }}
-        >
-            <CardContent>
-                {POSITIONS.map((position) => (
-                    <Box key={position} sx={{ marginBottom: 2 }}>
-                        <Card
-                            sx={{
-                                backgroundColor: 'white',
-                                border: '1px solid black',
-                                boxShadow: '2px 2px 0px 0px black',
-                                borderRadius: '15px',
-                            }}
-                        >
-                            <CardContent>
-                                <Typography variant="h6" component="div">
-                                    {capitalizeFirstLetter(position)}
-                                </Typography>
-                                {teamByPosition[position].map((member) => (
-                                    <ListItem
-                                        key={member._id}
-                                        secondaryAction={
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="delete"
-                                                onClick={() =>
-                                                    deleteMember(
-                                                        member._id,
-                                                        member.teamMemberName,
-                                                        member.position
-                                                    )
-                                                }
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        }
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar>
-                                                <FolderIcon />
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={
-                                                member.teamMemberName
-                                                    ? capitalizeFirstLetter(member.teamMemberName)
-                                                    : 'Unknown'
-                                            }
-                                            secondary={member.position}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </CardContent>
-                        </Card>
-                    </Box>
-                ))}
-            </CardContent>
-        </Card>
-    );
+	const columns = [
+		{ field: 'teamMemberName', headerName: 'Name', width: 130 },
+		{ field: 'position', headerName: 'Position', width: 130 },
+		// { field: 'phoneNumber', headerName: 'Phone Number', width: 130 },
+		// { field: 'email', headerName: 'Email', width: 130 },
+		{
+			field: 'delete',
+			headerName: 'Delete',
+			sortable: false,
+			width: 100,
+			renderCell: (params) => (
+				<IconButton
+					onClick={() => deleteMember(params.row._id, params.row.teamMemberName, params.row.position)}
+				>
+					<DeleteIcon />
+				</IconButton>
+			),
+		},
+	];
+
+	const rows = Object.values(teamByPosition)
+		.flat()
+		.map((member) => ({
+			...member,
+			id: member._id,
+			teamMemberName: member.teamMemberName ? capitalizeFirstLetter(member.teamMemberName) : 'Unknown',
+		}));
+
+	return (
+		<div style={{ height: '100%', width: '100%', marginBottom: '5px' }}>
+			<Typography variant="h6" gutterBottom>
+				Team Members
+			</Typography>
+			<DataGrid
+				rows={rows}
+				columns={columns}
+				pageSize={5}
+				rowsPerPageOptions={[10]}
+				getRowId={(row) => row._id}
+				// components={{
+				//     Toolbar: CustomToolbar,
+				// }}
+			/>
+		</div>
+	);
 }
 
 export default TeamMembersRender;

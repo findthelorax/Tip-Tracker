@@ -1,5 +1,4 @@
-import { useCallback, useContext } from 'react';
-import { ErrorContext } from '../contexts/ErrorContext';
+import { useCallback } from 'react';
 import { submitDailyTotalToServer } from '../utils/api';
 import { prepareDailyTotals } from '../hooks/prepareDailyTotals';
 
@@ -12,7 +11,6 @@ export const useSubmitDailyTotals = (
     updateTeamMemberTipOuts,
     clearFormFields
 ) => {
-    const { setError } = useContext(ErrorContext);
 
     return useCallback(
         async (dailyTotals, selectedTeamMember) => {
@@ -64,7 +62,6 @@ export const useSubmitDailyTotals = (
             setRefreshDailyTotals,
             updateTeamMemberTipOuts,
             clearFormFields,
-            setError,
         ]
     );
 };

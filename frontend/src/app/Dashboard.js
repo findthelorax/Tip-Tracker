@@ -31,8 +31,6 @@ import { TeamContext } from '../contexts/TeamContext';
 import SettingsPage from './Settings';
 import { useAuth } from '../contexts/AuthContext';
 import { MainListItems, SecondaryListItems } from './SideNav';
-import { OverviewTraffic } from '../sections/overview/overview-traffic';
-import { OverviewTotalProfit } from '../sections/overview/overview-total-profit';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
 import { calculateSalesDifferences } from '../hooks/weeklyTotalsLogic';
 
@@ -110,20 +108,17 @@ function Dashboard({ refresh }) {
 					>
 						<Container maxWidth="xl">
 							<Grid container spacing={3}>
-								<Grid item xs={12} md={8} lg={8}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 250 }}>
-										<TeamMembersList />
-									</Paper>
-								</Grid>
-								<Grid item xs={12} md={8} lg={8}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 250 }}>
+								<Grid item xs={4} md={6} lg={6}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column'}}>
 										<TeamMemberForm />
 									</Paper>
 								</Grid>
-								<Grid item xs={12} sm={6} lg={3}>
-									<OverviewTotalProfit sx={{ height: '100%' }} value="$15k" />
+								<Grid item xs={4} md={6} lg={6}>
+									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+										<TeamMembersList />
+									</Paper>
 								</Grid>
-								<Grid item xs={12}>
+								<Grid item xs={4} md={6} lg={6}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
 										<DailyTotalsForm refresh={refresh} />
 									</Paper>
@@ -132,13 +127,6 @@ function Dashboard({ refresh }) {
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
 										<DailyTotalsTable refresh={refresh} />
 									</Paper>
-								</Grid>
-								<Grid item xs={12} md={6} lg={4}>
-									<OverviewTraffic
-										chartSeries={[63, 15, 22]}
-										labels={['Desktop', 'Tablet', 'Phone']}
-										sx={{ height: '100%' }}
-									/>
 								</Grid>
 								<Grid item xs={12}>
 									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>

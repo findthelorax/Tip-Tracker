@@ -4,6 +4,7 @@ import moment from 'moment';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
 import { TeamContext } from '../contexts/TeamContext';
+import { useFetchDailyTotals } from '../hooks/fetchDailyTotals';
 
 const columnNames = {
 	date: 'Date',
@@ -23,15 +24,19 @@ function DailyTotalsTable() {
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
 	const { deleteDailyTotal } = useContext(DailyTotalsContext);
 	const { team } = useContext(TeamContext);
-	console.log("🚀 ~ file: dailyTotalsTable.js:26 ~ DailyTotalsTable ~ team:", team)
+	console.log("🚀 ~ file: dailyTotalsTable.js:27 ~ DailyTotalsTable ~ team:", team)
+	const { fetchDailyTotals } = useFetchDailyTotals();
 
-	useEffect(() => {}, [refreshDailyTotals]);
+
+	useEffect(() => {
+		fetchDailyTotals();
+	}, [refreshDailyTotals, fetchDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal) => ({
 			_id: teamMember._id,
-			date: moment(dailyTotal.date).local().format('MMM D, YYYY'),
-			key: `${teamMember._id}-${moment(dailyTotal.date).local().format('MMM D, YYYY')}`,
+			date: moment(dailyTotal.date).format('MMM D, YYYY'),
+			key: `${teamMember._id}-${moment(dailyTotal.date).format('MMM D, YYYY')}`,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,
@@ -39,7 +44,7 @@ function DailyTotalsTable() {
 	);
 
 	const columns = [
-		{ field: 'teamMemberName', headerName: 'Team Member Name', width: 150 },
+		{ field: 'teamMemberName', headerName: 'Name', width: 150 },
 		{ field: 'teamMemberPosition', headerName: 'Position', width: 150 },
 		...Object.entries(columnNames).map(([key, name]) => ({
 			field: key,
@@ -51,7 +56,7 @@ function DailyTotalsTable() {
 							style: 'currency',
 							currency: 'USD',
 					  })
-					: moment(value).local().format('MMM D, YYYY'),
+					: moment.parseZone(value).format('MMM D, YYYY'),
 		})),
 	];
 
