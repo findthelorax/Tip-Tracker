@@ -4,7 +4,7 @@ import moment from 'moment';
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 import { CiBeerMugFull } from "react-icons/ci";
 import { GiHamburger } from "react-icons/gi";
-
+import { success, error } from '../../theme/colors';
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography, CircularProgress } from '@mui/material';
 
 function WeeklyBarSalesCardRender({ teamMembers, selectedDate, salesDifferences = { foodSales: { difference: 0, positive: 0 } }, sx }) {
@@ -44,7 +44,7 @@ function WeeklyBarSalesCardRender({ teamMembers, selectedDate, salesDifferences 
 					</Stack>
 					<Avatar
 						sx={{
-							backgroundColor: positive ? 'success.main' : 'error.main',
+							backgroundColor: positive ? success.main : error.main,
 							height: 56,
 							width: 56,
 						}}
@@ -60,7 +60,7 @@ function WeeklyBarSalesCardRender({ teamMembers, selectedDate, salesDifferences 
 							<SvgIcon color={positive ? 'success' : 'error'} fontSize="small">
 								{positive ? <FaArrowUp /> : <FaArrowDown />}
 							</SvgIcon>
-							<Typography color={positive ? 'success.main' : 'error.main'} variant="body2">
+							<Typography color={positive ? success.main : error.main} variant="body2">
 								{formattedDifference}%
 							</Typography>
 						</Stack>
@@ -117,7 +117,7 @@ function WeeklyFoodSalesCardRender({ teamMembers, selectedDate, salesDifferences
 					</Stack>
 					<Avatar
 						sx={{
-							backgroundColor: positive ? 'success.main' : 'error.main',
+							backgroundColor: positive ? success.main : error.main,
 							height: 56,
 							width: 56,
 						}}
@@ -133,7 +133,7 @@ function WeeklyFoodSalesCardRender({ teamMembers, selectedDate, salesDifferences
 							<SvgIcon color={positive ? 'success' : 'error'} fontSize="small">
 								{positive ? <FaArrowUp /> : <FaArrowDown />}
 							</SvgIcon>
-							<Typography color={positive ? 'success.main' : 'error.main'} variant="body2">
+							<Typography color={positive ? success.main : error.main} variant="body2">
 								{formattedDifference}%
 							</Typography>
 						</Stack>

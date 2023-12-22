@@ -132,8 +132,8 @@ TeamMemberSchema.methods.removeDailyTotal = function (dailyTotalId) {
 };
 
 TeamMemberSchema.methods.updateWeeklyTotals = function () {
-    const weekStart = moment().startOf('week').toDate();
-    const weekEnd = moment().endOf('week').toDate();
+    const weekStart = moment(this.dailyTotals[this.dailyTotals.length - 1].date).startOf('week').toDate();
+    const weekEnd = moment(this.dailyTotals[this.dailyTotals.length - 1].date).endOf('week').toDate();
 
     function isSameDayOrAfter(date1, date2) {
         return moment(date1).isSameOrAfter(date2, 'day');

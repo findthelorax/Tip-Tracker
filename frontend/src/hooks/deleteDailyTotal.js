@@ -10,8 +10,6 @@ export const useDeleteDailyTotal = (fetchDailyTotals, setRefreshDailyTotals) => 
 
     return useCallback(
         async (teamMember, dailyTotal) => {
-            console.log("🚀 ~ file: deleteDailyTotal.js:13 ~ dailyTotal:", dailyTotal)
-            console.log("🚀 ~ file: deleteDailyTotal.js:13 ~ teamMember:", teamMember)
             const confirmation = window.confirm(
                 `ARE YOU SURE YOU WANT TO DELETE THE DAILY TOTAL FOR:\n\n${teamMember.teamMemberName.toUpperCase()}		ON:		${FormattedDate(
                     dailyTotal.date
@@ -23,7 +21,7 @@ export const useDeleteDailyTotal = (fetchDailyTotals, setRefreshDailyTotals) => 
 
             try {
                 if (!teamMember._id || !dailyTotal._id) {
-                    console.error('teamMember or date is undefined');
+                    console.error('teamMember or daily total is undefined');
                     alert('Failed to delete daily total');
                     return;
                 }

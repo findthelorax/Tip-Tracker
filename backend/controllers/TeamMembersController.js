@@ -120,7 +120,7 @@ exports.getDailyTotals = async (req, res) => {
 	}
 };
 
-// Creat daily totals for a specific team member
+// Create daily totals for a specific team member
 exports.createDailyTotal = async (req, res) => {
 	try {
 		const memberId = req.params.id;
@@ -151,14 +151,13 @@ exports.createDailyTotal = async (req, res) => {
 		const teamMember = await Team.findById(memberId);
 
 		// Update the team member's daily totals
-		teamMember.dailyTotals.push(dailyTotal);
+		teamMember.addDailyTotal(dailyTotal); // Use the addDailyTotal method
 
 		// Mark the dailyTotals field as modified
 		teamMember.markModified('dailyTotals');
 
 		// Save the team member
 		await teamMember.save();
-
 
 		res.status(200).json({
 			success: true,
@@ -176,11 +175,12 @@ exports.createDailyTotal = async (req, res) => {
 // Delete daily totals for a specific team member
 exports.deleteDailyTotal = async (req, res) => {
     try {
-        const { teamMemberId, dailyTotalId } = req.params;
-        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ dailyTotalId:", dailyTotalId)
-        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ teamMemberId:", teamMemberId)
+        const { id: dailyTotalId } = req.params; // Extract dailyTotalId from req.params
         console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ req.params:", req.params)
-        const teamMember = await Team.findById(teamMemberId);
+        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ dailyTotalId:", dailyTotalId)
+        
+        // Assuming that the teamMemberId is stored in the teamMember object
+        const teamMember = await Team.findOne({ 'dailyTotals._id': dailyTotalId });
         console.log("🚀 ~ file: TeamMembersController.js:184 ~ exports.deleteDailyTotal ~ teamMember:", teamMember)
 
         if (!teamMember) {
@@ -188,27 +188,19 @@ exports.deleteDailyTotal = async (req, res) => {
         }
 
         // Use the _id of the daily total to remove it
-        teamMember.dailyTotals.id(dailyTotalId).remove();
+		teamMember.dailyTotals.pull(dailyTotalId);
         teamMember.markModified('dailyTotals');
+		try {
+			await teamMember.save();
+			console.log('Daily total deleted successfully');
+		} catch (err) {
+			console.error('Error deleting daily total:', err);
+		}
 
-        try {
-            await teamMember.save();
-        } catch (saveError) {
-            console.error('Error saving team member:', saveError);
-            throw saveError;
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Daily total deleted successfully',
-        });
     } catch (error) {
-        console.error('Error deleting daily total:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal Server Error',
-        });
-    }
+		console.error('Error deleting daily total:', error);
+		res.status(500).json({ message: 'Internal Server Error' });
+	}
 };
 
 // Update daily totals for a specific team member

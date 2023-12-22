@@ -25,6 +25,7 @@ import {
 	WeeklyBarSalesCard,
 	WeeklyFoodSalesCard,
 } from '../components/weeklyTotals';
+import { DailyBarSalesCard, DailyFoodSalesCard } from '../components/dailyTotalsCards';
 import DailyTotalsTable from '../components/dailyTotalsTable';
 import DailyTotalsForm from '../components/dailyTotalsForm';
 import { TeamContext } from '../contexts/TeamContext';
@@ -32,7 +33,7 @@ import SettingsPage from './Settings';
 import { useAuth } from '../contexts/AuthContext';
 import { MainListItems, SecondaryListItems } from './SideNav';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
-import { calculateSalesDifferences } from '../hooks/weeklyTotalsLogic';
+import { calculateWeeklySalesDifferences, calculateDailySalesDifferences } from '../hooks/salesTotalsLogic';
 
 import moment from 'moment';
 
@@ -81,7 +82,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 }));
 
 function Dashboard({ refresh }) {
-	const [salesDifferences, setSalesDifferences] = useState({});
+	const [weeklyDifferences, setWeeklySalesDifferences] = useState({});
+	const [dailyDifferences, setDailySalesDifferences] = useState({});
 	const { team } = React.useContext(TeamContext);
 	const [selectedMenu, setSelectedMenu] = useState('Dashboard');
 	const { currentUser } = useAuth();
@@ -91,8 +93,11 @@ function Dashboard({ refresh }) {
 		setOpen(!open);
 	};
 	useEffect(() => {
-		const differences = calculateSalesDifferences(team);
-		setSalesDifferences(differences);
+		const dailyDifferences = calculateWeeklySalesDifferences(team);
+		const weeklyDifferences = calculateWeeklySalesDifferences(team);
+
+		setDailySalesDifferences(dailyDifferences);
+		setWeeklySalesDifferences(weeklyDifferences);
 	}, [team]);
 
 	const renderSelectedComponent = () => {
@@ -144,7 +149,7 @@ function Dashboard({ refresh }) {
 										team={team}
 										refresh={refresh}
 										selectedDate={selectedDate}
-										salesDifferences={salesDifferences}
+										weeklyDifferences={weeklyDifferences}
 									/>
 								</Grid>
 								<Grid item xs={6}>
@@ -153,7 +158,25 @@ function Dashboard({ refresh }) {
 										team={team}
 										refresh={refresh}
 										selectedDate={selectedDate}
-										salesDifferences={salesDifferences}
+										weeklyDifferences={weeklyDifferences}
+									/>
+								</Grid>
+								<Grid item xs={6}>
+									<DailyBarSalesCard
+										sx={{ height: '100%' }}
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										weeklyDifferences={weeklyDifferences}
+									/>
+								</Grid>
+								<Grid item xs={6}>
+									<DailyFoodSalesCard
+										sx={{ height: '100%' }}
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										weeklyDifferences={weeklyDifferences}
 									/>
 								</Grid>
 								<Grid item xs={12}>

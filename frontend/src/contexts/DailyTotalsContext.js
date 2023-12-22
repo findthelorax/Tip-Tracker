@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDailyTotals } from '../hooks/dailyTotalsLogic';
+import { useDailyTotals } from '../hooks/dailyTotalsHooks';
 import { initialDailyTotals } from '../hooks/initiateDailyTotals';
 
 export const DailyTotalsContext = React.createContext();

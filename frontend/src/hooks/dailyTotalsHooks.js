@@ -2,14 +2,14 @@ import { useState, useContext, useMemo, useEffect } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
 import { ErrorContext } from '../contexts/ErrorContext';
 import { updateWeeklyTotals } from '../utils/api';
-import { CalculateTipOuts } from '../hooks/utils';
-import { useClearFormFields } from '../hooks/clearFormFields';
-import { useFetchDailyTotals } from '../hooks/fetchDailyTotals';
-import { useUpdateTeamMemberTipOuts } from '../hooks/updateTeamMemberTipOuts';
-import { useDeleteDailyTotal } from '../hooks/deleteDailyTotal';
-import { useHandleSubmissionError } from '../hooks/handleSubmissionError';
-import { useSubmitDailyTotals } from '../hooks/submitDailyTotals';
-import { prepareDailyTotals } from '../hooks/prepareDailyTotals';
+import { CalculateTipOuts } from './utils';
+import { useClearFormFields } from './clearFormFields';
+import { useFetchDailyTotals } from './fetchDailyTotals';
+import { useUpdateTeamMemberTipOuts } from './updateTeamMemberTipOuts';
+import { useDeleteDailyTotal } from './deleteDailyTotal';
+import { useHandleSubmissionError } from './handleSubmissionError';
+import { useSubmitDailyTotals } from './submitDailyTotals';
+import { prepareDailyTotals } from './prepareDailyTotals';
 
 export const useDailyTotals = (initialDailyTotals) => {
 	const [refreshDailyTotals, setRefreshDailyTotals] = useState(false);

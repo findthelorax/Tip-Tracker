@@ -5,7 +5,7 @@ import moment from 'moment';
 import WeeklyTotalsTableRender from '../sections/weeklyTotals/weeklyTotalsTableRender';
 import WeeklyTipsRender from '../sections/weeklyTotals/weeklyTipsRender';
 import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from '../sections/weeklyTotals/weeklyTotalsCardsRender';
-import { titleToPropName, titles, formatUSD, calculateSalesDifferences } from '../hooks/weeklyTotalsLogic';
+import { titleToPropName, titles, formatUSD, calculateWeeklySalesDifferences } from '../hooks/salesTotalsLogic';
 
 function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	const { team } = useContext(TeamContext);
@@ -137,58 +137,61 @@ function WeeklyTipsTable({ team, selectedDate, setSelectedDate }) {
 }
 
 function WeeklyFoodSalesCard({ team, selectedDate }) {
-	const teamMembers = useMemo(() => {
-		const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
-		const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
+    const teamMembers = useMemo(() => {
+        const selectedWeekStart = moment(selectedDate).startOf('week');
+        const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
 
-		return team.map((member) => {
-			const weeklyTotals = member.dailyTotals.filter((total) => {
-				const totalDate = moment.parseZone(total.date);
-				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
-			});
-			return { ...member, weeklyTotals };
-		});
-	}, [team, selectedDate]);
+        return team.map((member) => {
+            const weeklyTotals = member.weeklyTotals.filter((total) => {
+                const totalDate = moment.utc(total.date);
+                return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
+            });
+            return { ...member, weeklyTotals };
+        });
+    }, [team, selectedDate]);
 
-	const salesDifferences = calculateSalesDifferences(teamMembers);
+    const allWeeklyTotals = teamMembers.flatMap(member => member.weeklyTotals);
+    const salesDifferences = calculateWeeklySalesDifferences(allWeeklyTotals);
 
-	return (
-		<WeeklyFoodSalesCardRender
-			team={team}
-			teamMembers={teamMembers}
-			difference={salesDifferences.foodSales?.difference}
-			positive={salesDifferences.foodSales?.positive}
-			selectedDate={selectedDate}
-			sx={salesDifferences.foodSales?.sx}
-		/>
-	);
+    return (
+        <WeeklyFoodSalesCardRender
+            team={team}
+            teamMembers={teamMembers}
+            difference={salesDifferences.foodSales?.difference}
+            positive={salesDifferences.foodSales?.positive}
+            selectedDate={selectedDate}
+            sx={salesDifferences.foodSales?.sx}
+        />
+    );
 }
+
 function WeeklyBarSalesCard({ team, selectedDate }) {
-	const teamMembers = useMemo(() => {
-		const selectedWeekStart = moment.parseZone(selectedDate).startOf('week');
-		const selectedWeekEnd = moment.parseZone(selectedWeekStart).endOf('week');
+    const teamMembers = useMemo(() => {
+        const selectedWeekStart = moment(selectedDate).startOf('week');
+        const selectedWeekEnd = moment(selectedWeekStart).endOf('week');
 
-		return team.map((member) => {
-			const weeklyTotals = member.dailyTotals.filter((total) => {
-				const totalDate = moment.parseZone(total.date);
-				return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
-			});
-			return { ...member, weeklyTotals };
-		});
-	}, [team, selectedDate]);
+        return team.map((member) => {
+            const weeklyTotals = member.weeklyTotals.filter((total) => {
+                const totalDate = moment.utc(total.date);
+                return totalDate.isSameOrAfter(selectedWeekStart) && totalDate.isSameOrBefore(selectedWeekEnd);
+            });
+            return { ...member, weeklyTotals };
+        });
+    }, [team, selectedDate]);
 
-	const salesDifferences = calculateSalesDifferences(teamMembers);
-
-	return (
-		<WeeklyBarSalesCardRender
-			team={team}
-			teamMembers={teamMembers}
-			difference={salesDifferences.barSales?.difference}
-			positive={salesDifferences.barSales?.positive}
-			selectedDate={selectedDate}
-			sx={salesDifferences.barSales?.sx}
-		/>
-	);
+    const allWeeklyTotals = teamMembers.flatMap(member => member.weeklyTotals);
+    const salesDifferences = calculateWeeklySalesDifferences(allWeeklyTotals);
+    
+    return (
+        <WeeklyBarSalesCardRender
+            team={team}
+            teamMembers={teamMembers}
+            difference={salesDifferences.barSales?.difference}
+            positive={salesDifferences.barSales?.positive}
+            selectedDate={selectedDate}
+            sx={salesDifferences.barSales?.sx}
+        />
+    );
 }
 
 export { WeeklyTotalsTable, WeeklyTipsTable, WeeklyBarSalesCard, WeeklyFoodSalesCard };

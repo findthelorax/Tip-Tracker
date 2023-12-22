@@ -35,7 +35,7 @@ function DailyTotalsTable() {
 			teamMemberId: teamMember._id,
 			_id: dailyTotal._id,
 			date: moment.parseZone(dailyTotal.date).format('MMM D, YYYY'),
-			key: dailyTotal._id,
+			key: `${teamMember._id}-${dailyTotal._id}`,
 			teamMemberName: teamMember.teamMemberName,
 			teamMemberPosition: teamMember.position,
 			...dailyTotal,

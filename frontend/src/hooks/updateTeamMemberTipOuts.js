@@ -10,6 +10,9 @@ export const useUpdateTeamMemberTipOuts = () => {
 
     return useCallback(
         async (date, position, tipOut, dailyTotals) => {
+            console.log("🚀 ~ file: updateTeamMemberTipOuts.js:13 ~ position:", position)
+            console.log("🚀 ~ file: updateTeamMemberTipOuts.js:13 ~ dailyTotals:", dailyTotals)
+            console.log("🚀 ~ file: updateTeamMemberTipOuts.js:13 ~ tipOut:", tipOut)
             const promises = team.map(async (member) => {
                 const workedSameDate = member.dailyTotals.some(
                     (total) => moment(total.date).format('YYYY-MM-DD') === moment(dailyTotals.date).format('YYYY-MM-DD')
