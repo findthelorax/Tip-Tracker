@@ -42,13 +42,7 @@ function WeeklyBarSalesCardRender({ teamMembers, selectedDate, salesDifferences 
 						</Typography>
 						<Typography variant="h4">{formattedTotalWeeklyBarSales}</Typography>
 					</Stack>
-					<Avatar
-						sx={{
-							backgroundColor: positive ? success.main : error.main,
-							height: 56,
-							width: 56,
-						}}
-					>
+					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">
 							<CiBeerMugFull />
 						</SvgIcon>
@@ -115,13 +109,7 @@ function WeeklyFoodSalesCardRender({ teamMembers, selectedDate, salesDifferences
 						</Typography>
 						<Typography variant="h4">{formattedTotalWeeklyFoodSales}</Typography>
 					</Stack>
-					<Avatar
-						sx={{
-							backgroundColor: positive ? success.main : error.main,
-							height: 56,
-							width: 56,
-						}}
-					>
+					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">
 							<GiHamburger />
 						</SvgIcon>

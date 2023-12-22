@@ -83,19 +83,15 @@ function calculateWeeklySalesDifferences(weeklyTotals) {
 
     salesTypes.forEach(salesType => {
         const lastWeekSales = calculateLastWeekSales(weeklyTotals, salesType);
-        console.log("🚀 ~ file: salesTotalsLogic.js:85 ~ calculateWeeklySalesDifferences ~ lastWeekSales:", lastWeekSales)
         const thisWeekSales = calculateThisWeekSales(weeklyTotals, salesType);
-        console.log("🚀 ~ file: salesTotalsLogic.js:87 ~ calculateWeeklySalesDifferences ~ thisWeekSales:", thisWeekSales)
         let differenceSales = 0;
         if (lastWeekSales !== 0) {
             differenceSales = ((thisWeekSales - lastWeekSales) / lastWeekSales) * 100;
-            console.log("🚀 ~ file: salesTotalsLogic.js:91 ~ calculateWeeklySalesDifferences ~ differenceSales:", differenceSales)
         } else if (thisWeekSales > 0) {
             differenceSales = 100;
         }
         const positiveSales = differenceSales >= 0;
         const sxSales = { bgcolor: positiveSales ? success.main : error.main };
-        console.log("🚀 ~ file: salesTotalsLogic.js:97 ~ calculateWeeklySalesDifferences ~ positiveSales:", positiveSales)
 
         differences[salesType] = {
             difference: differenceSales,
@@ -115,9 +111,7 @@ function calculateDailySalesDifferences(dailyTotals) {
 
     salesTypes.forEach(salesType => {
         const yesterdaySales = calculateYesterdaySales(dailyTotals, salesType);
-        console.log("🚀 ~ file: salesTotalsLogic.js:115 ~ calculateDailySalesDifferences ~ yesterdaySales:", yesterdaySales)
         const todaySales = calculateTodaySales(dailyTotals, salesType);
-        console.log("🚀 ~ file: salesTotalsLogic.js:117 ~ calculateDailySalesDifferences ~ todaySales:", todaySales)
         let differenceSales = 0;
         if (yesterdaySales !== 0) {
             differenceSales = ((todaySales - yesterdaySales) / yesterdaySales) * 100;
@@ -126,7 +120,6 @@ function calculateDailySalesDifferences(dailyTotals) {
         }
         const positiveSales = differenceSales >= 0;
         const sxSales = { bgcolor: positiveSales ? success.main : error.main };
-        console.log("🚀 ~ file: salesTotalsLogic.js:128 ~ calculateDailySalesDifferences ~ positiveSales:", positiveSales)
 
         differences[salesType] = {
             difference: differenceSales,
