@@ -176,8 +176,6 @@ exports.createDailyTotal = async (req, res) => {
 exports.deleteDailyTotal = async (req, res) => {
     try {
         const { id: dailyTotalId } = req.params; // Extract dailyTotalId from req.params
-        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ req.params:", req.params)
-        console.log("🚀 ~ file: TeamMembersController.js:180 ~ exports.deleteDailyTotal ~ dailyTotalId:", dailyTotalId)
         
         // Assuming that the teamMemberId is stored in the teamMember object
         const teamMember = await Team.findOne({ 'dailyTotals._id': dailyTotalId });
