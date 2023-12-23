@@ -2,24 +2,24 @@ const express = require('express');
 const router = express.Router();
 const TeamMembersController = require('../controllers/TeamMembersController');
 
-router.get('/:id', TeamMembersController.getTeamMember);
+router.get('/:teamMemberId', TeamMembersController.getTeamMember);
 router.post("/", TeamMembersController.createTeamMember);
-router.put('/:id', TeamMembersController.updateTeamMember);
-router.delete('/:id', TeamMembersController.deleteTeamMember);
+router.put('/:teamMemberId', TeamMembersController.updateTeamMember);
+router.delete('/:teamMemberId', TeamMembersController.deleteTeamMember);
 
 router.get('/', TeamMembersController.getTeamMembers);
 
-router.get('/:id/dailyTotals', TeamMembersController.getDailyTotals);
-router.post('/:id/dailyTotals', TeamMembersController.createDailyTotal);
-router.delete('/:id/dailyTotals/:id', TeamMembersController.deleteDailyTotal);
+router.get('/:teamMemberId/dailyTotals', TeamMembersController.getDailyTotals);
+router.post('/:teamMemberId/dailyTotals', TeamMembersController.createDailyTotal);
+router.delete('/:teamMemberId/dailyTotals/:dailyTotalId', TeamMembersController.deleteDailyTotal);
 
-router.get('/:id/weeklyTotals/', TeamMembersController.getOneTMWeeklyTotals);
+router.get('/:teamMemberId/weeklyTotals/', TeamMembersController.getOneTMWeeklyTotals);
 
-router.get('/:id/weeklyTotals/:week', TeamMembersController.getOneWeeklyTotals);
-router.post('/:id/weeklyTotals/:week', TeamMembersController.createWeeklyTotals);
-router.delete('/:id/weeklyTotals/:week', TeamMembersController.deleteWeeklyTotals);
+router.get('/:teamMemberId/weeklyTotals/:week', TeamMembersController.getOneWeeklyTotals);
+router.post('/:teamMemberId/weeklyTotals/:week', TeamMembersController.createWeeklyTotals);
+router.delete('/:teamMemberId/weeklyTotals/:week', TeamMembersController.deleteWeeklyTotals);
 
-router.put('/:id/updateWeeklyTotals', TeamMembersController.updateWeeklyTotalsPut);
-router.patch('/:id/weeklyTotals/:week', TeamMembersController.updateWeeklyTotalsPatch);
+router.put('/:teamMemberId/updateWeeklyTotals', TeamMembersController.updateWeeklyTotalsPut);
+router.patch('/:teamMemberId/weeklyTotals/:week', TeamMembersController.updateWeeklyTotalsPatch);
 
 module.exports = router;

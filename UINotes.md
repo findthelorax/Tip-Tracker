@@ -1,12 +1,12 @@
-Add into user schema: 
-  avatar: '/assets/avatars/avatar-anika-visser.png',
-  city: 'Los Angeles',
-  country: 'USA',
-  jobTitle: 'Senior Developer',
-  name: 'Anika Visser',
-  timezone: 'GTM-7'
-
 https://github.com/devias-io/material-kit-react/blob/main/src/sections/account/
+
+const moment = require('moment-timezone');
+
+// Get a date from the database
+const dateFromDatabase = teamMember.someDate;
+
+// Convert the date to the team member's local time zone
+const localDate = moment(dateFromDatabase).tz(teamMember.timeZone);
 
 
 npm install winston
@@ -90,153 +90,6 @@ app.get('/logs', authCheck, (req, res) => {
 });
 
 
-To handle authentication with Passport.js, you need to install the passport and passport-local packages. The passport-local strategy is used for username and password authentication.
-
-Here's how you can modify your code to use Passport.js:
-
-const express = require('express');
-const bcrypt = require('bcrypt');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const User = require('../models/users');
-const router = express.Router();
-
-// Configure passport middleware
-passport.use(new LocalStrategy(
-    async (username, password, done) => {
-        try {
-            const user = await User.findOne({ username });
-
-            if (!user) {
-                return done(null, false, { message: 'Invalid username or password' });
-            }
-
-            const passwordMatch = await bcrypt.compare(password, user.password);
-
-            if (!passwordMatch) {
-                return done(null, false, { message: 'Invalid username or password' });
-            }
-
-            return done(null, user);
-        } catch (err) {
-            done(err);
-        }
-    }
-));
-
-// Configure passport session
-passport.serializeUser((user, done) => {
-    done(null, user._id);
-});
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch (err) {
-        done(err);
-    }
-});
-
-router.use(passport.initialize());
-router.use(passport.session());
-
-router.post('/login', passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
-
-router.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = new User({
-            username,
-            password: hashedPassword,
-        });
-
-        await user.save();
-
-        res.status(201).json({ message: 'User created successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-module.exports = router;
-
-GitHub Copilot
-To handle authentication with Passport.js, you need to install the passport and passport-local packages. The passport-local strategy is used for username and password authentication.
-
-Here's how you can modify your code to use Passport.js:
-
-In this code, the passport.authenticate('local') middleware is used to authenticate users when they log in. If authentication is successful, the user is redirected to the /profile route. If authentication fails, the user is redirected back to the /login route.
-
-The serializeUser and deserializeUser methods are used to store the user ID in the session and retrieve the user from the session, respectively.
-
-
-Yes, you will need to adjust your main server file (usually app.js or server.js) to use Passport.js. Here's what you need to do:
-
-Install the necessary packages: passport, passport-local, and express-session.
-
-Require passport and express-session in your main server file.
-
-Set up the Express session middleware:
-
-app.use(session({
-    secret: 'your session secret',
-    resave: false,
-    saveUninitialized: false
-}));
-
-
-Replace 'your session secret' with a secret string of your choice. This is used to sign the session ID cookie.
-
-Initialize Passport and the Passport session:
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-Require your router file (the one where you set up the Passport strategy):
-
-const authRoutes = require('./routes/login');
-app.use('/', authRoutes);
-
-
-Replace './routes/login' with the path to your router file.
-
-Make sure to use the express-session middleware before the Passport middleware, and to use the Passport middleware before your routes.
-Here's how your main server file might look:
-
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const authRoutes = require('./routes/login');
-
-const app = express();
-
-app.use(session({
-    secret: 'your session secret',
-    resave: false,
-    saveUninitialized: false
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use('/', authRoutes);
-
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
-});
-
-Remember to replace 'your session secret' and './routes/login' with your own values.
-
-
-
 Show me how to always ensure to use secure HTTPS connections to protect sensitive data during transmission.
 
 const https = require('https');
@@ -285,8 +138,9 @@ app.use(session({
     store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
-Flash Messages: To use connect-flash for flash messages, first install it with npm install connect-flash, then use it like this:
 
+
+Flash Messages: To use connect-flash for flash messages, first install it with npm install connect-flash, then use it like this:
 
 const flash = require('connect-flash');
 

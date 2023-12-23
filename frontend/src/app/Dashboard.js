@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
+// import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -22,9 +22,11 @@ import DatabaseOperations from '../components/databaseOps';
 import {
 	WeeklyTotalsTable,
 	WeeklyTipsTable,
-	WeeklyBarSalesCard,
+} from '../components/weeklyTotalsTables';
+import {
 	WeeklyFoodSalesCard,
-} from '../components/weeklyTotals';
+	WeeklyBarSalesCard,
+} from '../components/weeklyTotalsCards';
 import { DailyBarSalesCard, DailyFoodSalesCard } from '../components/dailyTotalsCards';
 import DailyTotalsTable from '../components/dailyTotalsTable';
 import DailyTotalsForm from '../components/dailyTotalsForm';
@@ -67,6 +69,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 			duration: theme.transitions.duration.enteringScreen,
 		}),
 		boxSizing: 'border-box',
+		backgroundColor: '#333',
 		...(!open && {
 			overflowX: 'hidden',
 			transition: theme.transitions.create('width', {
@@ -92,13 +95,6 @@ function Dashboard({ refresh }) {
 	const toggleDrawer = () => {
 		setOpen(!open);
 	};
-	useEffect(() => {
-		const dailyDifferences = calculateWeeklySalesDifferences(team);
-		const weeklyDifferences = calculateWeeklySalesDifferences(team);
-
-		setDailySalesDifferences(dailyDifferences);
-		setWeeklySalesDifferences(weeklyDifferences);
-	}, [team]);
 
 	const renderSelectedComponent = () => {
 		switch (selectedMenu) {
@@ -114,47 +110,19 @@ function Dashboard({ refresh }) {
 						<Container maxWidth="xl">
 							<Grid container spacing={3}>
 								<Grid item xs={4} md={6} lg={6}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column'}}>
-										<TeamMemberForm />
-									</Paper>
+									<TeamMemberForm />
 								</Grid>
 								<Grid item xs={4} md={6} lg={6}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-										<TeamMembersList />
-									</Paper>
+									<TeamMembersList />
 								</Grid>
 								<Grid item xs={4} md={6} lg={6}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<DailyTotalsForm refresh={refresh} />
-									</Paper>
+									<DailyTotalsForm refresh={refresh} />
 								</Grid>
 								<Grid item xs={12}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<DailyTotalsTable refresh={refresh} />
-									</Paper>
-								</Grid>
-								<Grid item xs={12}>
-									<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-										<WeeklyTotalsTable
-											team={team}
-											refresh={refresh}
-											selectedDate={selectedDate}
-											setSelectedDate={setSelectedDate}
-										/>
-									</Paper>
-								</Grid>
-								<Grid item xs={6}>
-									<WeeklyBarSalesCard
-										sx={{ height: '100%' }}
-										team={team}
-										refresh={refresh}
-										selectedDate={selectedDate}
-										weeklyDifferences={weeklyDifferences}
-									/>
+									<DailyTotalsTable refresh={refresh} />
 								</Grid>
 								<Grid item xs={6}>
 									<WeeklyFoodSalesCard
-										sx={{ height: '100%' }}
 										team={team}
 										refresh={refresh}
 										selectedDate={selectedDate}
@@ -162,8 +130,7 @@ function Dashboard({ refresh }) {
 									/>
 								</Grid>
 								<Grid item xs={6}>
-									<DailyBarSalesCard
-										sx={{ height: '100%' }}
+									<WeeklyBarSalesCard
 										team={team}
 										refresh={refresh}
 										selectedDate={selectedDate}
@@ -172,11 +139,25 @@ function Dashboard({ refresh }) {
 								</Grid>
 								<Grid item xs={6}>
 									<DailyFoodSalesCard
-										sx={{ height: '100%' }}
 										team={team}
 										refresh={refresh}
 										selectedDate={selectedDate}
-										weeklyDifferences={weeklyDifferences}
+										dailyDifferences={dailyDifferences}
+									/>
+								</Grid>
+								<Grid item xs={6}>
+									<DailyBarSalesCard
+										refresh={refresh}
+										selectedDate={selectedDate}
+										dailyDifferences={dailyDifferences}
+									/>
+								</Grid>
+								<Grid item xs={12}>
+									<WeeklyTotalsTable
+										team={team}
+										refresh={refresh}
+										selectedDate={selectedDate}
+										setSelectedDate={setSelectedDate}
 									/>
 								</Grid>
 								<Grid item xs={12}>
@@ -261,6 +242,7 @@ function Dashboard({ refresh }) {
 					flexGrow: 1,
 					height: '100vh',
 					overflow: 'auto',
+					background: '#00008B',
 				}}
 			>
 				<Toolbar />

@@ -31,15 +31,18 @@ function DailyTotalsTable() {
 	}, [refreshDailyTotals, fetchDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
-		teamMember.dailyTotals.map((dailyTotal) => ({
-			teamMemberId: teamMember._id,
-			_id: dailyTotal._id,
-			date: moment.parseZone(dailyTotal.date).format('MMM D, YYYY'),
-			key: `${teamMember._id}-${dailyTotal._id}`,
-			teamMemberName: teamMember.teamMemberName,
-			teamMemberPosition: teamMember.position,
-			...dailyTotal,
-		}))
+		teamMember.dailyTotals.map((dailyTotal) => {
+			const localDate = moment.utc(dailyTotal.date).add(moment().utcOffset(), 'minutes').format('MMM D, YYYY');
+			return {
+				teamMemberId: teamMember._id,
+				_id: dailyTotal._id,
+				date: localDate,
+				key: `${teamMember._id}-${dailyTotal._id}`,
+				teamMemberName: teamMember.teamMemberName,
+				teamMemberPosition: teamMember.position,
+				...dailyTotal,
+			};
+		})
 	);
 
 	const columns = [
@@ -55,7 +58,7 @@ function DailyTotalsTable() {
 							style: 'currency',
 							currency: 'USD',
 					  })
-					: moment.parseZone(value).format('MMM D, YYYY'),
+					: moment(value).format('MMM D, YYYY'),
 		})),
 	];
 
