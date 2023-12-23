@@ -48,22 +48,13 @@ TeamMemberSchema.pre('save', function (next) {
 	next();
 });
 
-TeamMemberSchema.pre('save', function (next) {
-	const teamMember = this;
-
-	if (teamMember.isModified('dailyTotals')) {
-		teamMember.updateWeeklyTotals();
-	}
-
-	next();
-});
-
 TeamMemberSchema.methods.addDailyTotal = function (dailyTotal) {
 	// Add the daily total
 	this.dailyTotals.push(dailyTotal);
 
 	// Get the start of the week for the daily total
 	const weekStart = moment(dailyTotal.date).startOf('week').format('YYYY-MM-DD');
+    const weekEnd = moment(dailyTotal.date).endOf('week').format('YYYY-MM-DD');
 
 	// Find the index of the corresponding weekly total
 	const index = this.weeklyTotals.findIndex((total) => total.weekStart === weekStart);
@@ -72,7 +63,7 @@ TeamMemberSchema.methods.addDailyTotal = function (dailyTotal) {
 	if (index === -1) {
 		this.weeklyTotals.push({
 			weekStart: weekStart,
-			weekEnd: moment(dailyTotal.date).endOf('week').format('YYYY-MM-DD'),
+			weekEnd: weekEnd,
 			foodSales: dailyTotal.foodSales,
 			barSales: dailyTotal.barSales,
 			nonCashTips: dailyTotal.nonCashTips,
@@ -100,10 +91,12 @@ TeamMemberSchema.methods.addDailyTotal = function (dailyTotal) {
 };
 
 TeamMemberSchema.methods.updateWeeklyTotals = function () {
-	const weekStart = moment(this.dailyTotals[this.dailyTotals.length - 1].date)
+	const weekStart = moment
+		(this.dailyTotals[this.dailyTotals.length - 1].date)
 		.startOf('week')
 		.toDate();
-	const weekEnd = moment(this.dailyTotals[this.dailyTotals.length - 1].date)
+	const weekEnd = moment
+		(this.dailyTotals[this.dailyTotals.length - 1].date)
 		.endOf('week')
 		.toDate();
 

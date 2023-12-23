@@ -24,58 +24,55 @@ const formatUSD = (value) => {
     return formatter.format(value);
 };
 
-function calculateYesterdaySales(dailyTotals, salesType) {
-    const yesterday = moment().subtract(1, 'day').startOf('day');
+function isDateInRange(date, start, end) {
+    const dateMoment = moment(date);
+    const startOfDay = moment(date).startOf('day');
+    const endOfDay = moment(date).endOf('day');
+    return dateMoment.isBetween(startOfDay, endOfDay, 'day', '[]');
+}
 
-    return dailyTotals.reduce((total, dailyTotal) => {
-        const totalDate = moment(dailyTotal.date).startOf('day');
-        if (totalDate.isSame(yesterday, 'day')) {
-            return total + (Number(dailyTotal[salesType]) || 0);
+function calculateSales(totals, salesType, start, end) {
+    if (!Array.isArray(totals)) {
+        console.error('Invalid argument: totals must be an array');
+        return 0;
+    }
+
+    return totals.reduce((total, totalItem) => {
+        if (isDateInRange(totalItem.date, start, end)) {
+            return total + (Number(totalItem[salesType]) || 0);
         }
         return total;
     }, 0);
+}
+
+function calculateYesterdaySales(dailyTotals, salesType) {
+    console.log("🚀 ~ file: salesTotalsLogic.js:44 ~ calculateYesterdaySales ~ dailyTotals:", dailyTotals)
+    const yesterdayStart = moment().subtract(1, 'day').startOf('day');
+    const yesterdayEnd = moment().subtract(1, 'day').endOf('day');
+    return calculateSales(dailyTotals, salesType, yesterdayStart, yesterdayEnd);
 }
 
 function calculateTodaySales(dailyTotals, salesType) {
-    const today = moment().startOf('day');
-
-    return dailyTotals.reduce((total, dailyTotal) => {
-        const totalDate = moment(dailyTotal.date).startOf('day');
-        if (totalDate.isSame(today, 'day')) {
-            return total + (Number(dailyTotal[salesType]) || 0);
-        }
-        return total;
-    }, 0);
+    const todayStart = moment().startOf('day');
+    const todayEnd = moment().endOf('day');
+    return calculateSales(dailyTotals, salesType, todayStart, todayEnd);
 }
 
 function calculateLastWeekSales(weeklyTotals, salesType) {
+    console.log("🚀 ~ file: salesTotalsLogic.js:57 ~ calculateLastWeekSales ~ weeklyTotals:", weeklyTotals)
     const lastWeekStart = moment().subtract(1, 'week').startOf('week');
     const lastWeekEnd = moment().subtract(1, 'week').endOf('week');
-
-    return weeklyTotals.reduce((total, weeklyTotal) => {
-        const totalDate = moment(weeklyTotal.date);
-        if (totalDate.isSameOrAfter(lastWeekStart) && totalDate.isSameOrBefore(lastWeekEnd)) {
-            return total + (Number(weeklyTotal[salesType]) || 0);
-        }
-        return total;
-    }, 0);
+    return calculateSales(weeklyTotals, salesType, lastWeekStart, lastWeekEnd);
 }
 
 function calculateThisWeekSales(weeklyTotals, salesType) {
     const thisWeekStart = moment().startOf('week');
     const thisWeekEnd = moment().endOf('week');
-
-    return weeklyTotals.reduce((total, weeklyTotal) => {
-        const totalDate = moment(weeklyTotal.date);
-        if (totalDate.isSameOrAfter(thisWeekStart) && totalDate.isSameOrBefore(thisWeekEnd)) {
-            return total + (Number(weeklyTotal[salesType]) || 0);
-        }
-        return total;
-    }, 0);
+    return calculateSales(weeklyTotals, salesType, thisWeekStart, thisWeekEnd);
 }
 
-
 function calculateWeeklySalesDifferences(weeklyTotals) {
+    // console.log("🚀 ~ file: salesTotalsLogic.js:64 ~ calculateWeeklySalesDifferences ~ weeklyTotals:", weeklyTotals)
     if (!weeklyTotals || weeklyTotals.length === 0) return {};
 
     const salesTypes = ['barSales', 'foodSales'];
@@ -104,6 +101,7 @@ function calculateWeeklySalesDifferences(weeklyTotals) {
 }
 
 function calculateDailySalesDifferences(dailyTotals) {
+    console.log("🚀 ~ file: salesTotalsLogic.js:93 ~ calculateDailySalesDifferences ~ dailyTotals:", dailyTotals)
     if (!dailyTotals || dailyTotals.length === 0) return {};
 
     const salesTypes = ['barSales', 'foodSales'];
