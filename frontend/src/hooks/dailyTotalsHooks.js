@@ -2,9 +2,9 @@ import { useState, useContext, useMemo, useEffect } from 'react';
 import { TeamContext } from '../contexts/TeamContext';
 import { ErrorContext } from '../contexts/ErrorContext';
 import { updateWeeklyTotals } from '../utils/api';
-import { CalculateTipOuts } from './utils';
+import { CalculateTipOuts } from './tipOuts';
 import { useClearFormFields } from './clearFormFields';
-import { useFetchDailyTotals } from './fetchDailyTotals';
+import { useGetAllDailyTotals } from './getAllDailyTotals';
 import { useUpdateTeamMemberTipOuts } from './updateTeamMemberTipOuts';
 import { useDeleteDailyTotal } from './deleteDailyTotal';
 import { useHandleSubmissionError } from './handleSubmissionError';
@@ -23,13 +23,13 @@ export const useDailyTotals = (initialDailyTotals) => {
 		[dailyTotals, selectedTeamMember, team]
 	);
 	const clearFormFields = useClearFormFields(initialDailyTotals, setDailyTotals);
-	const { dailyTotalsAll, fetchDailyTotals } = useFetchDailyTotals();
+	const { allDailyTotals, fetchAllDailyTotals } = useGetAllDailyTotals();
 	const updateTeamMemberTipOuts = useUpdateTeamMemberTipOuts(team, setError);
-	const deleteDailyTotal = useDeleteDailyTotal(setError, fetchDailyTotals, setRefreshDailyTotals);
+	const deleteDailyTotal = useDeleteDailyTotal(setError, fetchAllDailyTotals, setRefreshDailyTotals);
 	const handleSubmissionError = useHandleSubmissionError(selectedTeamMember, setSubmissionError);
 	const submitDailyTotals = useSubmitDailyTotals(
 		team,
-		fetchDailyTotals,
+		fetchAllDailyTotals,
 		handleSubmissionError,
 		tipOuts,
 		setRefreshDailyTotals,
@@ -38,13 +38,13 @@ export const useDailyTotals = (initialDailyTotals) => {
 	);
 
 	useEffect(() => {
-		fetchDailyTotals();
-	}, [fetchDailyTotals, refreshDailyTotals, setError]);
+		fetchAllDailyTotals();
+	}, [fetchAllDailyTotals, refreshDailyTotals, setError]);
 
 	return {
 		refreshDailyTotals,
 		setRefreshDailyTotals,
-		dailyTotalsAll,
+		allDailyTotals,
 		selectedTeamMember,
 		setSelectedTeamMember,
 		submissionError,
@@ -54,7 +54,7 @@ export const useDailyTotals = (initialDailyTotals) => {
 		submitDailyTotals,
 		deleteDailyTotal,
 		prepareDailyTotals,
-		fetchDailyTotals,
+		fetchAllDailyTotals,
 		updateWeeklyTotals,
 	};
 };

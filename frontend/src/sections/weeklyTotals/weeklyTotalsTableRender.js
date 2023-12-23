@@ -1,31 +1,56 @@
 import React from 'react';
-import { Typography, Box, Card, CardContent } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { Typography, Box, Card, CardContent, TextField } from '@mui/material';
+import {
+	DataGrid,
+	GridToolbarContainer,
+	GridToolbarColumnsButton,
+	GridToolbarFilterButton,
+	GridToolbarDensitySelector,
+	GridToolbarExport,
+} from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { ExportToCsvButton, ExportToExcelButton } from '../../hooks/utils';
 
 export default function WeeklyTotalsTableRender({ date, handleDateChange, rows, columns }) {
-    return (
-        <Card style={{ height: '100%', width: '100%' }}>
-            <CardContent>
-                <Typography variant="h5" component="h2">
-                    Weekly Totals
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 2 }}>
-                    <DatePicker
-                        label="Select a week"
-                        value={date}
-                        onChange={handleDateChange}
-                    />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-					<Box sx={{ display: 'flex', justifyContent: 'flex-end', pr: 1 }}>
-                            <ExportToCsvButton data={rows} />
-                            <ExportToExcelButton data={rows} />
-                        </Box>
-                    </Box>
-                </Box>
-                <DataGrid rows={rows} columns={columns} pageSize={5} />
-            </CardContent>
-        </Card>
-    );
+	const weekStart = date.startOf('week').format('MM/DD/YY');
+	const weekEnd = date.endOf('week').format('MM/DD/YY');
+
+	return (
+		<Card style={{ height: '100%', width: '100%' }}>
+			<CardContent>
+				<Typography variant="h4" component="h2" style={{ paddingBottom: 0 }}>
+					Weekly Totals {weekStart} - {weekEnd}
+				</Typography>
+				<DataGrid
+					rows={rows}
+					columns={columns}
+					pageSize={5}
+					density="compact"
+					components={{
+						Toolbar: GridToolbarContainer,
+					}}
+					componentsProps={{
+						toolbar: {
+							children: (
+								<div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+									<div style={{ width: '150px' }}>
+										<DatePicker
+											value={date}
+											onChange={handleDateChange}
+											renderInput={(params) => <TextField {...params} size="small" />}
+										/>
+									</div>
+									<div>
+										<GridToolbarColumnsButton />
+										<GridToolbarFilterButton />
+										<GridToolbarDensitySelector />
+										<GridToolbarExport />
+									</div>
+								</div>
+							),
+						},
+					}}
+				/>
+			</CardContent>
+		</Card>
+	);
 }

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, navigate } from 'react';
 import axios from 'axios';
-import { setAuthToken } from '../hooks/utils'; // This is a utility function to set the token in the axios headers
+import { setAuthToken } from '../hooks/authToken'; // This is a utility function to set the token in the axios headers
 
 // Create the context
 const AuthContext = createContext();

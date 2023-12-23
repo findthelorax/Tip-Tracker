@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const TeamMembersController = require('../controllers/TeamMembersController');
 
+router.get('/allDailyTotals', TeamMembersController.getAllDailyTotals);
+router.get('/allWeeklyTotals', TeamMembersController.getAllWeeklyTotals);
+
 router.get('/:teamMemberId', TeamMembersController.getTeamMember);
 router.post("/", TeamMembersController.createTeamMember);
 router.put('/:teamMemberId', TeamMembersController.updateTeamMember);

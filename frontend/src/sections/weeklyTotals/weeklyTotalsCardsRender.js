@@ -25,16 +25,13 @@ function WeeklyFoodSalesCardRender({
 	// 	const weekTotal = member.weeklyTotals.find((total) => total.weekStart === weekStart);
 	// 	return total + (weekTotal ? weekTotal.foodSales : 0);
 	// }, 0);
-	console.log("🚀 ~ file: weeklyTotalsCardsRender.js:101 ~ totalWeeklyFoodSales ~ totalWeeklyFoodSales:", totalWeeklyFoodSales)
 
 	const formattedTotalWeeklyFoodSales = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
 		totalWeeklyFoodSales
 	);
 
 	const difference = salesDifferences.foodSales?.difference || 0;
-	console.log("🚀 ~ file: weeklyTotalsCardsRender.js:107 ~ difference:", difference)
 	const positive = salesDifferences.foodSales?.positive || 0;
-	console.log("🚀 ~ file: weeklyTotalsCardsRender.js:109 ~ positive:", positive)
 	const formattedDifference = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
 		difference
 	);

@@ -272,9 +272,9 @@ export const deleteTeamMember = async (id) => {
 };
 
 // Daily Totals
-export const fetchDailyTotalsAll = async () => {
+export const getAllDailyTotals = async () => {
 	try {
-		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers`);
+		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers/allDailyTotals`);
 		return response.data;
 	} catch (error) {
 		console.error(`Error fetching daily totals: ${error.message}`);
@@ -316,6 +316,16 @@ export const getWeeklyTotal = async (teamMemberId, week) => {
 		return response.data;
 	} catch (error) {
 		console.error(`Error getting weekly total: ${error.message}`);
+		throw error;
+	}
+};
+
+export const getAllWeeklyTotals = async () => {
+	try {
+		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers/allWeeklyTotals`);
+		return response.data;
+	} catch (error) {
+		console.error(`Error fetching daily totals: ${error.message}`);
 		throw error;
 	}
 };

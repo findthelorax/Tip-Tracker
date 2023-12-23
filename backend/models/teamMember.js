@@ -91,61 +91,56 @@ TeamMemberSchema.methods.addDailyTotal = function (dailyTotal) {
 };
 
 TeamMemberSchema.methods.updateWeeklyTotals = function () {
-	const weekStart = moment
-		(this.dailyTotals[this.dailyTotals.length - 1].date)
-		.startOf('week')
-		.toDate();
-	const weekEnd = moment
-		(this.dailyTotals[this.dailyTotals.length - 1].date)
-		.endOf('week')
-		.toDate();
+    // Get the start and end of the current week
+    const weekStart = moment().startOf('week').toDate();
+    const weekEnd = moment().endOf('week').toDate();
 
-	function isSameDayOrAfter(date1, date2) {
-		return moment(date1).isSameOrAfter(date2, 'day');
-	}
+    // Filter the daily totals for the current week
+    const thisWeeksDailyTotals = this.dailyTotals.filter((total) => {
+        const date = moment(total.date);
+        return date.isSameOrAfter(weekStart) && date.isSameOrBefore(weekEnd);
+    });
 
-	const weeklyTotal = this.dailyTotals
-		.filter((total) => total && isSameDayOrAfter(total.date, weekStart))
-		.reduce(
-			(acc, curr) => ({
-				weekStart: weekStart,
-				weekEnd: weekEnd,
-				foodSales: acc.foodSales + curr.foodSales,
-				barSales: acc.barSales + curr.barSales,
-				nonCashTips: acc.nonCashTips + curr.nonCashTips,
-				cashTips: acc.cashTips + curr.cashTips,
-				barTipOuts: acc.barTipOuts + curr.barTipOuts,
-				runnerTipOuts: acc.runnerTipOuts + curr.runnerTipOuts,
-				hostTipOuts: acc.hostTipOuts + curr.hostTipOuts,
-				totalTipOut: acc.totalTipOut + curr.totalTipOut,
-				tipsReceived: acc.tipsReceived + curr.tipsReceived,
-				totalPayrollTips: acc.totalPayrollTips + curr.totalPayrollTips,
-			}),
-			{
-				weekStart: weekStart,
-				weekEnd: weekEnd,
-				foodSales: 0,
-				barSales: 0,
-				nonCashTips: 0,
-				cashTips: 0,
-				barTipOuts: 0,
-				runnerTipOuts: 0,
-				hostTipOuts: 0,
-				totalTipOut: 0,
-				tipsReceived: 0,
-				totalPayrollTips: 0,
-			}
-		);
+    // Calculate the weekly total for the current week
+    const weeklyTotal = thisWeeksDailyTotals.reduce((acc, curr) => ({
+        weekStart: weekStart,
+        weekEnd: weekEnd,
+        foodSales: acc.foodSales + curr.foodSales,
+        barSales: acc.barSales + curr.barSales,
+        nonCashTips: acc.nonCashTips + curr.nonCashTips,
+        cashTips: acc.cashTips + curr.cashTips,
+        barTipOuts: acc.barTipOuts + curr.barTipOuts,
+        runnerTipOuts: acc.runnerTipOuts + curr.runnerTipOuts,
+        hostTipOuts: acc.hostTipOuts + curr.hostTipOuts,
+        totalTipOut: acc.totalTipOut + curr.totalTipOut,
+        tipsReceived: acc.tipsReceived + curr.tipsReceived,
+        totalPayrollTips: acc.totalPayrollTips + curr.totalPayrollTips,
+    }), {
+        weekStart: weekStart,
+        weekEnd: weekEnd,
+        foodSales: 0,
+        barSales: 0,
+        nonCashTips: 0,
+        cashTips: 0,
+        barTipOuts: 0,
+        runnerTipOuts: 0,
+        hostTipOuts: 0,
+        totalTipOut: 0,
+        tipsReceived: 0,
+        totalPayrollTips: 0,
+    });
 
-	const existingWeeklyTotalIndex = this.weeklyTotals.findIndex((total) =>
-		moment(total.weekStart).isSame(weekStart, 'day')
-	);
+    // Find the existing weekly total for the current week
+    const existingWeeklyTotalIndex = this.weeklyTotals.findIndex((total) =>
+        moment(total.weekStart).isSame(weekStart, 'day')
+    );
 
-	if (existingWeeklyTotalIndex !== -1) {
-		this.weeklyTotals[existingWeeklyTotalIndex] = weeklyTotal;
-	} else {
-		this.weeklyTotals.push(weeklyTotal);
-	}
+    // Update the existing weekly total or add a new one
+    if (existingWeeklyTotalIndex !== -1) {
+        this.weeklyTotals[existingWeeklyTotalIndex] = weeklyTotal;
+    } else {
+        this.weeklyTotals.push(weeklyTotal);
+    }
 };
 
 TeamMemberSchema.methods.getWeeklyTotals = function (weekStart) {

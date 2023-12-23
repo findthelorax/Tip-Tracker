@@ -106,6 +106,30 @@ exports.getTeamMembers = async (req, res) => {
 	}
 };
 
+// Get All Daily Totals
+exports.getAllDailyTotals = async (req, res, next) => {
+    try {
+        const teamMembers = await Team.find({});
+        const dailyTotalsAll = teamMembers.flatMap(teamMember => teamMember.dailyTotals);
+        res.json(dailyTotalsAll);
+    } catch (error) {
+        console.error(`Error getting daily totals: ${error.message}`);
+        next(error);
+    }
+};
+
+// Get All Weekly Totals
+exports.getAllWeeklyTotals = async (req, res, next) => {
+    try {
+        const teamMembers = await Team.find({});
+        const weeklyTotalsAll = teamMembers.flatMap(teamMember => teamMember.weeklyTotals);
+        res.json(weeklyTotalsAll);
+    } catch (error) {
+        console.error(`Error getting weekly totals: ${error.message}`);
+        next(error);
+    }
+};
+
 // Route to get daily totals for a specific team member
 exports.getDailyTotals = async (req, res) => {
 	try {
@@ -153,7 +177,8 @@ exports.createDailyTotal = async (req, res) => {
 		const teamMember = await Team.findById(teamMemberId);
 
 		// Update the team member's daily totals
-		teamMember.addDailyTotal(dailyTotal); // Use the addDailyTotal method
+		teamMember.addDailyTotal(dailyTotal);
+		teamMember.updateWeeklyTotals();
 
 		// Mark the dailyTotals field as modified
 		teamMember.markModified('dailyTotals');
@@ -189,51 +214,26 @@ exports.deleteDailyTotal = async (req, res) => {
 		const dailyTotalIndex = teamMember.dailyTotals.findIndex(
 			(dailyTotal) => dailyTotal._id.toString() === dailyTotalId
 		);
-		console.log("🚀 ~ file: TeamMembersController.js:191 ~ exports.deleteDailyTotal ~ dailyTotalIndex:", dailyTotalIndex)
-		console.log('dailyTotalIndex:', dailyTotalIndex);
 		if (dailyTotalIndex === -1) {
 			return res.status(404).send({ message: 'Daily total not found' });
 		}
 
 		teamMember.dailyTotals.splice(dailyTotalIndex, 1);
+		teamMember.updateWeeklyTotals();
 		teamMember.markModified('dailyTotals');
 
 		try {
 			await teamMember.save();
-			console.log('Daily total deleted successfully');
 			res.send({ message: 'Daily total deleted successfully' });
 		} catch (err) {
-			console.error('Error deleting daily total:', err);
+			console.error('Error deleting daily total:', error);
+			next(error);
 		}
 	} catch (error) {
 		console.error('Error deleting daily total:', error);
 		res.status(500).json({ message: 'Internal Server Error' });
 	}
 };
-
-// exports.deleteDailyTotal = async (req, res) => {
-// 	try {
-// 		const { teamMemberId, dailyTotalId } = req.params;
-// 		const teamMember = await TeamMember.findById(teamMemberId); // use TeamMember here
-
-// 		if (!teamMember) {
-// 			return res.status(404).json({ message: 'Team member not found' });
-// 		}
-
-// 		const dailyTotal = teamMember.dailyTotals.id(dailyTotalId);
-// 		if (!dailyTotal) {
-// 			return res.status(404).json({ message: 'Daily total not found' });
-// 		}
-
-// 		dailyTotal.remove();
-// 		await teamMember.save();
-
-// 		res.status(200).json({ message: 'Daily total deleted' });
-// 	} catch (error) {
-// 		console.error(`Error deleting daily total: ${error}`);
-// 		res.status(500).json({ message: 'Internal Server Error' });
-// 	}
-// };
 
 // Update daily totals for a specific team member
 exports.updateDailyTotal = async (req, res) => {
@@ -264,6 +264,7 @@ exports.updateDailyTotal = async (req, res) => {
 
 		// Update the daily total
 		dailyTotal.set(updatedDailyTotal);
+		teamMember.updateWeeklyTotals();
 		teamMember.markModified('dailyTotals');
 
 		try {
@@ -332,6 +333,7 @@ exports.createWeeklyTotals = async (req, res) => {
 		const memberId = req.params.teamMemberId;
 		const week = req.params.week;
 		const weeklyTotalsData = { ...req.body, week };
+		console.log("🚀 ~ file: TeamMembersController.js:335 ~ exports.createWeeklyTotals= ~ weeklyTotalsData:", weeklyTotalsData)
 
 		await Team.updateOne({ _id: memberId }, { $push: { weeklyTotals: weeklyTotalsData } });
 

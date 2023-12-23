@@ -4,7 +4,7 @@ import moment from 'moment';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
 import { TeamContext } from '../contexts/TeamContext';
-import { useFetchDailyTotals } from '../hooks/fetchDailyTotals';
+import { useGetAllDailyTotals } from '../hooks/getAllDailyTotals';
 
 const columnNames = {
 	date: 'Date',
@@ -24,11 +24,11 @@ function DailyTotalsTable() {
 	const { refreshDailyTotals } = useContext(DailyTotalsContext);
 	const { deleteDailyTotal } = useContext(DailyTotalsContext);
 	const { team } = useContext(TeamContext);
-	const { fetchDailyTotals } = useFetchDailyTotals();
+	const { fetchAllDailyTotals } = useGetAllDailyTotals();
 
 	useEffect(() => {
-		fetchDailyTotals();
-	}, [refreshDailyTotals, fetchDailyTotals]);
+		fetchAllDailyTotals();
+	}, [refreshDailyTotals, fetchAllDailyTotals]);
 
 	const rows = team.flatMap((teamMember) =>
 		teamMember.dailyTotals.map((dailyTotal) => {

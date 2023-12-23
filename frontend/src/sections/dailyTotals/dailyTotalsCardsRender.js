@@ -82,7 +82,6 @@ export function DailyBarSalesCardRender({
 	salesDifferences = { barSales: { difference: 0, positive: 0 } },
 	sx,
 }) {
-	console.log('🚀 ~ file: dailyTotalsCardsRender.js:16 ~ salesDifferences:', salesDifferences);
 	if (totalBarSales === undefined) {
 		return <CircularProgress />;
 	}

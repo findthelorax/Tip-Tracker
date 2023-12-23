@@ -2,9 +2,9 @@ import { useCallback, useContext } from 'react';
 import { ErrorContext } from '../contexts/ErrorContext';
 import { TeamContext } from '../contexts/TeamContext'; // import TeamContext
 import { deleteDailyTotalFromServer } from '../utils/api';
-import { FormattedDate } from '../hooks/utils';
+import { FormattedDate } from '../hooks/formatDate';
 
-export const useDeleteDailyTotal = (fetchDailyTotals, setRefreshDailyTotals) => {
+export const useDeleteDailyTotal = (fetchAllDailyTotals, setRefreshDailyTotals) => {
     const { setError } = useContext(ErrorContext);
     const { team, setTeam } = useContext(TeamContext); // use setTeam from TeamContext
 
@@ -37,13 +37,13 @@ export const useDeleteDailyTotal = (fetchDailyTotals, setRefreshDailyTotals) => 
                             : member
                     );
                     setTeam(newTeam); // set the new team array
-                    fetchDailyTotals();
+                    fetchAllDailyTotals();
                 }
             } catch (error) {
                 setError(`Error deleting daily total: ${error.message}`);
                 alert(`Failed to delete daily totals: ${error.message}`);
             }
         },
-        [setError, fetchDailyTotals, setRefreshDailyTotals, team, setTeam]
+        [setError, fetchAllDailyTotals, setRefreshDailyTotals, team, setTeam]
     );
 };

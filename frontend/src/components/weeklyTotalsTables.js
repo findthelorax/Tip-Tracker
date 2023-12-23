@@ -46,12 +46,12 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	};
 
 	const columns = [
-		{ field: 'salesTips', headerName: 'Sales / Tips', width: 150 },
+		{ field: 'salesTips', headerName: 'Sales / Tips', flex: 1 },
 		...daysOfWeek.map((day, index) => {
 			const date = moment(selectedDate).startOf('week').add(index, 'days').format('MM/DD');
-			return { field: day, headerName: `${day} (${date})`, width: 150 };
+			return { field: day, headerName: `${day} ${date}`, flex: 1 };
 		}),
-		{ field: 'total', headerName: 'Total', width: 150 },
+		{ field: 'total', headerName: 'Total', flex: 1 },
 	];
 
 	const rows = titles.map((title, i) => {
@@ -118,9 +118,9 @@ function WeeklyTipsTable({ selectedDate, setSelectedDate }) {
 	}, [team, selectedDate]);
 
 	const columns = [
-		{ field: 'name', headerName: 'Name', width: 150 },
-		{ field: 'position', headerName: 'Position', width: 150 },
-		...Object.keys(titleToPropName).map((title) => ({ field: title, headerName: title, width: 150 })),
+		{ field: 'name', headerName: 'Name', flex: 1 },
+		{ field: 'position', headerName: 'Position', flex: 1 },
+		...Object.keys(titleToPropName).map((title) => ({ field: title, headerName: title, flex: 1 })),
 	];
 
 	const rows = tips.map((tip, index) => ({ id: index, ...tip }));

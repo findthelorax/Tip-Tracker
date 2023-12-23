@@ -1,4 +1,3 @@
-// clearFormFieldsHook.js
 import { useCallback } from 'react';
 
 export const useClearFormFields = (initialDailyTotals, setDailyTotals) => {
