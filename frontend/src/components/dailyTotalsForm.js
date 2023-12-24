@@ -34,6 +34,7 @@ export default function DailyTotalsFormContainer() {
 			handleDailyTotalsChange={handleDailyTotalsChange}
 			handleSubmit={handleSubmit}
 			selectedTeamMember={selectedTeamMember}
+			setSelectedTeamMember={setSelectedTeamMember}
 		/>
 	);
 }

@@ -244,7 +244,7 @@ export const getTeamMembers = async () => {
 		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers`);
 		return response.data;
 	} catch (error) {
-		console.error('Error fetching team members:', error);
+		console.error('Error geting team members:', error);
 		throw error;
 	}
 };
@@ -277,7 +277,7 @@ export const getAllDailyTotals = async () => {
 		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers/allDailyTotals`);
 		return response.data;
 	} catch (error) {
-		console.error(`Error fetching daily totals: ${error.message}`);
+		console.error(`Error getting daily totals: ${error.message}`);
 		throw error;
 	}
 };
@@ -325,7 +325,7 @@ export const getAllWeeklyTotals = async () => {
 		const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/teamMembers/allWeeklyTotals`);
 		return response.data;
 	} catch (error) {
-		console.error(`Error fetching daily totals: ${error.message}`);
+		console.error(`Error geting daily totals: ${error.message}`);
 		throw error;
 	}
 };
