@@ -20,7 +20,7 @@ function WeeklyFoodSalesCardRender({
 		return <CircularProgress />;
 	}
 
-	const weekStart = moment(selectedDate).startOf('week').format('YYYY-MM-DD');
+	// const weekStart = moment(selectedDate).startOf('week').format('YYYY-MM-DD');
 	// const totalWeeklyFoodSales = team.reduce((total, member) => {
 	// 	const weekTotal = member.weeklyTotals.find((total) => total.weekStart === weekStart);
 	// 	return total + (weekTotal ? weekTotal.foodSales : 0);

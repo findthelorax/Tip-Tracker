@@ -10,7 +10,7 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	const { team } = useContext(TeamContext);
 	const date = moment(selectedDate);
 
-	const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 	const weeklyTotals = useMemo(() => {
 		const totals = Array(7)
@@ -46,12 +46,12 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	};
 
 	const columns = [
-		{ field: 'salesTips', headerName: 'Sales / Tips', flex: 1 },
+		{ field: 'salesTips', headerName: 'Sales / Tips', width: 130 },
 		...daysOfWeek.map((day, index) => {
 			const date = moment(selectedDate).startOf('week').add(index, 'days').format('MM/DD');
-			return { field: day, headerName: `${day} ${date}`, flex: 1 };
+			return { field: day, headerName: `${day} ${date}`, width: 110 };
 		}),
-		{ field: 'total', headerName: 'Total', flex: 1 },
+		{ field: 'total', headerName: 'Total', width: 100 },
 	];
 
 	const rows = titles.map((title, i) => {

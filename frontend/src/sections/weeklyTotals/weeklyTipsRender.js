@@ -19,21 +19,21 @@ export default function WeeklyTipsRender({ date, handleDateChange, rows, columns
                 <DataGrid 
                     rows={rows} 
                     columns={columns} 
-                    pageSize={5}
                     density="compact"
-                    components={{
+                    hideFooter
+                    slots={{
                         Toolbar: GridToolbarContainer,
                     }}
-                    componentsProps={{
+                    slotProps={{
                         toolbar: {
                             children: (
                                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                    <div style={{ width: '150px' }}>
+                                    {/* <div style={{ width: '150px' }}>
                                         <DatePicker
                                             value={date}
                                             onChange={handleDateChange}
                                         />
-                                    </div>
+                                    </div> */}
                                     <div>
                                         <GridToolbarColumnsButton />
                                         <GridToolbarFilterButton />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Box, Card, CardContent, TextField } from '@mui/material';
+import { Typography, Card, CardContent } from '@mui/material';
 import {
 	DataGrid,
 	GridToolbarContainer,
@@ -23,12 +23,12 @@ export default function WeeklyTotalsTableRender({ date, handleDateChange, rows, 
 				<DataGrid
 					rows={rows}
 					columns={columns}
-					pageSize={5}
 					density="compact"
-					components={{
+					hideFooter
+					slots={{
 						Toolbar: GridToolbarContainer,
 					}}
-					componentsProps={{
+					slotProps={{
 						toolbar: {
 							children: (
 								<div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -36,7 +36,6 @@ export default function WeeklyTotalsTableRender({ date, handleDateChange, rows, 
 										<DatePicker
 											value={date}
 											onChange={handleDateChange}
-											renderInput={(params) => <TextField {...params} size="small" />}
 										/>
 									</div>
 									<div>

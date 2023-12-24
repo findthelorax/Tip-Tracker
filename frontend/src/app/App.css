@@ -49,22 +49,28 @@
   font-family: Arial, sans-serif;
   padding: 20px;
 }
-
+.MuiDataGrid-row:nth-child(even) {
+  background-color: #ccefff;
+}
 .MuiDataGrid-row:nth-child(odd) {
   background-color: #ffebcc;
 }
 .MuiDataGrid-row:hover {
   background-color: #f7c3fd !important;
 }
-.MuiDataGrid-pagination {
-  justify-content: center;
-}
-.MuiDataGrid-paginationContainer {
-  justify-content: center;
-}
 .MuiDataGrid-toolbarContainer {
   justify-content: center;
 }
 .MuiDataGrid-cell.Mui-even {
   background-color: #f9ccff;
+}
+.MuiDataGrid-cell[data-field='teamMemberName'] {
+  position: sticky;
+  left: 0;
+  z-index: 999;
+  background-color: inherit;
+}
+
+.ag-root-wrapper {
+  border: none !important;
 }
