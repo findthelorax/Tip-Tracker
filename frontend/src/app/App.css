@@ -74,3 +74,12 @@
 .ag-root-wrapper {
   border: none !important;
 }
+.ag-cell.pinned .pinned-header .ag-pinned-left-cols-container {
+  border-right: none !important;
+}
+.ag-theme-quartz .ag-pinned-left-cols-container .ag-cell {
+  --ag-borders: none;
+}
+.ag-row:nth-child(even) {
+  background-color: #0b4059 !important; /* darker gray */
+}

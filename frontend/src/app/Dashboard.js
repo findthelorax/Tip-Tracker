@@ -1,20 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
-import Box from '@mui/material/Box';
 import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
+import { Grid, Container, Badge, IconButton, Divider, Typography, Toolbar, Box, CssBaseline } from '@mui/material';
 // import Paper from '@mui/material/Paper';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import { Menu, ChevronLeft, Notifications } from '@mui/icons-material';
 import TeamMembersList from '../components/teamMembersList';
 import TeamMemberForm from '../components/teamMemberForm';
 import TeamMembersPage from './TeamMembersPage';
@@ -35,29 +25,29 @@ import SettingsPage from './Settings';
 import { useAuth } from '../contexts/AuthContext';
 import { MainListItems, SecondaryListItems } from './SideNav';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
-import { calculateWeeklySalesDifferences, calculateDailySalesDifferences } from '../hooks/salesTotalsLogic';
+// import { calculateWeeklySalesDifferences, calculateDailySalesDifferences } from '../hooks/salesTotalsLogic';
 
 import moment from 'moment';
 
 const drawerWidth = 240;
 
-const AppBar = styled(MuiAppBar, {
-	shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-	zIndex: theme.zIndex.drawer + 1,
-	transition: theme.transitions.create(['width', 'margin'], {
-		easing: theme.transitions.easing.sharp,
-		duration: theme.transitions.duration.leavingScreen,
-	}),
-	...(open && {
-		marginLeft: drawerWidth,
-		width: `calc(100% - ${drawerWidth}px)`,
-		transition: theme.transitions.create(['width', 'margin'], {
-			easing: theme.transitions.easing.sharp,
-			duration: theme.transitions.duration.enteringScreen,
-		}),
-	}),
-}));
+// const AppBar = styled(MuiAppBar, {
+// 	shouldForwardProp: (prop) => prop !== 'open',
+// })(({ theme, open }) => ({
+// 	zIndex: theme.zIndex.drawer + 1,
+// 	transition: theme.transitions.create(['width', 'margin'], {
+// 		easing: theme.transitions.easing.sharp,
+// 		duration: theme.transitions.duration.leavingScreen,
+// 	}),
+// 	...(open && {
+// 		marginLeft: drawerWidth,
+// 		width: `calc(100% - ${drawerWidth}px)`,
+// 		transition: theme.transitions.create(['width', 'margin'], {
+// 			easing: theme.transitions.easing.sharp,
+// 			duration: theme.transitions.duration.enteringScreen,
+// 		}),
+// 	}),
+// }));
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
 	'& .MuiDrawer-paper': {
@@ -186,7 +176,7 @@ function Dashboard({ refresh }) {
 	return (
 		<Box sx={{ display: 'flex' }}>
 			<CssBaseline />
-			<AppBar position="absolute" open={open}>
+			<MuiAppBar position="absolute" open={open}>
 				<Toolbar
 					sx={{
 						pr: '24px', // keep right padding when drawer closed
@@ -203,19 +193,19 @@ function Dashboard({ refresh }) {
 							}),
 						}}
 					>
-						<MenuIcon />
+						<Menu />
 					</IconButton>
 					<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
 						Dashboard
 					</Typography>
 					<IconButton color="inherit">
 						<Badge badgeContent={4} color="error">
-							<NotificationsIcon />
+							<Notifications />
 						</Badge>
 					</IconButton>
 				</Toolbar>
-			</AppBar>
-			<Drawer variant="permanent" open={open}>
+			</MuiAppBar>
+			<MuiDrawer variant="permanent" open={open}>
 				<Toolbar
 					sx={{
 						display: 'flex',
@@ -225,7 +215,7 @@ function Dashboard({ refresh }) {
 					}}
 				>
 					<IconButton onClick={toggleDrawer}>
-						<ChevronLeftIcon />
+						<ChevronLeft />
 					</IconButton>
 				</Toolbar>
 
@@ -235,7 +225,7 @@ function Dashboard({ refresh }) {
 				</Box>
 				<Divider />
 				<SecondaryListItems setSelectedMenu={setSelectedMenu} />
-			</Drawer>
+			</MuiDrawer>
 			<Box
 				component="main"
 				sx={{

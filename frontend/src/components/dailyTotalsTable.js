@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react';
-import { Button } from '@mui/material';
 import moment from 'moment';
 import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
 import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
 import { TeamContext } from '../contexts/TeamContext';
 import { useGetAllDailyTotals } from '../hooks/getAllDailyTotals';
+import { DeleteButton } from './deleteButton';
 
 const columnNames = {
 	date: 'Date',
@@ -46,43 +46,33 @@ function DailyTotalsTable() {
 	);
 
 	const columns = [
-		{ field: 'teamMemberName', headerName: 'Name', width: 150 },
-		{ field: 'teamMemberPosition', headerName: 'Position', width: 150 },
+		{ field: 'teamMemberName', headerName: 'Name', pinned: 'left', cellClass: 'pinned', headerClass: 'pinned-header' },
+		{ field: 'teamMemberPosition', headerName: 'Position', width: 120 },
 		...Object.entries(columnNames).map(([key, name]) => ({
 			field: key,
 			headerName: name,
 			width: 150,
-			valueFormatter: ({ value }) =>
+			valueGetter: ({ data }) =>
 				key !== 'date'
-					? Number(value || 0).toLocaleString('en-US', {
+					? Number(data[key] || 0).toLocaleString('en-US', {
 							style: 'currency',
 							currency: 'USD',
 					  })
-					: moment(value).format('MMM D, YYYY'),
+					: moment(data[key]).format('MMM D, YYYY'),
 		})),
 	];
 
 	columns.push({
+		headerName: 'Delete',
 		field: 'delete',
-		headerName: 'Action',
-		sortable: false,
-		width: 100,
-		renderCell: (params) => {
-			const teamMember = team.find((member) => member._id === params.row.teamMemberId);
-			const dailyTotal = params.row;
-			return (
-				<Button
-					variant="contained"
-					sx={{ bgcolor: 'error.main', color: 'white' }}
-					onClick={() => deleteDailyTotal(teamMember, dailyTotal)}
-				>
-					Delete
-				</Button>
-			);
+		cellRenderer: DeleteButton, // Directly reference the DeleteButton component
+		cellRendererParams: {
+			deleteDailyTotal: deleteDailyTotal,
 		},
+		width: 100,
 	});
 
-	return <DailyTotalsTableRender rows={rows} columns={columns} deleteDailyTotal={deleteDailyTotal} />;
+	return <DailyTotalsTableRender rows={rows} columns={columns} />;
 }
 
 export default DailyTotalsTable;
