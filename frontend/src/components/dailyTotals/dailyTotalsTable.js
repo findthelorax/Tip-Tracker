@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react';
 import moment from 'moment';
-import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import DailyTotalsTableRender from '../sections/dailyTotals/dailyTotalsTableRender';
-import { TeamContext } from '../contexts/TeamContext';
-import { useGetAllDailyTotals } from '../hooks/getAllDailyTotals';
-import { DeleteButton } from './deleteButton';
+import { DailyTotalsContext } from '../../contexts/DailyTotalsContext';
+import DailyTotalsTableRender from '../dailyTotals/dailyTotalsTableRender';
+import { TeamContext } from '../../contexts/TeamContext';
+import { useGetAllDailyTotals } from '../../hooks/getAllDailyTotals';
+import { DeleteButton } from '../deleteButton';
 
 const columnNames = {
 	date: 'Date',

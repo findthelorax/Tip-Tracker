@@ -1,78 +1,29 @@
 import React, { useState } from 'react';
-import { styled } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
-import { Grid, Container, Badge, IconButton, Divider, Typography, Toolbar, Box, CssBaseline } from '@mui/material';
+import { Grid, Container, Badge, IconButton, Divider, Typography, Toolbar, Box, CssBaseline, Drawer } from '@mui/material';
 // import Paper from '@mui/material/Paper';
 import { Menu, ChevronLeft, Notifications } from '@mui/icons-material';
-import TeamMembersList from '../components/teamMembersList';
-import TeamMemberForm from '../components/teamMemberForm';
+import TeamMembersList from '../components/teamMembers/teamMembersList';
+import TeamMemberForm from '../components/teamMembers/teamMemberForm';
 import TeamMembersPage from './TeamMembersPage';
-import DatabaseOperations from '../components/databaseOps';
-import {
-	WeeklyTotalsTable,
-	WeeklyTipsTable,
-} from '../components/weeklyTotalsTables';
-import {
-	WeeklyFoodSalesCard,
-	WeeklyBarSalesCard,
-} from '../components/weeklyTotalsCards';
-import { DailyBarSalesCard, DailyFoodSalesCard } from '../components/dailyTotalsCards';
-import DailyTotalsTable from '../components/dailyTotalsTable';
-import DailyTotalsForm from '../components/dailyTotalsForm';
+import DatabaseOperations from '../components/database/databaseOps';
+import { WeeklyTotalsTable } from '../components/weeklyTotals/weeklyTotalsTable';
+import { WeeklyTipsTable } from '../components/weeklyTotals/weeklyTipsTable';
+import { WeeklyFoodSalesCard, WeeklyBarSalesCard } from '../components/weeklyTotals/weeklyTotalsCards';
+import { DailyBarSalesCard, DailyFoodSalesCard } from '../components/dailyTotals/dailyTotalsCards';
+import DailyTotalsTable from '../components/dailyTotals/dailyTotalsTable';
+import DailyTotalsForm from '../components/dailyTotals/dailyTotalsForm';
 import { TeamContext } from '../contexts/TeamContext';
-import SettingsPage from './Settings';
+import SettingsPage from '../pages/Settings';
 import { useAuth } from '../contexts/AuthContext';
-import { MainListItems, SecondaryListItems } from './SideNav';
+import { MainListItems, SecondaryListItems, SettingsListItems } from './SideNav';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
 // import { calculateWeeklySalesDifferences, calculateDailySalesDifferences } from '../hooks/salesTotalsLogic';
-
+import AppIcon from '../assets/restaurant.png'; // for PNG
+import { Avatar, Link as MuiLink } from '@mui/material';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
-
-const drawerWidth = 240;
-
-// const AppBar = styled(MuiAppBar, {
-// 	shouldForwardProp: (prop) => prop !== 'open',
-// })(({ theme, open }) => ({
-// 	zIndex: theme.zIndex.drawer + 1,
-// 	transition: theme.transitions.create(['width', 'margin'], {
-// 		easing: theme.transitions.easing.sharp,
-// 		duration: theme.transitions.duration.leavingScreen,
-// 	}),
-// 	...(open && {
-// 		marginLeft: drawerWidth,
-// 		width: `calc(100% - ${drawerWidth}px)`,
-// 		transition: theme.transitions.create(['width', 'margin'], {
-// 			easing: theme.transitions.easing.sharp,
-// 			duration: theme.transitions.duration.enteringScreen,
-// 		}),
-// 	}),
-// }));
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
-	'& .MuiDrawer-paper': {
-		position: 'relative',
-		whiteSpace: 'nowrap',
-		width: drawerWidth,
-		transition: theme.transitions.create('width', {
-			easing: theme.transitions.easing.sharp,
-			duration: theme.transitions.duration.enteringScreen,
-		}),
-		boxSizing: 'border-box',
-		backgroundColor: '#333',
-		...(!open && {
-			overflowX: 'hidden',
-			transition: theme.transitions.create('width', {
-				easing: theme.transitions.easing.sharp,
-				duration: theme.transitions.duration.leavingScreen,
-			}),
-			width: theme.spacing(7),
-			[theme.breakpoints.up('sm')]: {
-				width: theme.spacing(9),
-			},
-		}),
-	},
-}));
+import MiniDrawer from '../pages/dashboard/drawer'; // adjust the path as necessary
 
 function Dashboard({ refresh }) {
 	const [weeklyDifferences, setWeeklySalesDifferences] = useState({});
@@ -176,10 +127,11 @@ function Dashboard({ refresh }) {
 	return (
 		<Box sx={{ display: 'flex' }}>
 			<CssBaseline />
-			<MuiAppBar position="absolute" open={open}>
+			<MuiAppBar position="absolute" open={open} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
 				<Toolbar
 					sx={{
 						pr: '24px', // keep right padding when drawer closed
+						minHeight: '48px', // reduce height
 					}}
 				>
 					<IconButton
@@ -196,17 +148,33 @@ function Dashboard({ refresh }) {
 						<Menu />
 					</IconButton>
 					<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-						Dashboard
+						{/* Welcome, {currentUser.displayName} */} Welcome
 					</Typography>
 					<IconButton color="inherit">
 						<Badge badgeContent={4} color="error">
 							<Notifications />
 						</Badge>
 					</IconButton>
+					<MuiLink component={Link} to="/profile" sx={{ marginLeft: 'auto' }}>
+						<Avatar alt="User Avatar" src="/static/images/avatar/1.jpg" />
+					</MuiLink>
 				</Toolbar>
 			</MuiAppBar>
-			<MuiDrawer variant="permanent" open={open}>
-				<Toolbar
+			<div>
+            <MiniDrawer />
+        </div>
+			{/* <Drawer variant="permanent" open={open}>
+				<Box
+					sx={{
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						padding: '30px',
+					}}
+				>
+					<img src={AppIcon} alt="App Icon" style={{ width: '50px', height: '50px' }} />{' '}
+				</Box> */}
+				{/* <Toolbar
 					sx={{
 						display: 'flex',
 						alignItems: 'center',
@@ -217,22 +185,26 @@ function Dashboard({ refresh }) {
 					<IconButton onClick={toggleDrawer}>
 						<ChevronLeft />
 					</IconButton>
-				</Toolbar>
+				</Toolbar> */}
 
-				<Divider />
+				{/* <Divider />
 				<Box>
 					<MainListItems setSelectedMenu={setSelectedMenu} />
 				</Box>
 				<Divider />
 				<SecondaryListItems setSelectedMenu={setSelectedMenu} />
-			</MuiDrawer>
+				<Divider />
+				<Box>
+					<SettingsListItems setSelectedMenu={setSelectedMenu} />
+				</Box>
+			</Drawer> */}
 			<Box
 				component="main"
 				sx={{
 					flexGrow: 1,
 					height: '100vh',
 					overflow: 'auto',
-					background: '#00008B',
+					background: '#f5f5f5',
 				}}
 			>
 				<Toolbar />

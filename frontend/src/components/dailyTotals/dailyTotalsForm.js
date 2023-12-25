@@ -1,12 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
 import moment from 'moment';
-import { DailyTotalsFormRender } from '../sections/dailyTotals/dailyTotalsFormRender';
-import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { TeamContext } from '../contexts/TeamContext';
-import { updateWeeklyTotals } from '../utils/api';
-import { initialDailyTotals } from '../hooks/initiateDailyTotals';
-import { useHandleDailyTotalsChange } from '../hooks/handleDailyTotalsChange';
-import { useHandleSubmit } from '../hooks/handleSubmitDailyTotals';
+import { DailyTotalsFormRender } from '../dailyTotals/dailyTotalsFormRender';
+import { DailyTotalsContext } from '../../contexts/DailyTotalsContext';
+import { TeamContext } from '../../contexts/TeamContext';
+import { updateWeeklyTotals } from '../../utils/api';
+import { initialDailyTotals } from '../../hooks/initiateDailyTotals';
+import { useHandleDailyTotalsChange } from '../../hooks/handleDailyTotalsChange';
+import { useHandleSubmit } from '../../hooks/handleSubmitDailyTotals';
 
 export default function DailyTotalsFormContainer() {
 	const { team } = useContext(TeamContext);

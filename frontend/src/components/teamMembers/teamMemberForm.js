@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { TeamContext } from '../contexts/TeamContext';
-import { addTeamMemberToTeam } from '../hooks/teamMembersLogic';
-import TeamMemberFormRender from '../sections/teamMembers/teamMembersFormRender';
+import { TeamContext } from '../../contexts/TeamContext';
+import { addTeamMemberToTeam } from '../../hooks/teamMembersLogic';
+import TeamMemberFormRender from './teamMembersFormRender';
 
 function TeamMemberForm() {
     const { setTeam } = useContext(TeamContext);

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import moment from 'moment';
-import { TeamContext } from '../contexts/TeamContext';
-import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from '../sections/weeklyTotals/weeklyTotalsCardsRender';
-import { calculateWeeklySalesDifferences } from '../hooks/salesTotalsLogic';
+import { TeamContext } from '../../contexts/TeamContext';
+import { WeeklyBarSalesCardRender, WeeklyFoodSalesCardRender } from './weeklyTotalsCardsRender';
+import { calculateWeeklySalesDifferences } from '../../hooks/salesTotalsLogic';
 
 export function WeeklyFoodSalesCard({ selectedDate }) {
 	const { team } = useContext(TeamContext);

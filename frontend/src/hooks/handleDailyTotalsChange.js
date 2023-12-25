@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useContext } from 'react';
+import { TeamContext } from '../contexts/TeamContext'; // import TeamContext
 
-export const useHandleDailyTotalsChange = (team, setDailyTotals, setSelectedTeamMember) => {
+export const useHandleDailyTotalsChange = (setDailyTotals, setSelectedTeamMember) => {
+    const { team } = useContext(TeamContext); // use setTeam from TeamContext
     const handleDailyTotalsChange = (field, value) => {
         if (field === 'teamMemberId') {
             const teamMember = team.find((member) => member._id === value);

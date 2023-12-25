@@ -10,7 +10,7 @@ import Profile from './Profile';
 import { fetchProfile } from '../utils/api';
 // import logo from '../../logo.svg';
 import AdminRegister from './Admin';
-import Main from './Main';
+import Main from '../pages/Main';
 import { AuthProvider } from '../contexts/AuthContext'; // Adjust the path as necessary
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';

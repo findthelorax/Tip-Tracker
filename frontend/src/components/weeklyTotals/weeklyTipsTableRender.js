@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Card, CardContent, CardHeader } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector, GridToolbarExport } from '@mui/x-data-grid';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 export default function WeeklyTipsRender({ date, handleDateChange, rows, columns }) {
     return (

@@ -1,9 +1,9 @@
 import React, { useEffect, useContext, useMemo } from 'react';
-import { TeamContext } from '../contexts/TeamContext';
-import { getTeamMembers } from '../utils/api';
-import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { deleteTeamMemberFromTeam } from '../hooks/teamMembersLogic';
-import TeamMembersRender from '../sections/teamMembers/teamMembersListRender';
+import { TeamContext } from '../../contexts/TeamContext';
+import { getTeamMembers } from '../../utils/api';
+import { DailyTotalsContext } from '../../contexts/DailyTotalsContext';
+import { deleteTeamMemberFromTeam } from '../../hooks/teamMembersLogic';
+import TeamMembersRender from './teamMembersListRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 

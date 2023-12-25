@@ -5,20 +5,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-// function CustomToolbar() {
-//     return (
-//         <GridToolbarContainer>
-//             <GridToolbarExport />
-//         </GridToolbarContainer>
-//     );
-// }
+function CustomToolbar() {
+    return (
+        <GridToolbarContainer>
+            <GridToolbarExport />
+        </GridToolbarContainer>
+    );
+}
 
 function TeamMembersRender({ teamByPosition, deleteMember }) {
 	const columns = [
 		{ field: 'teamMemberName', headerName: 'Name', width: 130 },
 		{ field: 'position', headerName: 'Position', width: 130 },
-		// { field: 'phoneNumber', headerName: 'Phone Number', width: 130 },
-		// { field: 'email', headerName: 'Email', width: 130 },
+		{ field: 'phoneNumber', headerName: 'Phone Number', width: 130 },
+		{ field: 'email', headerName: 'Email', width: 130 },
 		{
 			field: 'delete',
 			headerName: 'Delete',
@@ -53,9 +53,9 @@ function TeamMembersRender({ teamByPosition, deleteMember }) {
 				pageSize={5}
 				rowsPerPageOptions={[10]}
 				getRowId={(row) => row._id}
-				// components={{
-				//     Toolbar: CustomToolbar,
-				// }}
+				slots={{
+				    Toolbar: CustomToolbar,
+				}}
 			/>
 		</div>
 	);
