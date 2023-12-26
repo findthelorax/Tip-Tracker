@@ -2,10 +2,8 @@ import React from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { Typography } from '@mui/material';
-import { DeleteButton } from '../../components/deleteButton';
 
-function DailyTotalsTableRender({ rows, columns, frameworkComponents }) {
+function MonthlyTotalsTableRender({ rows, columns }) {
 	const defaultColDef = {
 		sortable: true,
 		filter: true,
@@ -17,10 +15,9 @@ function DailyTotalsTableRender({ rows, columns, frameworkComponents }) {
 					rowData={rows}
 					columnDefs={columns}
 					defaultColDef={defaultColDef}
-					frameworkComponents={{ ...frameworkComponents, deleteButton: DeleteButton }}
 				/>
 			</div>
 	);
 }
 
-export default DailyTotalsTableRender;
+export default MonthlyTotalsTableRender;

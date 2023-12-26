@@ -2,7 +2,7 @@ import { Button, TextField, InputAdornment, Snackbar, SnackbarContent, IconButto
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/system';
-import { signup } from '../utils/api';
+import { signup } from '../../utils/api';
 import { signupStyles } from './SignupStyles';
 
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';

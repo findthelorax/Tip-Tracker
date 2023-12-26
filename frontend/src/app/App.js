@@ -4,12 +4,13 @@ import { TeamProvider } from '../contexts/TeamContext';
 import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
 import { ErrorProvider } from '../contexts/ErrorContext';
 import Dashboard from './Dashboard';
-import Login from './Login';
-import Signup from './Signup';
-import Profile from './Profile';
+import Login from '../pages/login/Login';
+import Signup from '../pages/signup/Signup';
+import Profile from '../pages/profile/Profile';
+import MainLayout from '../pages/dashboard/mainLayout';
 import { fetchProfile } from '../utils/api';
 // import logo from '../../logo.svg';
-import AdminRegister from './Admin';
+import AdminRegister from '../pages/admin/Admin';
 import Main from '../pages/Main';
 import { AuthProvider } from '../contexts/AuthContext'; // Adjust the path as necessary
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -20,7 +21,6 @@ import { createTheme } from '../theme/index';
 const initialState = {
 	team: [],
 	error: null,
-	refresh: false,
 };
 
 function reducer(state, action) {
@@ -88,7 +88,7 @@ function App() {
 												path="/"
 												element={
 													loggedIn ? (
-														<Dashboard refresh={state.refresh} error={state.error} />
+														<MainLayout error={state.error} />
 													) : (
 														<Signup />
 													)
@@ -96,7 +96,7 @@ function App() {
 											/>
 											<Route
 												path="/dashboard"
-												element={<Dashboard refresh={state.refresh} error={state.error} />}
+												element={<MainLayout error={state.error} />}
 											/>
 											<Route path="/login" element={<Login />} />
 											<Route path="/signup" element={<Signup />} />

@@ -20,20 +20,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-header {
-  background: linear-gradient(to right, #fffc47, #9400f7);
-  color: #fff;
-  padding: 20px;
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-footer {
-  background: linear-gradient(to right, #d447ff, #00eff7);
-  color: #fff;
-  text-align: center;
-  padding: 20px;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-}

@@ -1,11 +1,11 @@
 import React, { useEffect, useContext, useState, useMemo } from 'react';
-import { TeamContext } from '../contexts/TeamContext';
+import { TeamContext } from '../../contexts/TeamContext';
 // import { DailyTotalsContext } from '../contexts/DailyTotalsContext';
-import { getTeamMembers } from '../utils/api';
+import { getTeamMembers } from '../../utils/api';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../hooks/teamMembersLogic';
-import TeamMembersPageRender from '../components/teamMembers/teamMembersPageRender';
+import { addTeamMemberToTeam, deleteTeamMemberFromTeam } from '../../hooks/teamMembersLogic';
+import TeamMembersPageRender from '../../components/teamMembers/teamMembersPageRender';
 
 const POSITIONS = ['bartender', 'host', 'server', 'runner'];
 

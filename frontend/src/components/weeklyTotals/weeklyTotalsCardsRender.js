@@ -8,13 +8,8 @@ import { GiHamburger } from 'react-icons/gi';
 import { success, error } from '../../theme/colors';
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography, CircularProgress } from '@mui/material';
 
-function WeeklyFoodSalesCardRender({
-	selectedDate,
-	salesDifferences,
-	sx,
-	totalWeeklyFoodSales,
-}) {
-	console.log("🚀 ~ file: weeklyTotalsCardsRender.js:92 ~ salesDifferences:", salesDifferences)
+function WeeklyFoodSalesCardRender({ selectedDate, salesDifferences, sx, totalWeeklyFoodSales }) {
+	console.log('🚀 ~ file: weeklyTotalsCardsRender.js:92 ~ salesDifferences:', salesDifferences);
 	const { team } = useContext(TeamContext);
 	if (!team) {
 		return <CircularProgress />;
@@ -40,14 +35,15 @@ function WeeklyFoodSalesCardRender({
 	const endDate = moment(selectedDate).endOf('week').format('MM/DD');
 
 	return (
-		<Card sx={{ ...sx, backgroundColor: 'background.paper' }}>
+		<Card sx={{ ...sx, width: '300px', backgroundColor: 'background.paper' }}>
+			{' '}
 			<CardContent>
 				<Stack alignItems="flex-start" direction="row" justifyContent="space-between" spacing={3}>
 					<Stack spacing={1}>
-						<Typography color="text.secondary" variant="overline">
-							Total Food Sales {startDate} - {endDate}
+						<Typography color="text.secondary" variant="overline" noWrap>
+							Food Sales {startDate} - {endDate}
 						</Typography>
-						<Typography variant="h4">{formattedTotalWeeklyFoodSales}</Typography>
+						<Typography variant="h5">{formattedTotalWeeklyFoodSales}</Typography>
 					</Stack>
 					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">
@@ -92,15 +88,19 @@ function WeeklyBarSalesCardRender({
 	totalWeeklyBarSales,
 }) {
 	const { team } = useContext(TeamContext);
-	// console.log("🚀 ~ file: weeklyTotalsCardsRender.js:16 ~ salesDifferences:", salesDifferences)
+	console.log("🚀 ~ file: weeklyTotalsCardsRender.js:16 ~ salesDifferences:", salesDifferences)
 	if (!team) {
 		return <CircularProgress />;
 	}
-	// const weekStart = moment(selectedDate).startOf('week').format('YYYY-MM-DD');
-	// const totalWeeklyBarSales = team.reduce((total, member) => {
-	// 	const weekTotal = member.weeklyTotals.find((total) => total.weekStart === weekStart);
-	// 	return total + (weekTotal ? weekTotal.barSales : 0);
-	// }, 0);
+	const weekStart = moment(selectedDate).startOf('week').format('YYYY-MM-DD');
+	const totalWeekBarSales = team.reduce((total, member) => {
+		const weekTotal = member.weeklyTotals.find((total) => total.weekStart === weekStart);
+		return total + (weekTotal ? weekTotal.barSales : 0);
+	}, 0);
+	console.log(
+		'🚀 ~ file: weeklyTotalsCardsRender.js:104 ~ totalWeekBarSales ~ totalWeekBarSales:',
+		totalWeekBarSales
+	);
 
 	const formattedTotalWeeklyBarSales = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
 		totalWeeklyBarSales
@@ -116,14 +116,15 @@ function WeeklyBarSalesCardRender({
 	);
 
 	return (
-		<Card sx={{ ...sx, backgroundColor: 'background.paper' }}>
+		<Card sx={{ ...sx, width: '300px', backgroundColor: 'background.paper' }}>
+			{' '}
 			<CardContent>
 				<Stack alignItems="flex-start" direction="row" justifyContent="space-between" spacing={3}>
 					<Stack spacing={1}>
-						<Typography color="text.secondary" variant="overline">
-							Total Bar Sales {startDate} - {endDate}
+						<Typography color="text.secondary" variant="overline" noWrap sx={{ mt: 0 }}>
+							Bar Sales {startDate} - {endDate}
 						</Typography>
-						<Typography variant="h4">{formattedTotalWeeklyBarSales}</Typography>
+						<Typography variant="h5">{formattedTotalWeeklyBarSales}</Typography>
 					</Stack>
 					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">

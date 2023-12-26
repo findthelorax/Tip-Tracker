@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext'; // Adjust the path as necessary
 import Dashboard from '../app/Dashboard';
-import Login from '../app/Login';
+import Login from './login/Login';
 
 function Main() {
     const { currentUser } = useAuth(); // Get the current user from the AuthContext

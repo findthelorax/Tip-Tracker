@@ -1,7 +1,7 @@
 import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../utils/api';
+import { login } from '../../utils/api';
 
 function Login() {
 	const [username, setUsername] = useState('');

@@ -73,6 +73,4 @@ function WeeklyTotalsTable({ selectedDate, setSelectedDate }) {
 	);
 }
 
-
-
 export { WeeklyTotalsTable };

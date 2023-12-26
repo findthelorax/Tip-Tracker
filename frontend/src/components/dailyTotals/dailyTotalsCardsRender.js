@@ -30,14 +30,14 @@ export function DailyFoodSalesCardRender({
 	const formattedDate = moment(selectedDate).format('MM/DD');
 
 	return (
-		<Card sx={{ ...sx, backgroundColor: 'background.paper' }}>
+		<Card sx={{ ...sx, width: '300px', backgroundColor: 'background.paper' }}>
 			<CardContent>
 				<Stack alignItems="flex-start" direction="row" justifyContent="space-between" spacing={3}>
 					<Stack spacing={1}>
-						<Typography color="text.secondary" variant="overline">
-							Total Food Sales {formattedDate}
+						<Typography color="text.secondary" variant="overline" noWrap>
+							Food Sales {formattedDate}
 						</Typography>
-						<Typography variant="h4">{formattedTotalFoodSales}</Typography>
+						<Typography variant="h5">{formattedTotalFoodSales}</Typography>
 					</Stack>
 					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">
@@ -99,14 +99,14 @@ export function DailyBarSalesCardRender({
 	const formattedDate = moment(selectedDate).format('MM/DD');
 
 	return (
-		<Card sx={{ ...sx, backgroundColor: 'background.paper' }}>
+		<Card sx={{ ...sx, width: '300px', backgroundColor: 'background.paper' }}>
 			<CardContent>
 				<Stack alignItems="flex-start" direction="row" justifyContent="space-between" spacing={3}>
 					<Stack spacing={1}>
-						<Typography color="text.secondary" variant="overline">
-							Total Bar Sales {formattedDate}
+						<Typography color="text.secondary" variant="overline" noWrap>
+							Bar Sales {formattedDate}
 						</Typography>
-						<Typography variant="h4">{formattedTotalBarSales}</Typography>
+						<Typography variant="h5">{formattedTotalBarSales}</Typography>
 					</Stack>
 					<Avatar sx={{ ...sx, height: 56, width: 56 }}>
 						<SvgIcon fontSize="medium">

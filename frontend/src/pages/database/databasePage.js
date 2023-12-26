@@ -3,10 +3,10 @@ import { ErrorContext } from '../../contexts/ErrorContext';
 import { TeamContext } from '../../contexts/TeamContext';
 import { DailyTotalsContext } from '../../contexts/DailyTotalsContext';
 import { getDatabases, deleteDatabase } from '../../utils/api';
-import DatabaseOperationsRender from './databaseRender';
+import DatabaseOperationsRender from '../../components/database/databaseRender';
 
 
-function DatabaseOperations() {
+function DatabasePage() {
 	const [databases, setDatabases] = useState([]);
 	const { error, setError } = useContext(ErrorContext);
 	const { setRefreshTeamMembers } = useContext(TeamContext);
@@ -60,4 +60,4 @@ function DatabaseOperations() {
 	);
 }
 
-export default DatabaseOperations;
+export default DatabasePage;

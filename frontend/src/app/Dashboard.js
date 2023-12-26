@@ -5,8 +5,8 @@ import { Grid, Container, Badge, IconButton, Divider, Typography, Toolbar, Box, 
 import { Menu, ChevronLeft, Notifications } from '@mui/icons-material';
 import TeamMembersList from '../components/teamMembers/teamMembersList';
 import TeamMemberForm from '../components/teamMembers/teamMemberForm';
-import TeamMembersPage from './TeamMembersPage';
-import DatabaseOperations from '../components/database/databaseOps';
+import TeamMembersPage from '../pages/teamMembers/TeamMembersPage';
+import DatabasePage from '../pages/database/databasePage';
 import { WeeklyTotalsTable } from '../components/weeklyTotals/weeklyTotalsTable';
 import { WeeklyTipsTable } from '../components/weeklyTotals/weeklyTipsTable';
 import { WeeklyFoodSalesCard, WeeklyBarSalesCard } from '../components/weeklyTotals/weeklyTotalsCards';
@@ -16,14 +16,14 @@ import DailyTotalsForm from '../components/dailyTotals/dailyTotalsForm';
 import { TeamContext } from '../contexts/TeamContext';
 import SettingsPage from '../pages/Settings';
 import { useAuth } from '../contexts/AuthContext';
-import { MainListItems, SecondaryListItems, SettingsListItems } from './SideNav';
+import { MainListItems, SecondaryListItems, SettingsListItems } from '../pages/dashboard/drawer/navItemsList';
 // import { SalesCardStyling } from '../stylings/salesCardStyling';
 // import { calculateWeeklySalesDifferences, calculateDailySalesDifferences } from '../hooks/salesTotalsLogic';
 import AppIcon from '../assets/restaurant.png'; // for PNG
 import { Avatar, Link as MuiLink } from '@mui/material';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
-import MiniDrawer from '../pages/dashboard/drawer'; // adjust the path as necessary
+import MiniDrawer from '../pages/dashboard/drawer/drawer'; // adjust the path as necessary
 
 function Dashboard({ refresh }) {
 	const [weeklyDifferences, setWeeklySalesDifferences] = useState({});
@@ -126,12 +126,11 @@ function Dashboard({ refresh }) {
 
 	return (
 		<Box sx={{ display: 'flex' }}>
-			<CssBaseline />
-			<MuiAppBar position="absolute" open={open} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
+			{/* <MuiAppBar position="absolute" open={open} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
 				<Toolbar
 					sx={{
-						pr: '24px', // keep right padding when drawer closed
-						minHeight: '48px', // reduce height
+						pr: '24px',
+						minHeight: '48px',
 					}}
 				>
 					<IconButton
@@ -148,7 +147,7 @@ function Dashboard({ refresh }) {
 						<Menu />
 					</IconButton>
 					<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-						{/* Welcome, {currentUser.displayName} */} Welcome
+						Welcome
 					</Typography>
 					<IconButton color="inherit">
 						<Badge badgeContent={4} color="error">
@@ -159,7 +158,7 @@ function Dashboard({ refresh }) {
 						<Avatar alt="User Avatar" src="/static/images/avatar/1.jpg" />
 					</MuiLink>
 				</Toolbar>
-			</MuiAppBar>
+			</MuiAppBar> */}
 			<div>
             <MiniDrawer />
         </div>

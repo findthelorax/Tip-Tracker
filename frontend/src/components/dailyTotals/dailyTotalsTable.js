@@ -46,7 +46,7 @@ function DailyTotalsTable() {
 	);
 
 	const columns = [
-		{ field: 'teamMemberName', headerName: 'Name', pinned: 'left', cellClass: 'pinned', headerClass: 'pinned-header' },
+		{ field: 'teamMemberName', headerName: 'Name', pinned: 'left',},
 		{ field: 'teamMemberPosition', headerName: 'Position', width: 120 },
 		...Object.entries(columnNames).map(([key, name]) => ({
 			field: key,

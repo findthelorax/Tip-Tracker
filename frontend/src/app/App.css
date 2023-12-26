@@ -63,22 +63,18 @@
 .MuiDataGrid-cell.Mui-even {
   background-color: #f9ccff;
 }
-.MuiDataGrid-cell[data-field='teamMemberName'] {
-  position: sticky;
-  left: 0;
-  z-index: 999;
-  background-color: inherit;
-}
-
 .ag-root-wrapper {
   border: none !important;
 }
-.ag-cell.pinned .pinned-header .ag-pinned-left-cols-container {
+.ag-pinned-left-cols-container .ag-cell {
   border-right: none !important;
 }
-.ag-theme-quartz .ag-pinned-left-cols-container .ag-cell {
-  --ag-borders: none;
+.ag-pinned-left-header {
+  border-right: none !important;
 }
 .ag-row:nth-child(even) {
   background-color: #0b4059 !important; /* darker gray */
+}
+.pinned-header {
+  border-right: none !important;
 }
