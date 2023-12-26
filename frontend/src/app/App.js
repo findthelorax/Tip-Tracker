@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { TeamProvider } from '../contexts/TeamContext';
 import { DailyTotalsProvider } from '../contexts/DailyTotalsContext';
 import { ErrorProvider } from '../contexts/ErrorContext';
-import Dashboard from './Dashboard';
+// import Dashboard from './Dashboard';
 import Login from '../pages/login/Login';
 import Signup from '../pages/signup/Signup';
 import Profile from '../pages/profile/Profile';

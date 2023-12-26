@@ -3,16 +3,18 @@ import { Box, Toolbar } from '@mui/material';
 import MiniDrawer from './drawer/drawer';
 import CustAppBar from './appBar';
 import CustomAppBar from './appBar/customAppBar';
+import PrimarySearchAppBar from './appBar/searchAppBar';
 import Dashboard from './dashboard';
 import TeamMembersPage from '../teamMembers/TeamMembersPage';
 import SettingsPage from '../Settings';
 import DatabasePage from '../database/databasePage';
 import moment from 'moment';
-import { useAuth } from '../../contexts/AuthContext';
+import { Outlet } from 'react-router-dom';
+// import { useAuth } from '../../contexts/AuthContext';
 
 function MainLayout() {
 	const [selectedDate, setSelectedDate] = useState(moment());
-	const { currentUser } = useAuth();
+	// const { currentUser } = useAuth();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 	const handleDrawerToggle = () => {
@@ -36,19 +38,24 @@ function MainLayout() {
 		}
 	};
 
+	const drawerWidth = 240;
+
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-			<Box sx={{ display: 'flex', flexGrow: 1 }}>
-				<MiniDrawer
-					open={isDrawerOpen}
-					handleDrawerClose={handleDrawerToggle}
-					setSelectedMenu={setSelectedMenu}
-				/>
-				<Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-					<CustAppBar open={isDrawerOpen} handleDrawerToggle={handleDrawerToggle} />
-					<Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-						{renderSelectedComponent()}
-					</Box>
+		<Box sx={{ display: 'flex', width: '100%' }}>
+			<MiniDrawer open={isDrawerOpen} handleDrawerClose={handleDrawerToggle} setSelectedMenu={setSelectedMenu} />
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: 'column',
+					width: `calc(100% - ${isDrawerOpen ? drawerWidth : 0}px)`,
+					flexGrow: 1,
+				}}
+			>
+				<CustomAppBar open={isDrawerOpen} handleDrawerToggle={handleDrawerToggle} />
+				<Box component="main" sx={{ p: { xs: 2, sm: 3 } }}>
+					<Toolbar />
+					{renderSelectedComponent()}
+					<Outlet />
 				</Box>
 			</Box>
 		</Box>

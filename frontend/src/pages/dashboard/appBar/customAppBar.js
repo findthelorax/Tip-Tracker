@@ -29,13 +29,12 @@ const AppBar = styled(MuiAppBar, {
 }));
 // position fixed
 export default function CustomAppBar({ open, handleDrawerToggle }) {
+	const toggleDrawer = () => {
+		handleDrawerToggle(!open);
+	  };
 	return (
 		<AppBar position="absolute" open={open} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
 			<Toolbar
-				sx={{
-					pr: '24px',
-					minHeight: '48px',
-				}}
 			>
 				<IconButton
 					edge="start"

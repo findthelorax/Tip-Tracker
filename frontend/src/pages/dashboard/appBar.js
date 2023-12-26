@@ -1,12 +1,13 @@
-// AppBar.js
 import React from 'react';
 import { AppBar, Toolbar, IconButton, InputBase, Badge, Avatar, Divider } from '@mui/material';
 import { Search as SearchIcon, Notifications as NotificationsIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
+const drawerWidth = 200;
+
 function CustAppBar() {
 	return (
-		<AppBar position="static">
+		<AppBar position="sticky" style={{ zIndex: 1251, marginLeft: drawerWidth, width: `calc(100% - ${drawerWidth}px)` }}>
 			<Toolbar>
 				<IconButton edge="start" color="inherit">
 					<SearchIcon />
